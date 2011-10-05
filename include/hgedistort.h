@@ -8,9 +8,11 @@
 
 namespace hge {
 
-#define HGEDISP_NODE		0
-#define HGEDISP_TOPLEFT		1
-#define HGEDISP_CENTER		2
+enum {
+	HGEDISP_NODE	= 0,
+	HGEDISP_TOPLEFT	= 1,
+	HGEDISP_CENTER	= 2
+};
 
 /*
 ** HGE Distortion mesh class
@@ -29,14 +31,14 @@ public:
 
 	void		SetTexture(HTEXTURE tex);
 	void		SetTextureRect(float x, float y, float w, float h);
-	void		SetBlendMode(int blend);
+	void		SetBlendMode(blend_mode_t blend);
 	void		SetZ(int col, int row, float z);
 	void		SetColor(int col, int row, uint32_t color);
 	void		SetDisplacement(int col, int row, float dx, float dy, int ref);
 
-	HTEXTURE	GetTexture() const {return quad.tex;}
+	HTEXTURE	GetTexture() const {return m_quad.tex;}
 	void		GetTextureRect(float *x, float *y, float *w, float *h) const;
-	int			GetBlendMode() const;
+	blend_mode_t GetBlendMode() const;
 	float		GetZ(int col, int row) const;
 	uint32_t	GetColor(int col, int row) const;
 	void		GetDisplacement(int col, int row, float *dx, float *dy, int ref) const;
@@ -50,11 +52,16 @@ private:
 	//static HGE	*g_hgedistort_hge;
 	static HGE * get_hge();
 
-	hgeVertex	*disp_array;
-	int			nRows, nCols;
-	float		cellw,cellh;
-	float		tx,ty,width,height;
-	hgeQuad		quad;
+	hgeVertex	* m_disp_array;
+	int			m_row_count;
+	int			m_col_count;
+	float		m_cell_width;
+	float		m_cell_height;
+	float		m_tex_x;
+	float		m_tex_y;
+	float		m_width;
+	float		m_height;
+	hgeQuad		m_quad;
 };
 
 

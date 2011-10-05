@@ -17,8 +17,7 @@ class HGE_EXPORT hgeSprite
 public:
 	hgeSprite(HTEXTURE tex, float x, float y, float w, float h);
 	hgeSprite(const hgeSprite &spr);
-	~hgeSprite() { get_hge()->Release(); }
-	
+	~hgeSprite();
 	
 	void		Render(float x, float y);
 	void		RenderEx(float x, float y, float rot, float hscale=1.0f, float vscale=0.0f);
@@ -29,32 +28,39 @@ public:
 	void		SetTextureRect(float x, float y, float w, float h, bool adjSize = true);
 	void		SetColor(uint32_t col, int i=-1);
 	void		SetZ(float z, int i=-1);
-	void		SetBlendMode(int blend) { quad.blend=blend; }
-	void		SetHotSpot(float x, float y) { hotX=x; hotY=y; }
+	void		SetBlendMode(blend_mode_t blend);
+	void		SetHotSpot(float x, float y);
 	void		SetFlip(bool bX, bool bY, bool bHotSpot = false);
 
-	HTEXTURE	GetTexture() const { return quad.tex; }
-	void		GetTextureRect(float *x, float *y, float *w, float *h) const { *x=tx; *y=ty; *w=width; *h=height; }
-	uint32_t		GetColor(int i=0) const { return quad.v[i].col; }
-	float		GetZ(int i=0) const { return quad.v[i].z; }
-	int			GetBlendMode() const { return quad.blend; }
-	void		GetHotSpot(float *x, float *y) const { *x=hotX; *y=hotY; }
-	void		GetFlip(bool *bX, bool *bY) const { *bX=bXFlip; *bY=bYFlip; }
+	HTEXTURE	GetTexture() const;
+	void		GetTextureRect(float *x, float *y, float *w, float *h) const;
+	uint32_t	GetColor(int i=0) const;
+	float		GetZ(int i=0) const;
+	blend_mode_t GetBlendMode() const;
+	void		GetHotSpot(float *x, float *y) const;
+	void		GetFlip(bool *bX, bool *bY) const;
 
-	float		GetWidth() const { return width; }
-	float		GetHeight() const { return height; }
-	hgeRect*	GetBoundingBox(float x, float y, hgeRect *rect) const { rect->Set(x-hotX, y-hotY, x-hotX+width, y-hotY+height); return rect; }
+	float		GetWidth() const;
+	float		GetHeight() const;
+	hgeRect*	GetBoundingBox(float x, float y, hgeRect *rect) const;
 	hgeRect*	GetBoundingBoxEx(float x, float y, float rot, float hscale, float vscale,  hgeRect *rect) const;
 
 protected:
 	hgeSprite();
 	static HGE * get_hge();
 
-	hgeQuad		quad;
-	float		tx, ty, width, height;
-	float		tex_width, tex_height;
-	float		hotX, hotY;
-	bool		bXFlip, bYFlip, bHSFlip;
+	hgeQuad		m_quad;
+	float		m_tex_x;
+	float		m_tex_y;
+	float		m_width;
+	float		m_height;
+	float		m_tex_width;
+	float		m_tex_height;
+	float		hotX;
+	float		hotY;
+	bool		bXFlip;
+	bool		bYFlip;
+	bool		bHSFlip;
 };
 
 } // namespace hge

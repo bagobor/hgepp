@@ -42,7 +42,7 @@ hgeFont::hgeFont(const char *szFont, bool bMipmap)
 	hTexture=0;
 
 	fZ=0.5f;
-	nBlend=BLEND_COLORMUL | BLEND_ALPHABLEND | BLEND_NOZWRITE;
+	nBlend = (blend_mode_t)(BLEND_COLORMUL | BLEND_ALPHABLEND | BLEND_NOZWRITE);
 	dwCol=0xFFFFFFFF;
 
 	ZeroMemory( &letters, sizeof(letters) );
@@ -304,7 +304,7 @@ void hgeFont::SetZ(float z)
 			letters[i]->SetZ(z);
 }
 
-void hgeFont::SetBlendMode(int blend)
+void hgeFont::SetBlendMode(blend_mode_t blend)
 {
 	nBlend = blend;
 
@@ -334,6 +334,91 @@ char *hgeFont::_get_line(char *file, char *line)
 HGE * hgeFont::get_hge()
 {
 	return g_hgefont_hge;
+}
+
+void hgeFont::SetScale( float scale )
+{
+	fScale=scale;
+}
+
+void hgeFont::SetProportion( float prop )
+{
+	fProportion=prop;
+}
+
+void hgeFont::SetRotation( float rot )
+{
+	fRot=rot;
+}
+
+void hgeFont::SetTracking( float tracking )
+{
+	fTracking=tracking;
+}
+
+void hgeFont::SetSpacing( float spacing )
+{
+	fSpacing=spacing;
+}
+
+uint32_t hgeFont::GetColor() const
+{
+	return dwCol;
+}
+
+float hgeFont::GetZ() const
+{
+	return fZ;
+}
+
+blend_mode_t hgeFont::GetBlendMode() const
+{
+	return nBlend;
+}
+
+float hgeFont::GetScale() const
+{
+	return fScale;
+}
+
+float hgeFont::GetProportion() const
+{
+	return fProportion;
+}
+
+float hgeFont::GetRotation() const
+{
+	return fRot;
+}
+
+float hgeFont::GetTracking() const
+{
+	return fTracking;
+}
+
+float hgeFont::GetSpacing() const
+{
+	return fSpacing;
+}
+
+hgeSprite* hgeFont::GetSprite( char chr ) const
+{
+	return letters[(unsigned char)chr];
+}
+
+float hgeFont::GetPreWidth( char chr ) const
+{
+	return pre[(unsigned char)chr];
+}
+
+float hgeFont::GetPostWidth( char chr ) const
+{
+	return post[(unsigned char)chr];
+}
+
+float hgeFont::GetHeight() const
+{
+	return fHeight;
 }
 
 } // namespace hge

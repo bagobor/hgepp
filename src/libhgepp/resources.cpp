@@ -99,7 +99,7 @@ void ScriptParseFileResource(hgeResourceManager *rm, RScriptParser *sp, const ch
 	AddRes(rm, restype, rc);
 }
 
-void ScriptParseBlendMode(RScriptParser *sp, int *blend)
+void ScriptParseBlendMode(RScriptParser *sp, blend_mode_t *blend)
 {
 	for(;;)
 	{
@@ -109,27 +109,27 @@ void ScriptParseBlendMode(RScriptParser *sp, int *blend)
 		switch(sp->get_token())
 		{
 			case TTCON_COLORMUL:
-				*blend &= ~BLEND_COLORADD;
+				*blend = (blend_mode_t)(*blend & ~BLEND_COLORADD);
 				break;
 
 			case TTCON_COLORADD:
-				*blend |= BLEND_COLORADD;
+				*blend = (blend_mode_t)(*blend | BLEND_COLORADD);
 				break;
 
 			case TTCON_ALPHABLND:
-				*blend |= BLEND_ALPHABLEND;
+				*blend = (blend_mode_t)(*blend | BLEND_ALPHABLEND);
 				break;
 
 			case TTCON_ALPHAADD:
-				*blend &= ~BLEND_ALPHABLEND;
+				*blend = (blend_mode_t)(*blend & ~BLEND_ALPHABLEND);
 				break;
 
 			case TTCON_ZWRITE:
-				*blend |= BLEND_ZWRITE;
+				*blend = (blend_mode_t)(*blend | BLEND_ZWRITE);
 				break;
 
 			case TTCON_NOZWRITE:
-				*blend &= ~BLEND_ZWRITE;
+				*blend = (blend_mode_t)(*blend & ~BLEND_ZWRITE);
 				break;
 
 			default:
@@ -221,27 +221,27 @@ void ScriptParseSpriteAnim(RScriptParser *sp, RSprite *rc, bool anim)
 						switch(sp->get_token())
 						{
 							case TTCON_FORWARD:
-								((RAnimation *)rc)->mode &= ~HGEANIM_REV;
+								((RAnimation *)rc)->mode = (anim_mode_t)(((RAnimation *)rc)->mode & ~HGEANIM_REV);
 								break;
 
 							case TTCON_REVERSE:
-								((RAnimation *)rc)->mode |= HGEANIM_REV;
+								((RAnimation *)rc)->mode = (anim_mode_t)(((RAnimation *)rc)->mode | HGEANIM_REV);
 								break;
 
 							case TTCON_NOPINGPONG:
-								((RAnimation *)rc)->mode &= ~HGEANIM_PINGPONG;
+								((RAnimation *)rc)->mode = (anim_mode_t)(((RAnimation *)rc)->mode & ~HGEANIM_PINGPONG);
 								break;
 
 							case TTCON_PINGPONG:
-								((RAnimation *)rc)->mode |= HGEANIM_PINGPONG;
+								((RAnimation *)rc)->mode = (anim_mode_t)(((RAnimation *)rc)->mode | HGEANIM_PINGPONG);
 								break;
 
 							case TTCON_NOLOOP:
-								((RAnimation *)rc)->mode &= ~HGEANIM_LOOP;
+								((RAnimation *)rc)->mode = (anim_mode_t)(((RAnimation *)rc)->mode & ~HGEANIM_LOOP);
 								break;
 
 							case TTCON_LOOP:
-								((RAnimation *)rc)->mode |= HGEANIM_LOOP;
+								((RAnimation *)rc)->mode = (anim_mode_t)(((RAnimation *)rc)->mode | HGEANIM_LOOP);
 								break;
 
 							default:
@@ -628,7 +628,7 @@ void RSprite::Parse(hgeResourceManager *rm, RScriptParser *sp, const char *name,
 		rc->tx=rc->ty=0;
 		rc->w=rc->h=0;
 		rc->hotx=rc->hoty=0;
-		rc->blend=BLEND_COLORMUL | BLEND_ALPHABLEND | BLEND_NOZWRITE;
+		rc->blend = (blend_mode_t)(BLEND_COLORMUL | BLEND_ALPHABLEND | BLEND_NOZWRITE);
 		rc->color=0xFFFFFFFF;
 		rc->z=0.5f;
 		rc->bXFlip=false;
@@ -689,7 +689,7 @@ void RAnimation::Parse(hgeResourceManager *rm, RScriptParser *sp, const char *na
 		rc->tx=rc->ty=0;
 		rc->w=rc->h=0;
 		rc->hotx=rc->hoty=0;
-		rc->blend=BLEND_COLORMUL | BLEND_ALPHABLEND | BLEND_NOZWRITE;
+		rc->blend = (blend_mode_t)(BLEND_COLORMUL | BLEND_ALPHABLEND | BLEND_NOZWRITE);
 		rc->color=0xFFFFFFFF;
 		rc->z=0.5f;
 		rc->bXFlip=false;
@@ -700,7 +700,7 @@ void RAnimation::Parse(hgeResourceManager *rm, RScriptParser *sp, const char *na
 //		rc->collision=HGECOL_RECT;
 		rc->frames=1;
 		rc->fps=12.0f;
-		rc->mode=HGEANIM_FWD | HGEANIM_LOOP;
+		rc->mode = (anim_mode_t)(HGEANIM_FWD | HGEANIM_LOOP);
 	}
 	
 	rc->handle=0;
@@ -752,7 +752,7 @@ void RFont::Parse(hgeResourceManager *rm, RScriptParser *sp, const char *name, c
 		rc->resgroup=0;
 		rc->mipmap=false;
 		rc->filename[0]=0;
-		rc->blend=BLEND_COLORMUL | BLEND_ALPHABLEND | BLEND_NOZWRITE;
+		rc->blend = (blend_mode_t)(BLEND_COLORMUL | BLEND_ALPHABLEND | BLEND_NOZWRITE);
 		rc->color=0xFFFFFFFF;
 		rc->z=0.5f;
 		rc->scale=1.0f;
@@ -935,7 +935,7 @@ void RDistort::Parse(hgeResourceManager *rm, RScriptParser *sp, const char *name
 		rc->tx=rc->ty=0;
 		rc->w=rc->h=0;
 		rc->cols=rc->rows=2;
-		rc->blend=BLEND_COLORMUL | BLEND_ALPHABLEND | BLEND_NOZWRITE;
+		rc->blend = (blend_mode_t)(BLEND_COLORMUL | BLEND_ALPHABLEND | BLEND_NOZWRITE);
 		rc->color=0xFFFFFFFF;
 		rc->z=0.5f;
 	}

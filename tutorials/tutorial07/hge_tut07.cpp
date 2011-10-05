@@ -50,13 +50,13 @@ hgeFont				*fnt;
 
 void SetBlend(int blend)
 {
-	static int sprBlend[5]=
+	static blend_mode_t sprBlend[5]=
 	{
-		BLEND_COLORMUL | BLEND_ALPHABLEND | BLEND_NOZWRITE,
-		BLEND_COLORADD | BLEND_ALPHABLEND | BLEND_NOZWRITE,
-		BLEND_COLORMUL | BLEND_ALPHABLEND | BLEND_NOZWRITE,
-		BLEND_COLORMUL | BLEND_ALPHAADD   | BLEND_NOZWRITE,
-		BLEND_COLORMUL | BLEND_ALPHABLEND | BLEND_NOZWRITE
+		(blend_mode_t)(BLEND_COLORMUL | BLEND_ALPHABLEND | BLEND_NOZWRITE),
+		(blend_mode_t)(BLEND_COLORADD | BLEND_ALPHABLEND | BLEND_NOZWRITE),
+		(blend_mode_t)(BLEND_COLORMUL | BLEND_ALPHABLEND | BLEND_NOZWRITE),
+		(blend_mode_t)(BLEND_COLORMUL | BLEND_ALPHAADD   | BLEND_NOZWRITE),
+		(blend_mode_t)(BLEND_COLORMUL | BLEND_ALPHABLEND | BLEND_NOZWRITE)
 	};
 
 	static uint32_t fntColor[5]=
@@ -176,7 +176,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		spr->SetHotSpot(32,32);
 
 		bgspr=new hgeSprite(bgtex,0,0,800,600);
-		bgspr->SetBlendMode(BLEND_COLORADD | BLEND_ALPHABLEND | BLEND_NOZWRITE);
+		bgspr->SetBlendMode((blend_mode_t)(BLEND_COLORADD | BLEND_ALPHABLEND | BLEND_NOZWRITE));
 		bgspr->SetColor(0xFF000000,0);
 		bgspr->SetColor(0xFF000000,1);
 		bgspr->SetColor(0xFF000040,2);

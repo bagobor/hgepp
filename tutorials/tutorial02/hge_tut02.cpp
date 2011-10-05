@@ -132,7 +132,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		}
 
 		// Set up quad which we will use for rendering sprite
-		quad.blend=BLEND_ALPHAADD | BLEND_COLORMUL | BLEND_ZWRITE;
+		quad.blend = (blend_mode_t)(BLEND_ALPHAADD | BLEND_COLORMUL | BLEND_ZWRITE);
 
 		for(int i=0;i<4;i++)
 		{

@@ -8,7 +8,10 @@
 
 namespace hge {
 
-inline void ColorClamp(float &x) { if(x<0.0f) x=0.0f; if(x>1.0f) x=1.0f; }
+inline void ColorClamp(float &x) {
+	if( x < 0.0f ) x = 0.0f;
+	if( x > 1.0f ) x = 1.0f;
+}
 
 
 class hgeColorRGB
@@ -63,7 +66,7 @@ public:
 
 	void			Clamp() { ColorClamp(h); ColorClamp(s); ColorClamp(v); ColorClamp(a); }
 	void			SetHWColor(uint32_t col);
-	uint32_t			GetHWColor() const;
+	uint32_t		GetHWColor() const;
 };
 
 inline hgeColorHSV operator* (const float sc, const hgeColorHSV &c) { return c*sc; }

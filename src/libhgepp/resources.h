@@ -99,7 +99,7 @@ struct RSprite : public ResDesc
 	char		texname[MAXRESCHARS];
 	float		tx, ty, w, h;
 	float		hotx, hoty;
-	int			blend;
+	blend_mode_t	blend;
 	uint32_t		color;
 	float		z;
 	bool		bXFlip, bYFlip;
@@ -117,7 +117,7 @@ struct RAnimation : public RSprite
 {
 	int			frames;
 	float		fps;
-	int			mode;
+	anim_mode_t	mode;
 
 	static  void  Parse(hgeResourceManager *rm, RScriptParser *sp, const char *name, const char *basename);
 	virtual uint32_t Get(hgeResourceManager *rm);
@@ -128,7 +128,7 @@ struct RFont : public ResDesc
 {
 	char		filename[MAXRESCHARS];
 	bool		mipmap;
-	int			blend;
+	blend_mode_t	blend;
 	uint32_t		color;
 	float		z;
 	float		scale;
@@ -157,7 +157,7 @@ struct RDistort : public ResDesc
 	char		texname[MAXRESCHARS];
 	float		tx, ty, w, h;
 	int			cols, rows;
-	int			blend;
+	blend_mode_t blend;
 	uint32_t		color;
 	float		z;
 

@@ -343,7 +343,7 @@ bool HGE_CALL HGE_Impl::System_Start()
     return true;
 }
 
-void HGE_CALL HGE_Impl::System_SetStateBool(hgeBoolState state, bool value)
+void HGE_CALL HGE_Impl::System_SetStateBool(system_state_bool_t state, bool value)
 {
     switch(state)
     {
@@ -413,7 +413,7 @@ void HGE_CALL HGE_Impl::System_SetStateBool(hgeBoolState state, bool value)
     }
 }
 
-void HGE_CALL HGE_Impl::System_SetStateFunc(hgeFuncState state, hgeCallback value)
+void HGE_CALL HGE_Impl::System_SetStateFunc(system_state_func_t state, void_callback_t value)
 {
     switch(state)
     {
@@ -426,7 +426,7 @@ void HGE_CALL HGE_Impl::System_SetStateFunc(hgeFuncState state, hgeCallback valu
     }
 }
 
-void HGE_CALL HGE_Impl::System_SetStateHwnd(hgeHwndState state, HWND value)
+void HGE_CALL HGE_Impl::System_SetStateHwnd(system_state_hwnd_t state, HWND value)
 {
     switch(state)
     {
@@ -434,7 +434,7 @@ void HGE_CALL HGE_Impl::System_SetStateHwnd(hgeHwndState state, HWND value)
     }
 }
 
-void HGE_CALL HGE_Impl::System_SetStateInt(hgeIntState state, int value)
+void HGE_CALL HGE_Impl::System_SetStateInt(system_state_int_t state, int value)
 {
     switch(state)
     {
@@ -499,7 +499,7 @@ void HGE_CALL HGE_Impl::System_SetStateInt(hgeIntState state, int value)
     }
 }
 
-void HGE_CALL HGE_Impl::System_SetStateString(hgeStringState state, const char *value)
+void HGE_CALL HGE_Impl::System_SetStateString(system_state_string_t state, const char *value)
 {
     FILE *hf;
     
@@ -526,7 +526,7 @@ void HGE_CALL HGE_Impl::System_SetStateString(hgeStringState state, const char *
     }
 }
 
-bool HGE_CALL HGE_Impl::System_GetStateBool(hgeBoolState state)
+bool HGE_CALL HGE_Impl::System_GetStateBool(system_state_bool_t state)
 {
     switch(state)
     {
@@ -545,7 +545,7 @@ bool HGE_CALL HGE_Impl::System_GetStateBool(hgeBoolState state)
     return false;
 }
 
-hgeCallback HGE_CALL HGE_Impl::System_GetStateFunc(hgeFuncState state)
+void_callback_t HGE_CALL HGE_Impl::System_GetStateFunc(system_state_func_t state)
 {
     switch(state)
     {
@@ -559,7 +559,7 @@ hgeCallback HGE_CALL HGE_Impl::System_GetStateFunc(hgeFuncState state)
     return NULL;
 }
 
-HWND HGE_CALL HGE_Impl::System_GetStateHwnd(hgeHwndState state)
+HWND HGE_CALL HGE_Impl::System_GetStateHwnd(system_state_hwnd_t state)
 {
     switch(state)
     {
@@ -570,7 +570,7 @@ HWND HGE_CALL HGE_Impl::System_GetStateHwnd(hgeHwndState state)
     return 0;
 }
 
-int HGE_CALL HGE_Impl::System_GetStateInt(hgeIntState state)
+int HGE_CALL HGE_Impl::System_GetStateInt(system_state_int_t state)
 {
     switch(state)
     {
@@ -588,7 +588,7 @@ int HGE_CALL HGE_Impl::System_GetStateInt(hgeIntState state)
     return 0;
 }
 
-const char* HGE_CALL HGE_Impl::System_GetStateString(hgeStringState state) {
+const char* HGE_CALL HGE_Impl::System_GetStateString(system_state_string_t state) {
     switch(state) {
         case HGE_ICON:          return szIcon;
         case HGE_TITLE:         return szWinTitle;

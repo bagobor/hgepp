@@ -34,26 +34,26 @@ public:
 
 	void		SetColor(uint32_t col);
 	void		SetZ(float z);
-	void		SetBlendMode(int blend);
-	void		SetScale(float scale) {fScale=scale;}
-	void		SetProportion(float prop) { fProportion=prop; }
-	void		SetRotation(float rot) {fRot=rot;}
-	void		SetTracking(float tracking) {fTracking=tracking;}
-	void		SetSpacing(float spacing) {fSpacing=spacing;}
+	void		SetBlendMode(blend_mode_t blend);
+	void		SetScale(float scale);
+	void		SetProportion(float prop);
+	void		SetRotation(float rot);
+	void		SetTracking(float tracking);
+	void		SetSpacing(float spacing);
 
-	uint32_t	GetColor() const {return dwCol;}
-	float		GetZ() const {return fZ;}
-	int			GetBlendMode() const {return nBlend;}
-	float		GetScale() const {return fScale;}
-	float		GetProportion() const { return fProportion; }
-	float		GetRotation() const {return fRot;}
-	float		GetTracking() const {return fTracking;}
-	float		GetSpacing() const {return fSpacing;}
+	uint32_t	GetColor() const;
+	float		GetZ() const;
+	blend_mode_t GetBlendMode() const;
+	float		GetScale() const;
+	float		GetProportion() const;
+	float		GetRotation() const;
+	float		GetTracking() const;
+	float		GetSpacing() const;
 
-	hgeSprite*	GetSprite(char chr) const { return letters[(unsigned char)chr]; }
-	float		GetPreWidth(char chr) const { return pre[(unsigned char)chr]; }
-	float		GetPostWidth(char chr) const { return post[(unsigned char)chr]; }
-	float		GetHeight() const { return fHeight; }
+	hgeSprite*	GetSprite(char chr) const;
+	float		GetPreWidth(char chr) const;
+	float		GetPostWidth(char chr) const;
+	float		GetHeight() const;
 	float		GetStringWidth(const char *string, bool bMultiline=true) const;
 
 private:
@@ -80,8 +80,8 @@ private:
 	float		fSpacing;
 
 	uint32_t		dwCol;
-	float		fZ;
-	int			nBlend;
+	float			fZ;
+	blend_mode_t	nBlend;
 };
 
 } // namespace hge

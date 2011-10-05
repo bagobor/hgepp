@@ -9,13 +9,21 @@
 
 namespace hge {
 
-#define HGEANIM_FWD			0
-#define HGEANIM_REV			1
-#define HGEANIM_PINGPONG	2
-#define HGEANIM_NOPINGPONG	0
-#define HGEANIM_LOOP		4
-#define HGEANIM_NOLOOP		0
+// TODO: replace this with something more appropriate than macros or an enum. Struct with bit fields?
+typedef enum {
+	HGEANIM_FWD			= 0,
+	HGEANIM_REV			= 1,
+	HGEANIM_PINGPONG	= 2,
+	HGEANIM_NOPINGPONG	= 0,
+	HGEANIM_LOOP		= 4,
+	HGEANIM_NOLOOP		= 0
+} anim_mode_t;
 
+// typedef struct {
+// 	bool reverse:1;
+// 	bool pingpong:1;
+// 	bool loop:1;
+// } anim_mode_t;
 
 /*
 ** HGE Animation class
@@ -34,12 +42,12 @@ public:
 
 	void		SetTexture(HTEXTURE tex);
 	void		SetTextureRect(float x1, float y1, float x2, float y2);
-	void		SetMode(int mode);
+	void		SetMode(anim_mode_t mode);
 	void		SetSpeed(float FPS);
 	void		SetFrame(int n);
 	void		SetFrames(int n);
 
-	int			GetMode() const;
+	anim_mode_t GetMode() const;
 	float		GetSpeed() const;
 	int			GetFrame() const;
 	int			GetFrames() const;
@@ -47,17 +55,17 @@ public:
 private:
 	hgeAnimation();
 
-	int			orig_width;
+	int			m_orig_width;
 
-	bool		bPlaying;
+	bool		m_playing_flag;
 
-	float		fSpeed;
-	float		fSinceLastFrame;
+	float		m_speed;
+	float		m_since_last_frame;
 
-	int			Mode;
-	int			nDelta;
-	int			nFrames;
-	int			nCurFrame;
+	anim_mode_t	m_play_mode;
+	int			m_delta;
+	int			m_frame_count;
+	int			m_cur_frame;
 };
 
 } // namespace hge
