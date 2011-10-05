@@ -1,7 +1,7 @@
 /*
 ** Haaf's Game Engine 1.8
 ** Copyright (C) 2003-2007, Relish Games
-** hge.relishgames.com
+** g_hge.relishgames.com
 **
 ** hge_tut05 - Using distortion mesh
 */
@@ -12,20 +12,21 @@
 // Copy the files "particles.png", "menu.wav",
 // "font1.fnt", "font1.png" and "trail.psi" from
 // the folder "precompiled" to the folder with
-// executable file. Also copy hge.dll and bass.dll
+// executable file. Also copy g_hge.dll and bass.dll
 // to the same folder.
 
 
-#include "..\..\include\hge.h"
-#include "..\..\include\hgefont.h"
-#include "..\..\include\hgedistort.h"
+#include <hge.h>
+#include <hgefont.h>
+#include <hgedistort.h>
 
 #include <math.h>
 
+using namespace hge;
 
 // Pointer to the HGE interface.
 // Helper classes require this to work.
-HGE *hge=0;
+HGE *g_hge=0;
 
 HTEXTURE            tex;
 HSHADER             shad1;
@@ -50,7 +51,7 @@ bool useShader = false;
 
 bool FrameFunc()
 {
-    float dt=hge->Timer_GetDelta();
+    float dt=g_hge->Timer_GetDelta();
     static float t=0.0f;
     static int trans=0;
 
@@ -60,7 +61,7 @@ bool FrameFunc()
     t+=dt;
 
     // Process keys
-    switch(hge->Input_GetKey())
+    switch(g_hge->Input_GetKey())
     {
         case HGEK_ESCAPE:
             return true;
@@ -128,13 +129,13 @@ bool FrameFunc()
 bool RenderFunc()
 {
     // Render graphics
-    hge->Gfx_BeginScene();
-    hge->Gfx_Clear(0);
-    hge->Gfx_SetShader(currShader);
+    g_hge->Gfx_BeginScene();
+    g_hge->Gfx_Clear(0);
+    g_hge->Gfx_SetShader(currShader);
     dis->Render(meshx, meshy);
-    hge->Gfx_SetShader(NULL);
-    fnt->printf(5, 5, HGETEXT_LEFT, "dt:%.3f\nFPS:%d\n\nPress SPACE,1,2,3,4!", hge->Timer_GetDelta(), hge->Timer_GetFPS());
-    hge->Gfx_EndScene();
+    g_hge->Gfx_SetShader(NULL);
+    fnt->printf(5, 5, HGETEXT_LEFT, "dt:%.3f\nFPS:%d\n\nPress SPACE,1,2,3,4!", g_hge->Timer_GetDelta(), g_hge->Timer_GetFPS());
+    g_hge->Gfx_EndScene();
 
     return false;
 }
@@ -142,35 +143,35 @@ bool RenderFunc()
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
-    hge = hgeCreate(HGE_VERSION);
+    g_hge = hgeCreate(HGE_VERSION);
 
-    hge->System_SetState(HGE_LOGFILE, "hge_tut05.log");
-    hge->System_SetState(HGE_FRAMEFUNC, FrameFunc);
-    hge->System_SetState(HGE_RENDERFUNC, RenderFunc);
-    hge->System_SetState(HGE_TITLE, "HGE Tutorial 05 - Using distortion mesh");
-    hge->System_SetState(HGE_WINDOWED, true);
-    hge->System_SetState(HGE_SCREENWIDTH, 800);
-    hge->System_SetState(HGE_SCREENHEIGHT, 600);
-    hge->System_SetState(HGE_SCREENBPP, 32);
-    hge->System_SetState(HGE_USESOUND, false);
+    g_hge->System_SetState(HGE_LOGFILE, "hge_tut05.log");
+    g_hge->System_SetState(HGE_FRAMEFUNC, FrameFunc);
+    g_hge->System_SetState(HGE_RENDERFUNC, RenderFunc);
+    g_hge->System_SetState(HGE_TITLE, "HGE Tutorial 05 - Using distortion mesh");
+    g_hge->System_SetState(HGE_WINDOWED, true);
+    g_hge->System_SetState(HGE_SCREENWIDTH, 800);
+    g_hge->System_SetState(HGE_SCREENHEIGHT, 600);
+    g_hge->System_SetState(HGE_SCREENBPP, 32);
+    g_hge->System_SetState(HGE_USESOUND, false);
 
-    if(hge->System_Initiate()) {
+    if(g_hge->System_Initiate()) {
 
         // Load sound and texture
-        tex=hge->Texture_Load("texture.jpg");
+        tex=g_hge->Texture_Load("texture.jpg");
         if(!tex)
         {
             // If one of the data files is not found, display
             // an error message and shutdown.
             MessageBox(NULL, "Can't load TEXTURE.JPG", "Error", MB_OK | MB_ICONERROR | MB_APPLMODAL);
-            hge->System_Shutdown();
-            hge->Release();
+            g_hge->System_Shutdown();
+            g_hge->Release();
             return 0;
         }
        
-        shad1 = hge->Shader_Create("shader1.psh");
-        shad2 = hge->Shader_Create("shader2.psh");
-        shad3 = hge->Shader_Create("shader3.psh");
+        shad1 = g_hge->Shader_Create("shader1.psh");
+        shad2 = g_hge->Shader_Create("shader2.psh");
+        shad3 = g_hge->Shader_Create("shader3.psh");
 
         // Create a distortion mesh
         dis=new hgeDistortionMesh(nCols, nRows);
@@ -183,16 +184,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
         fnt=new hgeFont("font1.fnt");
 
         // Let's rock now!
-        hge->System_Start();
+        g_hge->System_Start();
 
         // Delete created objects and free loaded resources
         delete fnt;
         delete dis;
-        hge->Texture_Free(tex);
+        g_hge->Texture_Free(tex);
     }
 
     // Clean up and shutdown
-    hge->System_Shutdown();
-    hge->Release();
+    g_hge->System_Shutdown();
+    g_hge->Release();
     return 0;
 }

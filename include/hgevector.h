@@ -1,26 +1,21 @@
-/*
-** Haaf's Game Engine 1.7
-** Copyright (C) 2003-2007, Relish Games
-** hge.relishgames.com
-**
-** hgeVector helper class
-*/
+/* Part of HGEPP project, a HGE-rewrite https://github.com/kvakvs/hgepp
+ * Based on Haaf's Game Engine 1.8.1 (C) 2003-2007, Relish Games http://hge.relishgames.com
+ * hgeVector helper class
+ */
+#pragma once
 
+#include <hge.h>
 
-#ifndef HGEVECTOR_H
-#define HGEVECTOR_H
-
-
-#include "hge.h"
 #include <math.h>
 
+namespace hge {
 
 /*
 ** Fast 1.0/sqrtf(float) routine
 */
-float InvSqrt(float x);
+float HGE_EXPORT InvSqrt(float x);
 
-class hgeVector
+class HGE_EXPORT hgeVector
 {
 public:
 	float	x,y;
@@ -53,5 +48,4 @@ inline hgeVector operator* (const float s, const hgeVector &v)		{ return v*s; }
 inline float	 operator^ (const hgeVector &v, const hgeVector &u) { return v.Angle(&u); }
 inline float	 operator% (const hgeVector &v, const hgeVector &u) { return v.Dot(&u); }
 
-
-#endif
+} // namespace hge

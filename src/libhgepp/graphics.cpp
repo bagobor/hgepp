@@ -1,17 +1,14 @@
-/*
-** Haaf's Game Engine 1.8
-** Copyright (C) 2003-2007, Relish Games
-** hge.relishgames.com
-** edited by kvakvs@yandex.ru, see https://github.com/kvakvs/hge
-**
-** Core functions implementation: graphics
-*/
+/* Part of HGEPP project, a HGE-rewrite https://github.com/kvakvs/hgepp
+ * Based on Haaf's Game Engine 1.8.1 (C) 2003-2007, Relish Games http://hge.relishgames.com
+ * Core functions implementation: graphics
+ */
 
 
 #include "hge_impl.h"
 // GAPI dependent includes and defines (DX8/DX9 switch) by kvakvs@yandex.ru
 #include "hge_gapi.h"
 
+namespace hge {
 
 void HGE_CALL HGE_Impl::Gfx_Clear(uint32_t color)
 {
@@ -1182,3 +1179,5 @@ void HGE_CALL HGE_Impl::Shader_Free(HSHADER shader)
 	((LPDIRECT3DPIXELSHADER9)shader)->Release();
 }
 #endif
+
+} // namespace hge

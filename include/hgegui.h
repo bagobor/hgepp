@@ -5,10 +5,11 @@
  */
 #pragma once
 
-#include "hge.h"
-#include "hgesprite.h"
-#include "hgerect.h"
+#include <hge.h>
+#include <hgesprite.h>
+#include <hgerect.h>
 
+namespace hge {
 
 #define HGEGUI_NONAVKEYS		0
 #define HGEGUI_LEFTRIGHT		1
@@ -20,11 +21,11 @@ class hgeGUI;
 /*
 ** hgeGUIObject
 */
-class hgeGUIObject
+class HGE_EXPORT hgeGUIObject
 {
 public:
-	hgeGUIObject()	{ hge=hgeCreate(HGE_VERSION); color=0xFFFFFFFF; }
-	virtual			~hgeGUIObject() { hge->Release(); }
+	hgeGUIObject();
+	virtual			~hgeGUIObject();
 
 	virtual void	Render() = 0;
 	virtual void	Update(float dt) {}
@@ -59,14 +60,15 @@ protected:
 	hgeGUIObject(const hgeGUIObject &go);
 	hgeGUIObject&	operator= (const hgeGUIObject &go);
 
-	static HGE		*hge;
+	//static HGE		*g_hgeguiobject_hge;
+	static HGE * get_hge();
 };
 
 
 /*
 ** hgeGUI
 */
-class hgeGUI
+class HGE_EXPORT hgeGUI
 {
 public:
 	hgeGUI();
@@ -99,7 +101,8 @@ private:
 	hgeGUI&			operator= (const hgeGUI&);
 	bool			ProcessCtrl(hgeGUIObject *ctrl);
 
-	static HGE		*hge;
+	//static HGE		*g_hgegui_hge;
+	static HGE * get_hge();
 
 	hgeGUIObject	*ctrls;
 	hgeGUIObject	*ctrlLock;
@@ -117,4 +120,4 @@ private:
 };
 
 
-#endif
+} // namespace hge

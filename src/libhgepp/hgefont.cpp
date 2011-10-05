@@ -1,23 +1,22 @@
-/*
-** Haaf's Game Engine 1.7
-** Copyright (C) 2003-2007, Relish Games
-** hge.relishgames.com
-**
-** hgeFont helper class implementation
-*/
+/* Part of HGEPP project, a HGE-rewrite https://github.com/kvakvs/hgepp
+ * Based on Haaf's Game Engine 1.8.1 (C) 2003-2007, Relish Games http://hge.relishgames.com
+ * hgeFont helper class implementation
+ */
 
 
-#include "..\..\include\hgefont.h"
+#include <hgefont.h>
 #include <stdlib.h>
 #include <stdio.h>
+
+namespace hge {
 
 const char FNTHEADERTAG[] = "[HGEFONT]";
 const char FNTBITMAPTAG[] = "Bitmap";
 const char FNTCHARTAG[]   = "Char";
 
 
-HGE *hgeFont::hge=0;
-char hgeFont::buffer[1024];
+HGE * g_hgefont_hge = 0;
+char g_hgefont_buffer[1024];
 
 
 hgeFont::hgeFont(const char *szFont, bool bMipmap)
@@ -32,7 +31,7 @@ hgeFont::hgeFont(const char *szFont, bool bMipmap)
 
 	// Setup variables
 	
-	hge=hgeCreate(HGE_VERSION);
+	g_hgefont_hge=hgeCreate(HGE_VERSION);
 
 	fHeight=0.0f;
 	fScale=1.0f;
@@ -52,18 +51,18 @@ hgeFont::hgeFont(const char *szFont, bool bMipmap)
 	
 	// Load font description
 
-	data=hge->Resource_Load(szFont, &size);
+	data=g_hgefont_hge->Resource_Load(szFont, &size);
 	if(!data) return;
 
 	desc = new char[size+1];
 	memcpy(desc,data,size);
 	desc[size]=0;
-	hge->Resource_Free(data);
+	g_hgefont_hge->Resource_Free(data);
 
 	pdesc=_get_line(desc,linebuf);
 	if(strcmp(linebuf, FNTHEADERTAG))
 	{
-		hge->System_Log("Font %s has incorrect format.", szFont);
+		g_hgefont_hge->System_Log("Font %s has incorrect format.", szFont);
 		delete[] desc;	
 		return;
 	}
@@ -81,7 +80,7 @@ hgeFont::hgeFont(const char *szFont, bool bMipmap)
 			else pbuf++;
 			if(!sscanf(linebuf, "Bitmap = %s", pbuf)) continue;
 
-			hTexture=hge->Texture_Load(buf, 0, bMipmap);
+			hTexture=g_hgefont_hge->Texture_Load(buf, 0, bMipmap);
 			if(!hTexture)
 			{
 				delete[] desc;	
@@ -133,8 +132,8 @@ hgeFont::~hgeFont()
 {
 	for(int i=0; i<256; i++)
 		if(letters[i]) delete letters[i];
-	if(hTexture) hge->Texture_Free(hTexture);
-	hge->Release();
+	if(hTexture) g_hgefont_hge->Texture_Free(hTexture);
+	g_hgefont_hge->Release();
 }
 
 void hgeFont::Render(float x, float y, int align, const char *string)
@@ -174,11 +173,11 @@ void hgeFont::printf(float x, float y, int align, const char *format, ...)
 {
 	char	*pArg=(char *) &format+sizeof(format);
 
-	_vsnprintf(buffer, sizeof(buffer)-1, format, pArg);
-	buffer[sizeof(buffer)-1]=0;
+	_vsnprintf(g_hgefont_buffer, sizeof(g_hgefont_buffer)-1, format, pArg);
+	g_hgefont_buffer[sizeof(g_hgefont_buffer)-1]=0;
 	//vsprintf(buffer, format, pArg);
 
-	Render(x,y,align,buffer);
+	Render(x,y,align,g_hgefont_buffer);
 }
 
 void hgeFont::printfb(float x, float y, float w, float h, int align, const char *format, ...)
@@ -188,12 +187,12 @@ void hgeFont::printfb(float x, float y, float w, float h, int align, const char 
 	float	tx, ty, hh, ww;
 	char	*pArg=(char *) &format+sizeof(format);
 
-	_vsnprintf(buffer, sizeof(buffer)-1, format, pArg);
-	buffer[sizeof(buffer)-1]=0;
+	_vsnprintf(g_hgefont_buffer, sizeof(g_hgefont_buffer)-1, format, pArg);
+	g_hgefont_buffer[sizeof(g_hgefont_buffer)-1]=0;
 	//vsprintf(buffer, format, pArg);
 
-	linestart=buffer;
-	pbuf=buffer;
+	linestart=g_hgefont_buffer;
+	pbuf=g_hgefont_buffer;
 	prevword=0;
 
 	for(;;)
@@ -255,7 +254,7 @@ void hgeFont::printfb(float x, float y, float w, float h, int align, const char 
 		case HGETEXT_MIDDLE: ty+=int((h-hh)/2); break;
 	}
 
-	Render(tx,ty,align,buffer);
+	Render(tx,ty,align,g_hgefont_buffer);
 }
 
 float hgeFont::GetStringWidth(const char *string, bool bMultiline) const
@@ -331,3 +330,10 @@ char *hgeFont::_get_line(char *file, char *line)
 
 	return file + i;
 }
+
+HGE * hgeFont::get_hge()
+{
+	return g_hgefont_hge;
+}
+
+} // namespace hge

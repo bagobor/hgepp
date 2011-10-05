@@ -1,17 +1,15 @@
-/*
-** Haaf's Game Engine 1.7
-** Copyright (C) 2003-2007, Relish Games
-** hge.relishgames.com
-**
-** hgeGUI default controls implementation
-*/
+/* Part of HGEPP project, a HGE-rewrite https://github.com/kvakvs/hgepp
+ * Based on Haaf's Game Engine 1.8.1 (C) 2003-2007, Relish Games http://hge.relishgames.com
+ * hgeGUI default controls implementation
+ */
 
 
-#include "..\..\include\hgeguictrls.h"
+#include <hgeguictrls.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 
+namespace hge {
 
 /*
 ** hgeGUIText
@@ -355,3 +353,40 @@ bool hgeGUIListbox::KeyClick(int key, int chr)
 	}
 	return false;
 }
+
+int hgeGUIListbox::GetSelectedItem()
+{
+	return nSelectedItem;
+}
+
+void hgeGUIListbox::SetSelectedItem( int n )
+{
+	if(n>=0 && n<GetNumItems()) nSelectedItem=n;
+}
+
+int hgeGUIListbox::GetTopItem()
+{
+	return nTopItem;
+}
+
+void hgeGUIListbox::SetTopItem( int n )
+{
+	if(n>=0 && n<=GetNumItems()-GetNumRows()) nTopItem=n;
+}
+
+int hgeGUIListbox::GetNumItems()
+{
+	return nItems;
+}
+
+int hgeGUIListbox::GetNumRows()
+{
+	return int((rect.y2-rect.y1)/font->GetHeight());
+}
+
+bool hgeGUIListbox::MouseMove( float x, float y )
+{
+	mx=x; my=y; return false;
+}
+
+} // namespace hge

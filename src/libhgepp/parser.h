@@ -1,19 +1,15 @@
-/*
-** Haaf's Game Engine 1.7
-** Copyright (C) 2003-2007, Relish Games
-** hge.relishgames.com
-**
-** Resource script parser header
-*/
+/* Part of HGEPP project, a HGE-rewrite https://github.com/kvakvs/hgepp
+ * Based on Haaf's Game Engine 1.8.1 (C) 2003-2007, Relish Games http://hge.relishgames.com
+ * Resource script parser header
+ */
+#pragma once
 
-#ifndef HGEPARSER_H
-#define HGEPARSER_H
+#include <hge.h>
 
-
-#include "..\..\include\hge.h"
 #include <string.h>
 #include <stdlib.h>
 
+namespace hge {
 
 enum
 {
@@ -46,17 +42,17 @@ class RScriptParser
 {
 public:
 	RScriptParser(char *name, char *scr);
-	~RScriptParser() { hge->Release(); }
+	~RScriptParser();
 
 	int		get_token();
-	void	put_back()	 { script-=strlen(tokenvalue); }
-	int		get_line()	 { return line;}
-	char*	get_name()	 { return scriptname;}
+	void	put_back();
+	int		get_line();
+	char*	get_name();
 
-	char*	tkn_string() { return tokenvalue; }
-	int		tkn_int()    { return atoi(tokenvalue); }
-	float	tkn_float()  { return (float)atof(tokenvalue); }
-	bool	tkn_bool()   { return (tokenvalue[0]=='t' || tokenvalue[0]=='T') ? true : false; }
+	char*	tkn_string();
+	int		tkn_int();
+	float	tkn_float();
+	bool	tkn_bool();
 	uint32_t	tkn_hex();
 
 	void	ScriptPostError(char *msg1, char *msg2);
@@ -70,8 +66,7 @@ public:
 private:
 	bool	strtkcmp(char *str, char *mem);
 
-	static HGE *hge;
+	//static HGE *g_scriptparser_hge;
 };
 
-
-#endif
+} // namespace hge

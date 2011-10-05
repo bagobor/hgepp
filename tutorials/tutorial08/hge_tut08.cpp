@@ -1,7 +1,7 @@
 /*
 ** Haaf's Game Engine 1.8
 ** Copyright (C) 2003-2007, Relish Games
-** hge.relishgames.com
+** g_hge.relishgames.com
 **
 ** hge_tut08 - The Big Calm
 */
@@ -9,7 +9,7 @@
 
 // Copy the files "font2.fnt", "font2.png",
 // and "objects.png" from the folder "precompiled" to
-// the folder with executable file. Also copy hge.dll
+// the folder with executable file. Also copy g_hge.dll
 // to the same folder.
 
 
@@ -19,15 +19,16 @@
 
 #include <math.h>
 
-#include "..\..\include\hge.h"
-#include "..\..\include\hgecolor.h"
-#include "..\..\include\hgesprite.h"
-#include "..\..\include\hgedistort.h"
-#include "..\..\include\hgefont.h"
+#include <hge.h>
+#include <hgecolor.h>
+#include <hgesprite.h>
+#include <hgedistort.h>
+#include <hgefont.h>
+
+using namespace hge;
 
 // Pointer to the HGE interface (helper classes require this to work)
-
-HGE			*hge=0;
+HGE			*g_hge=0;
 hgeFont		*fnt=0;
 
 // Simulation constants
@@ -108,7 +109,7 @@ bool FrameFunc()
 {
 	// Process keys
 	
-	switch(hge->Input_GetKey())
+	switch(g_hge->Input_GetKey())
 	{
 		case HGEK_0:		speed=0.0f; break;
 		case HGEK_1:		speed=0.1f; break;
@@ -145,11 +146,11 @@ bool RenderFunc()
 
 	// Render scene
 	
-	hge->Gfx_BeginScene();
+	g_hge->Gfx_BeginScene();
 	RenderSimulation();	
-	fnt->printf(7, 7, HGETEXT_LEFT, "Keys 1-9 to adjust simulation speed, 0 - real time\nFPS: %d", hge->Timer_GetFPS());
+	fnt->printf(7, 7, HGETEXT_LEFT, "Keys 1-9 to adjust simulation speed, 0 - real time\nFPS: %d", g_hge->Timer_GetFPS());
 	fnt->printf(SCREEN_WIDTH-50, 7, HGETEXT_LEFT, "%02d:%02d:%02d", hrs, mins, secs);
-	hge->Gfx_EndScene();
+	g_hge->Gfx_EndScene();
 
 	return false;
 }
@@ -157,21 +158,21 @@ bool RenderFunc()
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
-	hge = hgeCreate(HGE_VERSION);
+	g_hge = hgeCreate(HGE_VERSION);
 
 	// Set desired system states and initialize HGE
 
-	hge->System_SetState(HGE_LOGFILE, "hge_tut08.log");
-	hge->System_SetState(HGE_FRAMEFUNC, FrameFunc);
-	hge->System_SetState(HGE_RENDERFUNC, RenderFunc);
-	hge->System_SetState(HGE_TITLE, "HGE Tutorial 08 - The Big Calm");
-	hge->System_SetState(HGE_USESOUND, false);
-	hge->System_SetState(HGE_WINDOWED, true);
-	hge->System_SetState(HGE_SCREENWIDTH, SCREEN_WIDTH);
-	hge->System_SetState(HGE_SCREENHEIGHT, SCREEN_HEIGHT);
-	hge->System_SetState(HGE_SCREENBPP, 32);
+	g_hge->System_SetState(HGE_LOGFILE, "hge_tut08.log");
+	g_hge->System_SetState(HGE_FRAMEFUNC, FrameFunc);
+	g_hge->System_SetState(HGE_RENDERFUNC, RenderFunc);
+	g_hge->System_SetState(HGE_TITLE, "HGE Tutorial 08 - The Big Calm");
+	g_hge->System_SetState(HGE_USESOUND, false);
+	g_hge->System_SetState(HGE_WINDOWED, true);
+	g_hge->System_SetState(HGE_SCREENWIDTH, SCREEN_WIDTH);
+	g_hge->System_SetState(HGE_SCREENHEIGHT, SCREEN_HEIGHT);
+	g_hge->System_SetState(HGE_SCREENBPP, 32);
 
-	if(hge->System_Initiate())
+	if(g_hge->System_Initiate())
 	{
 		fnt=new hgeFont("font2.fnt");
 		
@@ -179,19 +180,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		{
 			// If one of the data files is not found, display an error message and shutdown
 			MessageBox(NULL, "Can't load resources. See log for details.", "Error", MB_OK | MB_ICONERROR | MB_APPLMODAL);
-			hge->System_Shutdown();
-			hge->Release();
+			g_hge->System_Shutdown();
+			g_hge->Release();
 			return 0;
 		}
 
-		hge->System_Start();
+		g_hge->System_Start();
 
 		DoneSimulation();
 		delete fnt;
 	}
 
-	hge->System_Shutdown();
-	hge->Release();
+	g_hge->System_Shutdown();
+	g_hge->Release();
 	return 0;
 }
 
@@ -214,7 +215,7 @@ bool InitSimulation()
 {
 	// Load texture
 	
-	texObjects=hge->Texture_Load("objects.png");
+	texObjects=g_hge->Texture_Load("objects.png");
 	if(!texObjects) return false;
 
 	// Create sprites
@@ -245,14 +246,14 @@ bool InitSimulation()
 
 	for(int i=0;i<NUM_STARS;i++) // star positions
 	{
-		starX[i]=hge->Random_Float(0, SCREEN_WIDTH);
-		starY[i]=hge->Random_Float(0, STARS_HEIGHT);
-		starS[i]=hge->Random_Float(0.1f, 0.7f);
+		starX[i]=g_hge->Random_Float(0, SCREEN_WIDTH);
+		starY[i]=g_hge->Random_Float(0, STARS_HEIGHT);
+		starS[i]=g_hge->Random_Float(0.1f, 0.7f);
 	}
 
 	for(int i=0;i<SEA_SUBDIVISION;i++) // sea waves phase shifts
 	{
-		seaP[i]=i+hge->Random_Float(-15.0f, 15.0f);
+		seaP[i]=i+g_hge->Random_Float(-15.0f, 15.0f);
 	}
 
 	// Systems are ready now!
@@ -276,7 +277,7 @@ void DoneSimulation()
 
 	// Free texture
 
-	hge->Texture_Free(texObjects);
+	g_hge->Texture_Free(texObjects);
 }
 
 
@@ -294,7 +295,7 @@ void UpdateSimulation()
 	if(speed==0.0f) time=GetTime();
 	else
 	{
-		time+=hge->Timer_GetDelta()*speed;
+		time+=g_hge->Timer_GetDelta()*speed;
 		if(time>=24.0f) time-=24.0f;
 	}
 
@@ -326,7 +327,7 @@ void UpdateSimulation()
 		for(int i=0; i<NUM_STARS; i++)
 		{
 			a=1.0f-starY[i]/STARS_HEIGHT;
-			a*=hge->Random_Float(0.6f, 1.0f);
+			a*=g_hge->Random_Float(0.6f, 1.0f);
 			if(seq_id>=6) a*=sinf((time-18.0f)/6.0f*M_PI_2);
 			else a*=sinf((1.0f-time/6.0f)*M_PI_2);
 			starA[i]=a;
@@ -405,7 +406,7 @@ void UpdateSimulation()
 		a=float(i)/(SEA_SUBDIVISION-1);
 		col1=colSeaTop*(1-a)+colSeaBtm*a;
 		dwCol1=col1.GetHWColor();
-		fTime=2.0f*hge->Timer_GetTime();
+		fTime=2.0f*g_hge->Timer_GetTime();
 		a*=20;
 
 		for(j=0; j<SEA_SUBDIVISION; j++)

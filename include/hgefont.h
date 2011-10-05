@@ -1,19 +1,13 @@
-/*
-** Haaf's Game Engine 1.7
-** Copyright (C) 2003-2007, Relish Games
-** hge.relishgames.com
-**
-** hgeFont helper class header
-*/
+/* Part of HGEPP project, a HGE-rewrite https://github.com/kvakvs/hgepp
+ * Based on Haaf's Game Engine 1.8.1 (C) 2003-2007, Relish Games http://hge.relishgames.com
+ * hgeFont helper class header
+ */
+#pragma once
 
+#include <hge.h>
+#include <hgesprite.h>
 
-#ifndef HGEFONT_H
-#define HGEFONT_H
-
-
-#include "hge.h"
-#include "hgesprite.h"
-
+namespace hge {
 
 #define HGETEXT_LEFT		0
 #define HGETEXT_RIGHT		1
@@ -28,7 +22,7 @@
 /*
 ** HGE Font class
 */
-class hgeFont
+class HGE_EXPORT hgeFont
 {
 public:
 	hgeFont(const char *filename, bool bMipmap=false);
@@ -69,9 +63,10 @@ private:
 
 	char*		_get_line(char *file, char *line);
 
-	static HGE	*hge;
+	//static HGE	*g_hgefont_hge;
+	static HGE * get_hge();
 
-	static char	buffer[1024];
+	//static char	g_hgefont_buffer[1024];
 
 	HTEXTURE	hTexture;
 	hgeSprite*	letters[256];
@@ -89,5 +84,4 @@ private:
 	int			nBlend;
 };
 
-
-#endif
+} // namespace hge

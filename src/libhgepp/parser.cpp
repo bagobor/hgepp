@@ -1,15 +1,13 @@
-/*
-** Haaf's Game Engine 1.7
-** Copyright (C) 2003-2007, Relish Games
-** hge.relishgames.com
-**
-** Resource script parser implementation
-*/
+/* Part of HGEPP project, a HGE-rewrite https://github.com/kvakvs/hgepp
+ * Based on Haaf's Game Engine 1.8.1 (C) 2003-2007, Relish Games http://hge.relishgames.com
+ * Resource script parser implementation
+ */
 
 #include "parser.h"
 
+namespace hge {
 
-HGE *RScriptParser::hge=0;
+HGE * g_scriptparser_hge=0;
 
 
 struct keyword
@@ -87,7 +85,7 @@ keyword keytable[]=
 
 RScriptParser::RScriptParser(char *name, char *scr)
 {
-	hge=hgeCreate(HGE_VERSION);
+	g_scriptparser_hge=hgeCreate(HGE_VERSION);
 
 	scriptname=name;
 	script=scr;
@@ -204,6 +202,48 @@ uint32_t RScriptParser::tkn_hex()
 
 void RScriptParser::ScriptPostError(char *msg1, char *msg2)
 {
-	hge->System_Log("%s, line %d: %s'%s'%s",
+	g_scriptparser_hge->System_Log("%s, line %d: %s'%s'%s",
 		get_name(), get_line(), msg1, tokenvalue[0] ? tkn_string():"<EOF>", msg2);
 }
+
+RScriptParser::~RScriptParser()
+{
+	g_scriptparser_hge->Release();
+}
+
+void RScriptParser::put_back()
+{
+	script-=strlen(tokenvalue);
+}
+
+int RScriptParser::get_line()
+{
+	return line;
+}
+
+char* RScriptParser::get_name()
+{
+	return scriptname;
+}
+
+char* RScriptParser::tkn_string()
+{
+	return tokenvalue;
+}
+
+int RScriptParser::tkn_int()
+{
+	return atoi(tokenvalue);
+}
+
+float RScriptParser::tkn_float()
+{
+	return (float)atof(tokenvalue);
+}
+
+bool RScriptParser::tkn_bool()
+{
+	return (tokenvalue[0]=='t' || tokenvalue[0]=='T') ? true : false;
+}
+
+} // namespace hge

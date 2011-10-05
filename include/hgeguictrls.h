@@ -1,22 +1,17 @@
-/*
-** Haaf's Game Engine 1.7
-** Copyright (C) 2003-2007, Relish Games
-** hge.relishgames.com
-**
-** hgeGUI default controls header
-*/
+/* Part of HGEPP project, a HGE-rewrite https://github.com/kvakvs/hgepp
+ * Based on Haaf's Game Engine 1.8.1 (C) 2003-2007, Relish Games http://hge.relishgames.com
+ * hgeGUI default controls header
+ */
 
+#pragma once
 
-#ifndef HGEGUICTRLS_H
-#define HGEGUICTRLS_H
+#include <hge.h>
+#include <hgesprite.h>
+#include <hgefont.h>
+#include <hgerect.h>
+#include <hgegui.h>
 
-
-#include "hge.h"
-#include "hgesprite.h"
-#include "hgefont.h"
-#include "hgerect.h"
-#include "hgegui.h"
-
+namespace hge {
 
 #define hgeButtonGetState(gui,id)		((hgeGUIButton*)gui->GetCtrl(id))->GetState()
 #define hgeButtonSetState(gui,id,b)		((hgeGUIButton*)gui->GetCtrl(id))->SetState(b)
@@ -29,7 +24,7 @@
 /*
 ** hgeGUIText
 */
-class hgeGUIText : public hgeGUIObject
+class HGE_EXPORT hgeGUIText : public hgeGUIObject
 {
 public:
 	hgeGUIText(int id, float x, float y, float w, float h, hgeFont *fnt);
@@ -51,7 +46,7 @@ private:
 /*
 ** hgeGUIButton
 */
-class hgeGUIButton : public hgeGUIObject
+class HGE_EXPORT hgeGUIButton : public hgeGUIObject
 {
 public:
 	hgeGUIButton(int id, float x, float y, float w, float h, HTEXTURE tex, float tx, float ty);
@@ -79,7 +74,7 @@ private:
 #define HGESLIDER_BARRELATIVE	1
 #define HGESLIDER_SLIDER		2
 
-class hgeGUISlider : public hgeGUIObject
+class HGE_EXPORT hgeGUISlider : public hgeGUIObject
 {
 public:
 	hgeGUISlider(int id, float x, float y, float w, float h, HTEXTURE tex, float tx, float ty, float sw, float sh, bool vertical=false);
@@ -112,7 +107,7 @@ struct hgeGUIListboxItem
 	hgeGUIListboxItem	*next;
 };
 
-class hgeGUIListbox : public hgeGUIObject
+class HGE_EXPORT hgeGUIListbox : public hgeGUIObject
 {
 public:
 	hgeGUIListbox(int id, float x, float y, float w, float h, hgeFont *fnt, uint32_t tColor, uint32_t thColor, uint32_t hColor);
@@ -120,18 +115,18 @@ public:
 
 	int				AddItem(char *item);
 	void			DeleteItem(int n);
-	int				GetSelectedItem() { return nSelectedItem; }
-	void			SetSelectedItem(int n) { if(n>=0 && n<GetNumItems()) nSelectedItem=n; }
-	int				GetTopItem() { return nTopItem; }
-	void			SetTopItem(int n) { if(n>=0 && n<=GetNumItems()-GetNumRows()) nTopItem=n; }
+	int				GetSelectedItem();
+	void			SetSelectedItem(int n);
+	int				GetTopItem();
+	void			SetTopItem(int n);
 
 	char			*GetItemText(int n);
-	int				GetNumItems() { return nItems; }
-	int				GetNumRows() { return int((rect.y2-rect.y1)/font->GetHeight()); }
+	int				GetNumItems();
+	int				GetNumRows();
 	void			Clear();
 
 	virtual void	Render();
-	virtual bool	MouseMove(float x, float y) { mx=x; my=y; return false; }
+	virtual bool	MouseMove(float x, float y);
 	virtual bool	MouseLButton(bool bDown);
 	virtual bool	MouseWheel(int nNotches);
 	virtual bool	KeyClick(int key, int chr);
@@ -146,5 +141,4 @@ private:
 	hgeGUIListboxItem	*pItems;
 };
 
-
-#endif
+} // namespace hge

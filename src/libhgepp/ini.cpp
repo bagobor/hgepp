@@ -1,14 +1,10 @@
-/*
-** Haaf's Game Engine 1.8
-** Copyright (C) 2003-2007, Relish Games
-** hge.relishgames.com
-**
-** Core functions implementation: ini file
-*/
-
-
+/* Part of HGEPP project, a HGE-rewrite https://github.com/kvakvs/hgepp
+ * Based on Haaf's Game Engine 1.8.1 (C) 2003-2007, Relish Games http://hge.relishgames.com
+ * Core functions implementation: ini file
+ */
 #include "hge_impl.h"
 
+namespace hge {
 
 void HGE_CALL HGE_Impl::Ini_SetInt(const char *section, const char *name, int value)
 {
@@ -71,3 +67,4 @@ char* HGE_CALL HGE_Impl::Ini_GetString(const char *section, const char *name, co
 	return szIniString;
 }
 
+} // namespace hge

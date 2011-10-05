@@ -1,7 +1,7 @@
 /*
 ** Haaf's Game Engine 1.8
 ** Copyright (C) 2003-2007, Relish Games
-** hge.relishgames.com
+** g_hge.relishgames.com
 **
 ** hge_tut07 - Thousand of Hares
 */
@@ -9,13 +9,14 @@
 
 // Copy the files "font2.fnt", "font2.png", "bg2.png"
 // and "zazaka.png" from the folder "precompiled" to
-// the folder with executable file. Also copy hge.dll
+// the folder with executable file. Also copy g_hge.dll
 // to the same folder.
 
 
-#include "..\..\include\hge.h"
-#include "..\..\include\hgefont.h"
+#include <hge.h>
+#include <hgefont.h>
 
+using namespace hge;
 
 #define SCREEN_WIDTH  800
 #define SCREEN_HEIGHT 600
@@ -37,8 +38,7 @@ int			nObjects;
 int			nBlend;
 
 // Pointer to the HGE interface (helper classes require this to work)
-
-HGE *hge=0;
+HGE *g_hge=0;
 
 // Resource handles
 
@@ -78,17 +78,17 @@ void SetBlend(int blend)
 
 	spr->SetBlendMode(sprBlend[blend]);
 	fnt->SetColor(fntColor[blend]);
-	for(int i=0;i<MAX_OBJECTS;i++) pObjects[i].color=sprColors[blend][hge->Random_Int(0,4)];
+	for(int i=0;i<MAX_OBJECTS;i++) pObjects[i].color=sprColors[blend][g_hge->Random_Int(0,4)];
 }
 
 bool FrameFunc()
 {
-	float dt=hge->Timer_GetDelta();
+	float dt=g_hge->Timer_GetDelta();
 	int i;
 
 	// Process keys
 
-	switch(hge->Input_GetKey())
+	switch(g_hge->Input_GetKey())
 	{
 		case HGEK_UP:		if(nObjects<MAX_OBJECTS) nObjects+=100; break;
 		case HGEK_DOWN:		if(nObjects>MIN_OBJECTS) nObjects-=100; break;
@@ -119,7 +119,7 @@ bool RenderFunc()
 	
 	// Render the scene
 	
-	hge->Gfx_BeginScene();
+	g_hge->Gfx_BeginScene();
 	bgspr->Render(0,0);
 	
 	for(i=0;i<nObjects;i++)
@@ -128,8 +128,8 @@ bool RenderFunc()
 		spr->RenderEx(pObjects[i].x, pObjects[i].y, pObjects[i].rot, pObjects[i].scale);
 	}
 
-	fnt->printf(7, 7, HGETEXT_LEFT, "UP and DOWN to adjust number of hares: %d\nSPACE to change blending mode: %d\nFPS: %d", nObjects, nBlend, hge->Timer_GetFPS());
-	hge->Gfx_EndScene();
+	fnt->printf(7, 7, HGETEXT_LEFT, "UP and DOWN to adjust number of hares: %d\nSPACE to change blending mode: %d\nFPS: %d", nObjects, nBlend, g_hge->Timer_GetFPS());
+	g_hge->Gfx_EndScene();
 
 	return false;
 }
@@ -138,34 +138,34 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
 	int i;
 
-	hge = hgeCreate(HGE_VERSION);
+	g_hge = hgeCreate(HGE_VERSION);
 
 	// Set desired system states and initialize HGE
 
-	hge->System_SetState(HGE_LOGFILE, "hge_tut07.log");
-	hge->System_SetState(HGE_FRAMEFUNC, FrameFunc);
-	hge->System_SetState(HGE_RENDERFUNC, RenderFunc);
-	hge->System_SetState(HGE_TITLE, "HGE Tutorial 07 - Thousand of Hares");
-	hge->System_SetState(HGE_USESOUND, false);
-	hge->System_SetState(HGE_WINDOWED, true);
-	hge->System_SetState(HGE_SCREENWIDTH, SCREEN_WIDTH);
-	hge->System_SetState(HGE_SCREENHEIGHT, SCREEN_HEIGHT);
-	hge->System_SetState(HGE_SCREENBPP, 32);
+	g_hge->System_SetState(HGE_LOGFILE, "hge_tut07.log");
+	g_hge->System_SetState(HGE_FRAMEFUNC, FrameFunc);
+	g_hge->System_SetState(HGE_RENDERFUNC, RenderFunc);
+	g_hge->System_SetState(HGE_TITLE, "HGE Tutorial 07 - Thousand of Hares");
+	g_hge->System_SetState(HGE_USESOUND, false);
+	g_hge->System_SetState(HGE_WINDOWED, true);
+	g_hge->System_SetState(HGE_SCREENWIDTH, SCREEN_WIDTH);
+	g_hge->System_SetState(HGE_SCREENHEIGHT, SCREEN_HEIGHT);
+	g_hge->System_SetState(HGE_SCREENBPP, 32);
 
-	if(hge->System_Initiate())
+	if(g_hge->System_Initiate())
 	{
 
 		// Load textures
 
-		bgtex=hge->Texture_Load("bg2.png");
-		tex=hge->Texture_Load("zazaka.png");
+		bgtex=g_hge->Texture_Load("bg2.png");
+		tex=g_hge->Texture_Load("zazaka.png");
 		if(!bgtex || !tex)
 		{
 			// If one of the data files is not found,
 			// display an error message and shutdown
 			MessageBox(NULL, "Can't load BG2.PNG or ZAZAKA.PNG", "Error", MB_OK | MB_ICONERROR | MB_APPLMODAL);
-			hge->System_Shutdown();
-			hge->Release();
+			g_hge->System_Shutdown();
+			g_hge->Release();
 			return 0;
 		}
 
@@ -189,21 +189,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 		for(i=0;i<MAX_OBJECTS;i++)
 		{
-			pObjects[i].x=hge->Random_Float(0,SCREEN_WIDTH);
-			pObjects[i].y=hge->Random_Float(0,SCREEN_HEIGHT);
-			pObjects[i].dx=hge->Random_Float(-200,200);
-			pObjects[i].dy=hge->Random_Float(-200,200);
-			pObjects[i].scale=hge->Random_Float(0.5f,2.0f);
-			pObjects[i].dscale=hge->Random_Float(-1.0f,1.0f);
-			pObjects[i].rot=hge->Random_Float(0,M_PI*2);
-			pObjects[i].drot=hge->Random_Float(-1.0f,1.0f);
+			pObjects[i].x=g_hge->Random_Float(0,SCREEN_WIDTH);
+			pObjects[i].y=g_hge->Random_Float(0,SCREEN_HEIGHT);
+			pObjects[i].dx=g_hge->Random_Float(-200,200);
+			pObjects[i].dy=g_hge->Random_Float(-200,200);
+			pObjects[i].scale=g_hge->Random_Float(0.5f,2.0f);
+			pObjects[i].dscale=g_hge->Random_Float(-1.0f,1.0f);
+			pObjects[i].rot=g_hge->Random_Float(0,M_PI*2);
+			pObjects[i].drot=g_hge->Random_Float(-1.0f,1.0f);
 		}
 		
 		SetBlend(0);
 
 		// Let's rock now!
 
-		hge->System_Start();
+		g_hge->System_Start();
 
 		// Delete created objects and free loaded resources
 
@@ -211,13 +211,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		delete fnt;
 		delete spr;
 		delete bgspr;
-		hge->Texture_Free(tex);
-		hge->Texture_Free(bgtex);
+		g_hge->Texture_Free(tex);
+		g_hge->Texture_Free(bgtex);
 	}
 
 	// Clean up and shutdown
 
-	hge->System_Shutdown();
-	hge->Release();
+	g_hge->System_Shutdown();
+	g_hge->Release();
 	return 0;
 }

@@ -1,20 +1,12 @@
-/*
-** Haaf's Game Engine 1.7
-** Copyright (C) 2003-2007, Relish Games
-** hge.relishgames.com
-**
-** hgeColor*** helper classes
-*/
+/* Part of HGEPP project, a HGE-rewrite https://github.com/kvakvs/hgepp
+ * Based on Haaf's Game Engine 1.8.1 (C) 2003-2007, Relish Games http://hge.relishgames.com
+ * hgeColor* helper classes
+ */
+#pragma once
 
+#include <hge.h>
 
-#ifndef HGECOLOR_H
-#define HGECOLOR_H
-
-
-#include "hge.h"
-
-
-#define hgeColor hgeColorRGB
+namespace hge {
 
 inline void ColorClamp(float &x) { if(x<0.0f) x=0.0f; if(x>1.0f) x=1.0f; }
 
@@ -76,5 +68,6 @@ public:
 
 inline hgeColorHSV operator* (const float sc, const hgeColorHSV &c) { return c*sc; }
 
+typedef hgeColorRGB hgeColor;
 
-#endif
+} // namespace hge

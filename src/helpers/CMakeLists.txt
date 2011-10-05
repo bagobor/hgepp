@@ -23,10 +23,10 @@ set( HGEHELPERS_SRC
     )
 
 #------ additional includes ------
-include_directories( ${HGE_SOURCE_DIR}/include )
+include_directories( ${HGEPP_SOURCE_DIR}/include )
 
 #------ link directories listed ------
-link_directories( ${HGE_SOURCE_DIR}/linklib )
+link_directories( ${HGEPP_SOURCE_DIR}/linklib )
 
 #------ precompiled headers support (not done for now) ------
 ## if (MSVC)

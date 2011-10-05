@@ -1,7 +1,7 @@
 /*
 ** Haaf's Game Engine 1.7
 ** Copyright (C) 2007, Relish Games
-** hge.relishgames.com
+** g_hge.relishgames.com
 **
 ** Particle systems editor
 */
@@ -10,7 +10,7 @@
 #include "particleed.h"
 
 
-HGE *hge=0;
+HGE *g_hge=0;
 
 
 hgeFont			*fnt;
@@ -33,12 +33,12 @@ void			CreateGUI();
 bool FrameFunc()
 {
 	float		px, py;
-	float		dt=hge->Timer_GetDelta();
+	float		dt=g_hge->Timer_GetDelta();
 	
 	// Update
 	
-	hge->Input_GetMousePos(&state.mx, &state.my);
-	if(hge->Input_GetKeyState(HGEK_RBUTTON)) { psx=state.mx; psy=state.my; }
+	g_hge->Input_GetMousePos(&state.mx, &state.my);
+	if(g_hge->Input_GetKeyState(HGEK_RBUTTON)) { psx=state.mx; psy=state.my; }
 	else { psx=400; psy=300; }
 
 	if(state.bIFace)
@@ -51,7 +51,7 @@ bool FrameFunc()
 	state.ps->MoveTo(px+(psx-px)*10*dt, py+(psy-py)*10*dt);
 	state.ps->Update(dt);
 
-	if(HandleKeys(hge->Input_GetKey())) return true;
+	if(HandleKeys(g_hge->Input_GetKey())) return true;
 
 	if(state.bIFace)
 	{
@@ -59,7 +59,7 @@ bool FrameFunc()
 	}
 
 	GetTextCtrl(CMD_NPARTICLES)->printf("%d", state.ps->GetParticlesAlive());
-	GetTextCtrl(CMD_FPS)->printf("%d", hge->Timer_GetFPS());
+	GetTextCtrl(CMD_FPS)->printf("%d", g_hge->Timer_GetFPS());
 
 	return false;
 }
@@ -70,8 +70,8 @@ bool RenderFunc()
 
 	// Render
 	
-	hge->Gfx_Clear(0);
-	hge->Gfx_BeginScene();
+	g_hge->Gfx_Clear(0);
+	g_hge->Gfx_BeginScene();
 
 	if(state.sprBG)	state.sprBG->Render(400, 300);
 
@@ -107,9 +107,9 @@ bool RenderFunc()
 			"Edit PARTICLEED.INI file to change backdrop or fullscreen/windowed mode");
 	}
 
-	if(hge->Input_IsMouseOver() && !hge->Input_GetKeyState(HGEK_RBUTTON)) sprCursor->Render(state.mx, state.my);
+	if(g_hge->Input_IsMouseOver() && !g_hge->Input_GetKeyState(HGEK_RBUTTON)) sprCursor->Render(state.mx, state.my);
 
-	hge->Gfx_EndScene();
+	g_hge->Gfx_EndScene();
 
 	return false;
 }
@@ -117,31 +117,31 @@ bool RenderFunc()
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
-	hge = hgeCreate(HGE_VERSION);
+	g_hge = hgeCreate(HGE_VERSION);
 
-	hge->System_SetState(HGE_INIFILE, "particleed.ini");
-	hge->System_SetState(HGE_LOGFILE, "particleed.log");
-	hge->System_SetState(HGE_FRAMEFUNC, FrameFunc);
-	hge->System_SetState(HGE_RENDERFUNC, RenderFunc);
-	hge->System_SetState(HGE_TITLE, "HGE Particle Systems Editor");
-	hge->System_SetState(HGE_SCREENWIDTH, 800);
-	hge->System_SetState(HGE_SCREENHEIGHT, 600);
-	hge->System_SetState(HGE_SCREENBPP, 32);
-	hge->System_SetState(HGE_USESOUND, false);
+	g_hge->System_SetState(HGE_INIFILE, "particleed.ini");
+	g_hge->System_SetState(HGE_LOGFILE, "particleed.log");
+	g_hge->System_SetState(HGE_FRAMEFUNC, FrameFunc);
+	g_hge->System_SetState(HGE_RENDERFUNC, RenderFunc);
+	g_hge->System_SetState(HGE_TITLE, "HGE Particle Systems Editor");
+	g_hge->System_SetState(HGE_SCREENWIDTH, 800);
+	g_hge->System_SetState(HGE_SCREENHEIGHT, 600);
+	g_hge->System_SetState(HGE_SCREENBPP, 32);
+	g_hge->System_SetState(HGE_USESOUND, false);
 
-	if(hge->Ini_GetInt("HGE", "FullScreen",0))	hge->System_SetState(HGE_WINDOWED, false);
-	else hge->System_SetState(HGE_WINDOWED, true);
+	if(g_hge->Ini_GetInt("HGE", "FullScreen",0))	g_hge->System_SetState(HGE_WINDOWED, false);
+	else g_hge->System_SetState(HGE_WINDOWED, true);
 
-	if(hge->System_Initiate())
+	if(g_hge->System_Initiate())
 	{
 		InitEditor();
-		hge->System_Start();
+		g_hge->System_Start();
 		DoneEditor();
 	}
-	else MessageBox(NULL, hge->System_GetErrorMessage(), "Error", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
+	else MessageBox(NULL, g_hge->System_GetErrorMessage(), "Error", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
 
-	hge->System_Shutdown();
-	hge->Release();
+	g_hge->System_Shutdown();
+	g_hge->Release();
 	return 0;
 }
 
@@ -154,24 +154,24 @@ void InitEditor()
 	state.texBG = 0;
 	state.sprBG = 0;
 
-	bgName = hge->Ini_GetString("HGE", "Background", 0);
+	bgName = g_hge->Ini_GetString("HGE", "Background", 0);
 	if(bgName)
 	{
-		state.texBG = hge->Texture_Load(bgName);
-		bgw = hge->Texture_GetWidth(state.texBG, true);
-		bgh = hge->Texture_GetHeight(state.texBG, true);
+		state.texBG = g_hge->Texture_Load(bgName);
+		bgw = g_hge->Texture_GetWidth(state.texBG, true);
+		bgh = g_hge->Texture_GetHeight(state.texBG, true);
 		state.sprBG = new hgeSprite(state.texBG, 0, 0, (float)bgw, (float)bgh);
 		state.sprBG->SetHotSpot((float)bgw/2, (float)bgh/2);
 	}
 
-	hge->Resource_AttachPack("particleed.paq");
+	g_hge->Resource_AttachPack("particleed.paq");
 	
 	state.bIFace=true;
 	state.bHelp=false;
 	state.bBBox=false;
 	state.nPreset=0;
 
-	texParticles=hge->Texture_Load("particles.png");
+	texParticles=g_hge->Texture_Load("particles.png");
 	sprParticles=new hgeAnimation(texParticles, 16, 1.0f, 0, 0, 32, 32);
 	sprParticles->SetHotSpot(16,16);
 	memset(&psi, 0, sizeof(hgeParticleSystemInfo));
@@ -181,7 +181,7 @@ void InitEditor()
 	state.ps->MoveTo(psx, psy);
 
 	fnt=new hgeFont("font3.fnt");
-	texGui=hge->Texture_Load("pgui.png");
+	texGui=g_hge->Texture_Load("pgui.png");
 
 	sprCursor=new hgeSprite(texGui, 487, 181, 19, 26);
 	sprColor=new hgeSprite(texGui, 466, 208, 14, 80);
@@ -203,7 +203,7 @@ void DoneEditor()
 	cmdSavePreset(state.nPreset);
 
 	if(state.sprBG) delete state.sprBG;
-	if(state.texBG) hge->Texture_Free(state.texBG);
+	if(state.texBG) g_hge->Texture_Free(state.texBG);
 
 	delete gui;
 	delete sprLeftPane1;
@@ -217,10 +217,10 @@ void DoneEditor()
 	delete state.ps;
 	delete sprParticles;
 
-	hge->Texture_Free(texParticles);
-	hge->Texture_Free(texGui);
+	g_hge->Texture_Free(texParticles);
+	g_hge->Texture_Free(texGui);
 
-	hge->Resource_RemoveAllPacks();
+	g_hge->Resource_RemoveAllPacks();
 }
 
 void CreateGUI()

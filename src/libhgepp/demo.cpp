@@ -1,15 +1,14 @@
-/*
-** Haaf's Game Engine 1.8
-** Copyright (C) 2003-2007, Relish Games
-** hge.relishgames.com
-**
-** Core functions implementation: HGE splash screen
-*/
+/* Part of HGEPP project, a HGE-rewrite https://github.com/kvakvs/hgepp
+ * Based on Haaf's Game Engine 1.8.1 (C) 2003-2007, Relish Games http://hge.relishgames.com
+ * Core functions implementation: HGE splash screen
+ */
 
 
 #include "hge_impl.h"
 
-#ifdef DEMO
+#ifdef HGE_COMPILE_SPLASHSCREEN
+
+namespace hge {
 
 hgeQuad dquad;
 float dtime;
@@ -213,4 +212,6 @@ bool DFrame() {
 	return false;
 }
 
-#endif
+} // namespace hge
+
+#endif // DEMO

@@ -1,19 +1,12 @@
-/*
-** Haaf's Game Engine 1.7
-** Copyright (C) 2003-2007, Relish Games
-** hge.relishgames.com
-**
-** hgeResourceManager resources implementation
-*/
-
-
-#include "..\..\include\hgeresource.h"
+/* Part of HGEPP project, a HGE-rewrite https://github.com/kvakvs/hgepp
+ * Based on Haaf's Game Engine 1.8.1 (C) 2003-2007, Relish Games http://hge.relishgames.com
+ * hgeResourceManager resources implementation
+ */
+#include <hgeresource.h>
 #include "parser.h"
 #include "resources.h"
 
-
-HGE *ResDesc::hge=0;
-
+namespace hge {
 
 /////////////// COMMON //
 
@@ -283,11 +276,11 @@ void RScript::Parse(hgeResourceManager *rm, RScriptParser *sp, const char *sname
 		res_script = new RScript(); // hack! we need an instance of RScript to access hge
 									// if all ok, this object is used later to keep the script
 
-		data=hge->Resource_Load(sname, &size);
+		data = get_hge()->Resource_Load(sname, &size);
 		if(!data)
 		{
 			if(sp) sp->ScriptPostError("Script "," not found.");
-			else hge->System_Log("Script '%s' not found.",sname);
+			else get_hge()->System_Log("Script '%s' not found.",sname);
 			delete res_script;
 			return;
 		}
@@ -296,7 +289,7 @@ void RScript::Parse(hgeResourceManager *rm, RScriptParser *sp, const char *sname
 			script= new char[size+1];
 			memcpy(script, data, size);
 			script[size]=0;
-			hge->Resource_Free(data);
+			get_hge()->Resource_Free(data);
 
 			strcpy(res_script->name, sname);
 			AddRes(rm, RES_SCRIPT, res_script);
@@ -388,13 +381,13 @@ void RResource::Parse(hgeResourceManager *rm, RScriptParser *sp, const char *nam
 
 uint32_t RResource::Get(hgeResourceManager *rm)
 {
-	if(!handle) handle=(uint32_t)hge->Resource_Load(filename);
+	if(!handle) handle=(uint32_t)get_hge()->Resource_Load(filename);
 	return handle;
 }
 
 void RResource::Free()
 {
-	if(handle) hge->Resource_Free((void *)handle);
+	if(handle) get_hge()->Resource_Free((void *)handle);
 	handle=0;
 }
 
@@ -444,13 +437,13 @@ void RTexture::Parse(hgeResourceManager *rm, RScriptParser *sp, const char *name
 
 uint32_t RTexture::Get(hgeResourceManager *rm)
 {
-	if(!handle) handle=(uint32_t)hge->Texture_Load(filename, 0, mipmap);
+	if(!handle) handle=(uint32_t)get_hge()->Texture_Load(filename, 0, mipmap);
 	return handle;
 }
 
 void RTexture::Free()
 {
-	if(handle) hge->Texture_Free((HTEXTURE)handle);
+	if(handle) get_hge()->Texture_Free((HTEXTURE)handle);
 	handle=0;
 }
 
@@ -463,13 +456,13 @@ void REffect::Parse(hgeResourceManager *rm, RScriptParser *sp, const char *name,
 
 uint32_t REffect::Get(hgeResourceManager *rm)
 {
-	if(!handle) handle=(uint32_t)hge->Effect_Load(filename);
+	if(!handle) handle=(uint32_t)get_hge()->Effect_Load(filename);
 	return handle;
 }
 
 void REffect::Free()
 {
-	if(handle) hge->Effect_Free((HEFFECT)handle);
+	if(handle) get_hge()->Effect_Free((HEFFECT)handle);
 	handle=0;
 }
 
@@ -526,8 +519,8 @@ uint32_t RMusic::Get(hgeResourceManager *rm)
 {
 	if(!handle)
 	{
-		handle=(uint32_t)hge->Music_Load(filename);
-		hge->Music_SetAmplification(handle, amplify);
+		handle=(uint32_t)get_hge()->Music_Load(filename);
+		get_hge()->Music_SetAmplification(handle, amplify);
 	}
 
 	return handle;
@@ -535,7 +528,7 @@ uint32_t RMusic::Get(hgeResourceManager *rm)
 
 void RMusic::Free()
 {
-	if(handle) hge->Music_Free((HMUSIC)handle);
+	if(handle) get_hge()->Music_Free((HMUSIC)handle);
 	handle=0;
 }
 
@@ -548,13 +541,13 @@ void RStream::Parse(hgeResourceManager *rm, RScriptParser *sp, const char *name,
 
 uint32_t RStream::Get(hgeResourceManager *rm)
 {
-	if(!handle) handle=(uint32_t)hge->Stream_Load(filename);
+	if(!handle) handle=(uint32_t)get_hge()->Stream_Load(filename);
 	return handle;
 }
 
 void RStream::Free()
 {
-	if(handle) hge->Stream_Free((HSTREAM)handle);
+	if(handle) get_hge()->Stream_Free((HSTREAM)handle);
 	handle=0;
 }
 
@@ -609,13 +602,13 @@ void RTarget::Parse(hgeResourceManager *rm, RScriptParser *sp, const char *name,
 
 uint32_t RTarget::Get(hgeResourceManager *rm)
 {
-	if(!handle) handle=(uint32_t)hge->Target_Create(width, height, zbuffer);
+	if(!handle) handle=(uint32_t)get_hge()->Target_Create(width, height, zbuffer);
 	return handle;
 }
 
 void RTarget::Free()
 {
-	if(handle) hge->Target_Free((HTARGET)handle);
+	if(handle) get_hge()->Target_Free((HTARGET)handle);
 	handle=0;
 }
 
@@ -1043,3 +1036,5 @@ void RStringTable::Free()
 	if(handle) delete (hgeStringTable *)handle;
 	handle=0;
 }
+
+} // namespace hge

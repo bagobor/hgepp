@@ -1,28 +1,27 @@
-/*
-** Haaf's Game Engine 1.7
-** Copyright (C) 2003-2007, Relish Games
-** hge.relishgames.com
-**
-** hgeParticleSystem helper class implementation
-*/
+/* Part of HGEPP project, a HGE-rewrite https://github.com/kvakvs/hgepp
+ * Based on Haaf's Game Engine 1.8.1 (C) 2003-2007, Relish Games http://hge.relishgames.com
+ * hgeParticleSystem helper class implementation
+ */
 
 
-#include "..\..\include\hgeparticle.h"
+#include <hgeparticle.h>
+
+namespace hge {
 
 
-HGE	*hgeParticleSystem::hge=0;
+HGE	* g_hgeparticlesys_hge=0;
 
 
 hgeParticleSystem::hgeParticleSystem(const char *filename, hgeSprite *sprite)
 {
 	void *psi;
 
-	hge=hgeCreate(HGE_VERSION);
+	g_hgeparticlesys_hge=hgeCreate(HGE_VERSION);
 
-	psi=hge->Resource_Load(filename);
+	psi=g_hgeparticlesys_hge->Resource_Load(filename);
 	if(!psi) return;
 	memcpy(&info, psi, sizeof(hgeParticleSystemInfo));
-	hge->Resource_Free(psi);
+	g_hgeparticlesys_hge->Resource_Free(psi);
 	info.sprite=sprite;
 
 	vecLocation.x=vecPrevLocation.x=0.0f;
@@ -40,7 +39,7 @@ hgeParticleSystem::hgeParticleSystem(const char *filename, hgeSprite *sprite)
 
 hgeParticleSystem::hgeParticleSystem(hgeParticleSystemInfo *psi)
 {
-	hge=hgeCreate(HGE_VERSION);
+	g_hgeparticlesys_hge=hgeCreate(HGE_VERSION);
 
 	memcpy(&info, psi, sizeof(hgeParticleSystemInfo));
 
@@ -60,7 +59,7 @@ hgeParticleSystem::hgeParticleSystem(hgeParticleSystemInfo *psi)
 hgeParticleSystem::hgeParticleSystem(const hgeParticleSystem &ps)
 {
 	memcpy(this, &ps, sizeof(hgeParticleSystem));
-	hge=hgeCreate(HGE_VERSION);
+	g_hgeparticlesys_hge=hgeCreate(HGE_VERSION);
 }
 
 void hgeParticleSystem::Update(float fDeltaTime)
@@ -133,32 +132,32 @@ void hgeParticleSystem::Update(float fDeltaTime)
 			if(nParticlesAlive>=MAX_PARTICLES) break;
 
 			par->fAge = 0.0f;
-			par->fTerminalAge = hge->Random_Float(info.fParticleLifeMin, info.fParticleLifeMax);
+			par->fTerminalAge = g_hgeparticlesys_hge->Random_Float(info.fParticleLifeMin, info.fParticleLifeMax);
 
-			par->vecLocation = vecPrevLocation+(vecLocation-vecPrevLocation)*hge->Random_Float(0.0f, 1.0f);
-			par->vecLocation.x += hge->Random_Float(-2.0f, 2.0f);
-			par->vecLocation.y += hge->Random_Float(-2.0f, 2.0f);
+			par->vecLocation = vecPrevLocation+(vecLocation-vecPrevLocation)*g_hgeparticlesys_hge->Random_Float(0.0f, 1.0f);
+			par->vecLocation.x += g_hgeparticlesys_hge->Random_Float(-2.0f, 2.0f);
+			par->vecLocation.y += g_hgeparticlesys_hge->Random_Float(-2.0f, 2.0f);
 
-			ang=info.fDirection-M_PI_2+hge->Random_Float(0,info.fSpread)-info.fSpread/2.0f;
+			ang=info.fDirection-M_PI_2+g_hgeparticlesys_hge->Random_Float(0,info.fSpread)-info.fSpread/2.0f;
 			if(info.bRelative) ang += (vecPrevLocation-vecLocation).Angle()+M_PI_2;
 			par->vecVelocity.x = cosf(ang);
 			par->vecVelocity.y = sinf(ang);
-			par->vecVelocity *= hge->Random_Float(info.fSpeedMin, info.fSpeedMax);
+			par->vecVelocity *= g_hgeparticlesys_hge->Random_Float(info.fSpeedMin, info.fSpeedMax);
 
-			par->fGravity = hge->Random_Float(info.fGravityMin, info.fGravityMax);
-			par->fRadialAccel = hge->Random_Float(info.fRadialAccelMin, info.fRadialAccelMax);
-			par->fTangentialAccel = hge->Random_Float(info.fTangentialAccelMin, info.fTangentialAccelMax);
+			par->fGravity = g_hgeparticlesys_hge->Random_Float(info.fGravityMin, info.fGravityMax);
+			par->fRadialAccel = g_hgeparticlesys_hge->Random_Float(info.fRadialAccelMin, info.fRadialAccelMax);
+			par->fTangentialAccel = g_hgeparticlesys_hge->Random_Float(info.fTangentialAccelMin, info.fTangentialAccelMax);
 
-			par->fSize = hge->Random_Float(info.fSizeStart, info.fSizeStart+(info.fSizeEnd-info.fSizeStart)*info.fSizeVar);
+			par->fSize = g_hgeparticlesys_hge->Random_Float(info.fSizeStart, info.fSizeStart+(info.fSizeEnd-info.fSizeStart)*info.fSizeVar);
 			par->fSizeDelta = (info.fSizeEnd-par->fSize) / par->fTerminalAge;
 
-			par->fSpin = hge->Random_Float(info.fSpinStart, info.fSpinStart+(info.fSpinEnd-info.fSpinStart)*info.fSpinVar);
+			par->fSpin = g_hgeparticlesys_hge->Random_Float(info.fSpinStart, info.fSpinStart+(info.fSpinEnd-info.fSpinStart)*info.fSpinVar);
 			par->fSpinDelta = (info.fSpinEnd-par->fSpin) / par->fTerminalAge;
 
-			par->colColor.r = hge->Random_Float(info.colColorStart.r, info.colColorStart.r+(info.colColorEnd.r-info.colColorStart.r)*info.fColorVar);
-			par->colColor.g = hge->Random_Float(info.colColorStart.g, info.colColorStart.g+(info.colColorEnd.g-info.colColorStart.g)*info.fColorVar);
-			par->colColor.b = hge->Random_Float(info.colColorStart.b, info.colColorStart.b+(info.colColorEnd.b-info.colColorStart.b)*info.fColorVar);
-			par->colColor.a = hge->Random_Float(info.colColorStart.a, info.colColorStart.a+(info.colColorEnd.a-info.colColorStart.a)*info.fAlphaVar);
+			par->colColor.r = g_hgeparticlesys_hge->Random_Float(info.colColorStart.r, info.colColorStart.r+(info.colColorEnd.r-info.colColorStart.r)*info.fColorVar);
+			par->colColor.g = g_hgeparticlesys_hge->Random_Float(info.colColorStart.g, info.colColorStart.g+(info.colColorEnd.g-info.colColorStart.g)*info.fColorVar);
+			par->colColor.b = g_hgeparticlesys_hge->Random_Float(info.colColorStart.b, info.colColorStart.b+(info.colColorEnd.b-info.colColorStart.b)*info.fColorVar);
+			par->colColor.a = g_hgeparticlesys_hge->Random_Float(info.colColorStart.a, info.colColorStart.a+(info.colColorEnd.a-info.colColorStart.a)*info.fAlphaVar);
 
 			par->colColorDelta.r = (info.colColorEnd.r-par->colColor.r) / par->fTerminalAge;
 			par->colColorDelta.g = (info.colColorEnd.g-par->colColor.g) / par->fTerminalAge;
@@ -260,3 +259,60 @@ hgeRect *hgeParticleSystem::GetBoundingBox(hgeRect *rect) const
 
 	return rect;
 }
+
+HGE * hgeParticleSystem::get_hge()
+{
+	return g_hgeparticlesys_hge;
+}
+
+hgeParticleSystem::~hgeParticleSystem()
+{
+	g_hgeparticlesys_hge->Release();
+}
+
+void hgeParticleSystem::Transpose( float x, float y )
+{
+	fTx=x; fTy=y;
+}
+
+void hgeParticleSystem::TrackBoundingBox( bool bTrack )
+{
+	bUpdateBoundingBox=bTrack;
+}
+
+void hgeParticleSystem::SetScale( float scale )
+{
+	fScale = scale;
+}
+
+int hgeParticleSystem::GetParticlesAlive() const
+{
+	return nParticlesAlive;
+}
+
+float hgeParticleSystem::GetAge() const
+{
+	return fAge;
+}
+
+void hgeParticleSystem::GetPosition( float *x, float *y ) const
+{
+	*x=vecLocation.x; *y=vecLocation.y;
+}
+
+void hgeParticleSystem::GetTransposition( float *x, float *y ) const
+{
+	*x=fTx; *y=fTy;
+}
+
+float hgeParticleSystem::GetScale()
+{
+	return fScale;
+}
+
+void hgeParticleManager::GetTransposition( float *dx, float *dy ) const
+{
+	*dx=tX; *dy=tY;
+}
+
+} // namespace hge

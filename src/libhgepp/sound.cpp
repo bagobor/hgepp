@@ -1,14 +1,10 @@
-/*
-** Haaf's Game Engine 1.8
-** Copyright (C) 2003-2007, Relish Games
-** hge.relishgames.com
-**
-** Core functions implementation: audio routines
-*/
-
-
+/* Part of HGEPP project, a HGE-rewrite https://github.com/kvakvs/hgepp
+ * Based on Haaf's Game Engine 1.8.1 (C) 2003-2007, Relish Games http://hge.relishgames.com
+ * Core functions implementation: audio routines
+ */
 #include "hge_impl.h"
 
+namespace hge {
 
 #define BASSDEF(f) (WINAPI *f)	// define the functions as pointers
 #include "BASS\bass.h"
@@ -555,8 +551,4 @@ void HGE_Impl::_SetFXVolume(int vol)
 	if(hBass) BASS_SetConfig(BASS_CONFIG_GVOL_SAMPLE, vol);
 }
 
-
-
-
-
-
+} // namespace hge

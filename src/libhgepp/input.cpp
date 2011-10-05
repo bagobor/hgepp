@@ -1,14 +1,10 @@
-/*
-** Haaf's Game Engine 1.8
-** Copyright (C) 2003-2007, Relish Games
-** hge.relishgames.com
-**
-** Core functions implementation: input
-*/
-
-
+/* Part of HGEPP project, a HGE-rewrite https://github.com/kvakvs/hgepp
+ * Based on Haaf's Game Engine 1.8.1 (C) 2003-2007, Relish Games http://hge.relishgames.com
+ * Core functions implementation: input
+ */
 #include "hge_impl.h"
 
+namespace hge {
 
 char *KeyNames[] =
 {
@@ -250,3 +246,5 @@ void HGE_Impl::_ClearQueue()
 
 	queue=0; VKey=0; Char=0; Zpos=0;
 }
+
+} // namespace hge

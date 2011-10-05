@@ -24,12 +24,12 @@ set( HGELIBPNG_SRC
     pngconf.h    )
 
 #------ additional includes ------
-include_directories( ${HGE_SOURCE_DIR}/include )
-include_directories( ${HGE_SOURCE_DIR}/src )
-include_directories( ${HGE_SOURCE_DIR}/src/zlib-1.2.5 )
+include_directories( ${HGEPP_SOURCE_DIR}/include )
+include_directories( ${HGEPP_SOURCE_DIR}/src )
+include_directories( ${HGEPP_SOURCE_DIR}/src/zlib-1.2.5 )
 
 #------ link directories listed ------
-link_directories( ${HGE_SOURCE_DIR}/linklib )
+link_directories( ${HGEPP_SOURCE_DIR}/linklib )
 
 #------ target -----
 add_library( hgelibpng STATIC ${HGELIBPNG_SRC} )

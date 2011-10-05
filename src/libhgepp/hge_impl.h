@@ -1,25 +1,20 @@
-/*
-** Haaf's Game Engine 1.8
-** Copyright (C) 2003-2007, Relish Games
-** hge.relishgames.com
-**
-** Common core implementation header
-*/
-
-
-#ifndef HGE_IMPL_H
-#define HGE_IMPL_H
+/* Part of HGEPP project, a HGE-rewrite https://github.com/kvakvs/hgepp
+ * Based on Haaf's Game Engine 1.8.1 (C) 2003-2007, Relish Games http://hge.relishgames.com
+ * Common core implementation header
+ */
+#pragma once
 
 #include <hge.h>
 #include <stdio.h>
 #include <hge_gapi.h>
 
 
-#define DEMO
+#define HGE_COMPILE_SPLASHSCREEN
 
 #define D3DFVF_HGEVERTEX (D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1)
 #define VERTEX_BUFFER_SIZE 4000
 
+namespace hge {
 
 typedef BOOL (WINAPI *GetSystemPowerStatusFunc)(LPSYSTEM_POWER_STATUS);
 
@@ -239,7 +234,7 @@ public:
     bool                bDontSuspend;
     HWND                hwndParent;
 
-    #ifdef DEMO
+    #ifdef HGE_COMPILE_SPLASHSCREEN
     bool                bDMO;
     #endif
 
@@ -338,9 +333,9 @@ public:
     // Timer
     float               fTime;
     float               fDeltaTime;
-    uint32_t               nFixedDelta;
+    uint32_t            nFixedDelta;
     int                 nFPS;
-    uint32_t               t0, t0fps, dt;
+    uint32_t            t0, t0fps, dt;
     int                 cfps;
 
 
@@ -350,5 +345,4 @@ private:
 
 extern HGE_Impl*        pHGE;
 
-#endif
-
+} // namespace hge

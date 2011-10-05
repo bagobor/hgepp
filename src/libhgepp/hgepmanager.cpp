@@ -1,14 +1,10 @@
-/*
-** Haaf's Game Engine 1.7
-** Copyright (C) 2003-2007, Relish Games
-** hge.relishgames.com
-**
-** hgeParticleManager helper class implementation
-*/
+/* Part of HGEPP project, a HGE-rewrite https://github.com/kvakvs/hgepp
+ * Based on Haaf's Game Engine 1.8.1 (C) 2003-2007, Relish Games http://hge.relishgames.com
+ * hgeParticleManager helper class implementation
+ */
+#include <hgeparticle.h>
 
-
-#include "..\..\include\hgeparticle.h"
-
+namespace hge {
 
 hgeParticleManager::hgeParticleManager()
 {
@@ -89,3 +85,5 @@ void hgeParticleManager::KillAll()
 	for(i=0;i<nPS;i++) delete psList[i];
 	nPS=0;
 }
+
+} // namespace hge

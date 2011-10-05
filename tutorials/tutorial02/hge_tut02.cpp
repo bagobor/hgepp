@@ -9,13 +9,15 @@
 
 // Copy the files "particles.png" and "menu.wav"
 // from the folder "precompiled" to the folder with
-// executable file. Also copy hge.dll and bass.dll
+// executable file. Also copy g_hge.dll and bass.dll
 // to the same folder.
 
 
-#include "..\..\include\hge.h"
+#include <hge.h>
 
-HGE *hge=0;
+using namespace hge;
+
+HGE *g_hge=0;
 
 // Quad is the basic primitive in HGE
 // used for rendering graphics.
@@ -38,7 +40,7 @@ const float friction=0.98f;
 void boom() {
 	int pan=int((x-400)/4);
 	float pitch=(dx*dx+dy*dy)*0.0005f+0.2f;
-	hge->Effect_PlayEx(snd,100,pan,pitch);
+	g_hge->Effect_PlayEx(snd,100,pan,pitch);
 }
 
 bool FrameFunc()
@@ -46,14 +48,14 @@ bool FrameFunc()
 	// Get the time elapsed since last call of FrameFunc().
 	// This will help us to synchronize on different
 	// machines and video modes.
-	float dt=hge->Timer_GetDelta();
+	float dt=g_hge->Timer_GetDelta();
 
 	// Process keys
-	if (hge->Input_GetKeyState(HGEK_ESCAPE)) return true;
-	if (hge->Input_GetKeyState(HGEK_LEFT)) dx-=speed*dt;
-	if (hge->Input_GetKeyState(HGEK_RIGHT)) dx+=speed*dt;
-	if (hge->Input_GetKeyState(HGEK_UP)) dy-=speed*dt;
-	if (hge->Input_GetKeyState(HGEK_DOWN)) dy+=speed*dt;
+	if (g_hge->Input_GetKeyState(HGEK_ESCAPE)) return true;
+	if (g_hge->Input_GetKeyState(HGEK_LEFT)) dx-=speed*dt;
+	if (g_hge->Input_GetKeyState(HGEK_RIGHT)) dx+=speed*dt;
+	if (g_hge->Input_GetKeyState(HGEK_UP)) dy-=speed*dt;
+	if (g_hge->Input_GetKeyState(HGEK_DOWN)) dy+=speed*dt;
 
 	// Do some movement calculations and collision detection	
 	dx*=friction; dy*=friction; x+=dx; y+=dy;
@@ -80,17 +82,17 @@ bool RenderFunc()
 	// Begin rendering quads.
 	// This function must be called
 	// before any actual rendering.
-	hge->Gfx_BeginScene();
+	g_hge->Gfx_BeginScene();
 
 	// Clear screen with black color
-	hge->Gfx_Clear(0);
+	g_hge->Gfx_Clear(0);
 
 	// Render quads here. This time just
 	// one of them will serve our needs.
-	hge->Gfx_RenderQuad(&quad);
+	g_hge->Gfx_RenderQuad(&quad);
 
 	// End rendering and update the screen
-	hge->Gfx_EndScene();
+	g_hge->Gfx_EndScene();
 
 	// RenderFunc should always return false
 	return false;
@@ -100,32 +102,32 @@ bool RenderFunc()
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
 	// Get HGE interface
-	hge = hgeCreate(HGE_VERSION);
+	g_hge = hgeCreate(HGE_VERSION);
 
 	// Set up log file, frame function, render function and window title
-	hge->System_SetState(HGE_LOGFILE, "hge_tut02.log");
-	hge->System_SetState(HGE_FRAMEFUNC, FrameFunc);
-	hge->System_SetState(HGE_RENDERFUNC, RenderFunc);
-	hge->System_SetState(HGE_TITLE, "HGE Tutorial 02 - Using input, sound and rendering");
+	g_hge->System_SetState(HGE_LOGFILE, "hge_tut02.log");
+	g_hge->System_SetState(HGE_FRAMEFUNC, FrameFunc);
+	g_hge->System_SetState(HGE_RENDERFUNC, RenderFunc);
+	g_hge->System_SetState(HGE_TITLE, "HGE Tutorial 02 - Using input, sound and rendering");
 
 	// Set up video mode
-	hge->System_SetState(HGE_WINDOWED, true);
-	hge->System_SetState(HGE_SCREENWIDTH, 800);
-	hge->System_SetState(HGE_SCREENHEIGHT, 600);
-	hge->System_SetState(HGE_SCREENBPP, 32);
+	g_hge->System_SetState(HGE_WINDOWED, true);
+	g_hge->System_SetState(HGE_SCREENWIDTH, 800);
+	g_hge->System_SetState(HGE_SCREENHEIGHT, 600);
+	g_hge->System_SetState(HGE_SCREENBPP, 32);
 
-	if(hge->System_Initiate())
+	if(g_hge->System_Initiate())
 	{
 		// Load sound and texture
-		snd=hge->Effect_Load("menu.wav");
-		quad.tex=hge->Texture_Load("particles.png");
+		snd=g_hge->Effect_Load("menu.wav");
+		quad.tex=g_hge->Texture_Load("particles.png");
 		if(!snd || !quad.tex)
 		{
 			// If one of the data files is not found, display
 			// an error message and shutdown.
 			MessageBox(NULL, "Can't load MENU.WAV or PARTICLES.PNG", "Error", MB_OK | MB_ICONERROR | MB_APPLMODAL);
-			hge->System_Shutdown();
-			hge->Release();
+			g_hge->System_Shutdown();
+			g_hge->Release();
 			return 0;
 		}
 
@@ -149,16 +151,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		quad.v[3].tx=96.0/128.0; quad.v[3].ty=96.0/128.0; 
 
 		// Let's rock now!
-		hge->System_Start();
+		g_hge->System_Start();
 
 		// Free loaded texture and sound
-		hge->Texture_Free(quad.tex);
-		hge->Effect_Free(snd);
+		g_hge->Texture_Free(quad.tex);
+		g_hge->Effect_Free(snd);
 	}
-	else MessageBox(NULL, hge->System_GetErrorMessage(), "Error", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
+	else MessageBox(NULL, g_hge->System_GetErrorMessage(), "Error", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
 
 	// Clean up and shutdown
-	hge->System_Shutdown();
-	hge->Release();
+	g_hge->System_Shutdown();
+	g_hge->Release();
 	return 0;
 }

@@ -1,20 +1,19 @@
-/*
-** Haaf's Game Engine 1.7
-** Copyright (C) 2003-2007, Relish Games
-** hge.relishgames.com
-**
-** hgeStringTable helper class implementation
-*/
+/* Part of HGEPP project, a HGE-rewrite https://github.com/kvakvs/hgepp
+ * Based on Haaf's Game Engine 1.8.1 (C) 2003-2007, Relish Games http://hge.relishgames.com
+ * hgeStringTable helper class implementation
+ */
 
 
-#include "..\..\include\hgestrings.h"
+#include <hgestrings.h>
 #include <ctype.h>
+
+namespace hge {
 
 const char STRHEADERTAG[]="[HGESTRINGTABLE]";
 const char STRFORMATERROR[]="String table %s has incorrect format.";
 
 
-HGE *hgeStringTable::hge=0;
+HGE * g_hgestringtab_hge=0;
 
 
 hgeStringTable::hgeStringTable(const char *filename)
@@ -27,22 +26,22 @@ hgeStringTable::hgeStringTable(const char *filename)
 	char str_name[MAXSTRNAMELENGTH];
 	char *str_value, *pvalue;
 	
-	hge=hgeCreate(HGE_VERSION);
+	g_hgestringtab_hge=hgeCreate(HGE_VERSION);
 	strings=0;
 
 	// load string table file
-	data=hge->Resource_Load(filename, &size);
+	data=g_hgestringtab_hge->Resource_Load(filename, &size);
 	if(!data) return;
 
 	desc = new char[size+1];
 	memcpy(desc,data,size);
 	desc[size]=0;
-	hge->Resource_Free(data);
+	g_hgestringtab_hge->Resource_Free(data);
 
 	// check header
 	if(memcmp(desc, STRHEADERTAG, sizeof(STRHEADERTAG)-1))
 	{
-		hge->System_Log(STRFORMATERROR, filename);
+		g_hgestringtab_hge->System_Log(STRFORMATERROR, filename);
 		delete[] desc;	
 		return;
 	}
@@ -80,12 +79,12 @@ hgeStringTable::hgeStringTable(const char *filename)
 
 		// skip whitespaces to '='
 		while(isspace(*pdesc)) pdesc++;
-		if(*pdesc!='=')	{ hge->System_Log(STRFORMATERROR, filename); break; }
+		if(*pdesc!='=')	{ g_hgestringtab_hge->System_Log(STRFORMATERROR, filename); break; }
 		pdesc++;
 
 		// skip whitespaces to '"'
 		while(isspace(*pdesc)) pdesc++;
-		if(*pdesc!='"')	{ hge->System_Log(STRFORMATERROR, filename); break;	}
+		if(*pdesc!='"')	{ g_hgestringtab_hge->System_Log(STRFORMATERROR, filename); break;	}
 		pdesc++;
 
 		// parse string value till the closing '"' -> str_value
@@ -151,7 +150,7 @@ hgeStringTable::~hgeStringTable()
 		str=strnext;
 	}
 
-	hge->Release();
+	g_hgestringtab_hge->Release();
 }
 
 char *hgeStringTable::GetString(const char *name)
@@ -166,3 +165,11 @@ char *hgeStringTable::GetString(const char *name)
 
 	return 0;
 }
+
+HGE * hgeStringTable::get_hge()
+{
+	return g_hgestringtab_hge;
+}
+
+
+} // namespace hge

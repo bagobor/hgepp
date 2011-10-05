@@ -5,19 +5,17 @@
 **
 ** Particle systems editor
 */
+#pragma once
 
 
-#ifndef PARTICLEED_H
-#define PARTICLEED_H
+#include <hge.h>
+#include <hgeanim.h>
+#include <hgefont.h>
+#include <hgeparticle.h>
+#include <hgegui.h>
+#include <hgeguictrls.h>
 
-
-#include "..\..\include\hge.h"
-#include "..\..\include\hgeanim.h"
-#include "..\..\include\hgefont.h"
-#include "..\..\include\hgeparticle.h"
-#include "..\..\include\hgegui.h"
-#include "..\..\include\hgeguictrls.h"
-
+using namespace hge;
 
 #define PARTICLE_SIZE			32
 
@@ -28,7 +26,7 @@
 #define GetTextCtrl(id)			((hgeGUIText*)gui->GetCtrl(id))
 
 
-extern HGE *hge;
+extern HGE *g_hge;
 
 struct PEditorState
 {
@@ -133,5 +131,3 @@ void cmdChangeColor(int id);
 #define CMD_PA_BEND				60
 #define CMD_PA_RGBVAR			61
 
-
-#endif

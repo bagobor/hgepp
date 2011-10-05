@@ -1,32 +1,29 @@
-/*
-** Haaf's Game Engine 1.7
-** Copyright (C) 2003-2007, Relish Games
-** hge.relishgames.com
-**
-** hgeSprite helper class implementation
-*/
+/* Part of HGEPP project, a HGE-rewrite https://github.com/kvakvs/hgepp
+ * Based on Haaf's Game Engine 1.8.1 (C) 2003-2007, Relish Games http://hge.relishgames.com
+ * hgeSprite helper class implementation
+ */
 
-
-#include "..\..\include\hgesprite.h"
+#include <hgesprite.h>
 #include <math.h>
 
+namespace hge {
 
-HGE *hgeSprite::hge=0;
+HGE * g_hgesprite_hge = 0;
 
 
 hgeSprite::hgeSprite(HTEXTURE texture, float texx, float texy, float w, float h)
 {
 	float texx1, texy1, texx2, texy2;
 
-	hge=hgeCreate(HGE_VERSION);
+	g_hgesprite_hge = hgeCreate(HGE_VERSION);
 	
 	tx=texx; ty=texy;
 	width=w; height=h;
 
 	if(texture)
 	{
-		tex_width = (float)hge->Texture_GetWidth(texture);
-		tex_height = (float)hge->Texture_GetHeight(texture);
+		tex_width = (float)g_hgesprite_hge->Texture_GetWidth(texture);
+		tex_height = (float)g_hgesprite_hge->Texture_GetHeight(texture);
 	}
 	else
 	{
@@ -67,7 +64,7 @@ hgeSprite::hgeSprite(HTEXTURE texture, float texx, float texy, float w, float h)
 hgeSprite::hgeSprite(const hgeSprite &spr)
 {
 	memcpy(this, &spr, sizeof(hgeSprite));
-	hge=hgeCreate(HGE_VERSION);
+	g_hgesprite_hge = hgeCreate(HGE_VERSION);
 }
 
 void hgeSprite::Render(float x, float y)
@@ -84,7 +81,7 @@ void hgeSprite::Render(float x, float y)
 	quad.v[2].x = tempx2; quad.v[2].y = tempy2;
 	quad.v[3].x = tempx1; quad.v[3].y = tempy2;
 
-	hge->Gfx_RenderQuad(&quad);
+	g_hgesprite_hge->Gfx_RenderQuad(&quad);
 }
 
 
@@ -125,7 +122,7 @@ void hgeSprite::RenderEx(float x, float y, float rot, float hscale, float vscale
 		quad.v[3].x = tx1 + x; quad.v[3].y = ty2 + y;
 	}
 
-	hge->Gfx_RenderQuad(&quad);
+	g_hgesprite_hge->Gfx_RenderQuad(&quad);
 }
 
 
@@ -136,7 +133,7 @@ void hgeSprite::RenderStretch(float x1, float y1, float x2, float y2)
 	quad.v[2].x = x2; quad.v[2].y = y2;
 	quad.v[3].x = x1; quad.v[3].y = y2;
 
-	hge->Gfx_RenderQuad(&quad);
+	g_hgesprite_hge->Gfx_RenderQuad(&quad);
 }
 
 
@@ -147,7 +144,7 @@ void hgeSprite::Render4V(float x0, float y0, float x1, float y1, float x2, float
 	quad.v[2].x = x2; quad.v[2].y = y2;
 	quad.v[3].x = x3; quad.v[3].y = y3;
 
-	hge->Gfx_RenderQuad(&quad);
+	g_hgesprite_hge->Gfx_RenderQuad(&quad);
 }
 
 
@@ -227,8 +224,8 @@ void hgeSprite::SetTexture(HTEXTURE tex)
 
 	if(tex)
 	{
-		tw = (float)hge->Texture_GetWidth(tex);
-		th = (float)hge->Texture_GetHeight(tex);
+		tw = (float)g_hgesprite_hge->Texture_GetWidth(tex);
+		th = (float)g_hgesprite_hge->Texture_GetHeight(tex);
 	}
 	else
 	{
@@ -279,8 +276,11 @@ void hgeSprite::SetTextureRect(float x, float y, float w, float h, bool adjSize)
 	quad.v[2].tx=tx2; quad.v[2].ty=ty2; 
 	quad.v[3].tx=tx1; quad.v[3].ty=ty2; 
 
-	bX=bXFlip; bY=bYFlip; bHS=bHSFlip;
-	bXFlip=false; bYFlip=false;
+	bX=bXFlip;
+	bY=bYFlip;
+	bHS=bHSFlip;
+	bXFlip=false;
+	bYFlip=false;
 	SetFlip(bX,bY,bHS);
 }
 
@@ -299,4 +299,11 @@ void hgeSprite::SetZ(float z, int i)
 		quad.v[i].z = z;
 	else
 		quad.v[0].z = quad.v[1].z = quad.v[2].z = quad.v[3].z = z;
+}
+
+HGE * hgeSprite::get_hge()
+{
+	return g_hgesprite_hge;
+}
+
 }

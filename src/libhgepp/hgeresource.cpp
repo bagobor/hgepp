@@ -1,23 +1,23 @@
-/*
-** Haaf's Game Engine 1.7
-** Copyright (C) 2003-2007, Relish Games
-** hge.relishgames.com
-**
-** hgeResourceManager helper class implementation
-*/
+/* Part of HGEPP project, a HGE-rewrite https://github.com/kvakvs/hgepp
+ * Based on Haaf's Game Engine 1.8.1 (C) 2003-2007, Relish Games http://hge.relishgames.com
+ * hgeResourceManager helper class implementation
+ */
 
 
-#include "..\..\include\hgeresource.h"
+#include <hgeresource.h>
 #include "parser.h"
 #include "resources.h"
 
 
-HGE *hgeResourceManager::hge=0;
+namespace hge {
+
+HGE * g_rmanager_hge=0;
+HGE * g_resdesc_hge=0;
 
 
 hgeResourceManager::hgeResourceManager(const char *scriptname)
 {
-	hge=hgeCreate(HGE_VERSION);
+	g_rmanager_hge=hgeCreate(HGE_VERSION);
 
 	for(int i=0;i<RESTYPES;i++) res[i]=0;
 	_parse_script(scriptname);
@@ -26,7 +26,7 @@ hgeResourceManager::hgeResourceManager(const char *scriptname)
 hgeResourceManager::~hgeResourceManager()
 {
 	_remove_all();
-	hge->Release();
+	g_rmanager_hge->Release();
 }
 
 void hgeResourceManager::_parse_script(const char *scriptname)
@@ -118,7 +118,7 @@ void* hgeResourceManager::GetResource(const char *name, int resgroup)
 	if(Res) return (void *)Res->Get(this);
 	else
 	{
-		reshandle=hge->Resource_Load(name);
+		reshandle=g_rmanager_hge->Resource_Load(name);
 		if(reshandle)
 		{
 			resource=new RResource();
@@ -143,7 +143,7 @@ HTEXTURE hgeResourceManager::GetTexture(const char *name, int resgroup)
 	if(Res) return (HTEXTURE)Res->Get(this);
 	else
 	{
-		reshandle=hge->Texture_Load(name);
+		reshandle=g_rmanager_hge->Texture_Load(name);
 		if(reshandle)
 		{
 			resource=new RTexture();
@@ -169,7 +169,7 @@ HEFFECT hgeResourceManager::GetEffect(const char *name, int resgroup)
 	if(Res) return (HEFFECT)Res->Get(this);
 	else
 	{
-		reshandle=hge->Effect_Load(name);
+		reshandle=g_rmanager_hge->Effect_Load(name);
 		if(reshandle)
 		{
 			resource=new REffect();
@@ -194,7 +194,7 @@ HMUSIC hgeResourceManager::GetMusic(const char *name, int resgroup)
 	if(Res) return (HMUSIC)Res->Get(this);
 	else
 	{
-		reshandle=hge->Music_Load(name);
+		reshandle=g_rmanager_hge->Music_Load(name);
 		if(reshandle)
 		{
 			resource=new RMusic();
@@ -219,7 +219,7 @@ HSTREAM hgeResourceManager::GetStream(const char *name, int resgroup)
 	if(Res) return (HSTREAM)Res->Get(this);
 	else
 	{
-		reshandle=hge->Stream_Load(name);
+		reshandle=g_rmanager_hge->Stream_Load(name);
 		if(reshandle)
 		{
 			resource=new RStream();
@@ -302,3 +302,25 @@ hgeStringTable* hgeResourceManager::GetStringTable(const char *name, int resgrou
 
 	return 0;
 }
+
+HGE * hgeResourceManager::get_hge()
+{
+	return g_rmanager_hge;
+}
+
+ResDesc::ResDesc()
+{
+	g_resdesc_hge=hgeCreate(HGE_VERSION);
+}
+
+ResDesc::~ResDesc()
+{
+	g_resdesc_hge->Release();
+}
+
+HGE * ResDesc::get_hge()
+{
+	return g_resdesc_hge;
+}
+
+} // namespace hge

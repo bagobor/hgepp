@@ -1,29 +1,23 @@
-/*
-** Haaf's Game Engine 1.7
-** Copyright (C) 2003-2007, Relish Games
-** hge.relishgames.com
-**
-** hgeSprite helper class header
-*/
+/* Part of HGEPP project, a HGE-rewrite https://github.com/kvakvs/hgepp
+ * Based on Haaf's Game Engine 1.8.1 (C) 2003-2007, Relish Games http://hge.relishgames.com
+ * hgeSprite helper class header
+ */
+#pragma once
 
+#include <hge.h>
+#include <hgerect.h>
 
-#ifndef HGESPRITE_H
-#define HGESPRITE_H
-
-
-#include "hge.h"
-#include "hgerect.h"
-
+namespace hge {
 
 /*
 ** HGE Sprite class
 */
-class hgeSprite
+class HGE_EXPORT hgeSprite
 {
 public:
 	hgeSprite(HTEXTURE tex, float x, float y, float w, float h);
 	hgeSprite(const hgeSprite &spr);
-	~hgeSprite() { hge->Release(); }
+	~hgeSprite() { get_hge()->Release(); }
 	
 	
 	void		Render(float x, float y);
@@ -54,7 +48,7 @@ public:
 
 protected:
 	hgeSprite();
-	static HGE	*hge;
+	static HGE * get_hge();
 
 	hgeQuad		quad;
 	float		tx, ty, width, height;
@@ -63,5 +57,4 @@ protected:
 	bool		bXFlip, bYFlip, bHSFlip;
 };
 
-
-#endif
+} // namespace hge

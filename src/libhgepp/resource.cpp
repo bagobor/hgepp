@@ -1,18 +1,14 @@
-/*
-** Haaf's Game Engine 1.8
-** Copyright (C) 2003-2007, Relish Games
-** hge.relishgames.com
-**
-** Core functions implementation: resources management
-*/
-
-
+/* Part of HGEPP project, a HGE-rewrite https://github.com/kvakvs/hgepp
+ * Based on Haaf's Game Engine 1.8.1 (C) 2003-2007, Relish Games http://hge.relishgames.com
+ * Core functions implementation: resources management
+ */
 #include "hge_impl.h"
 
 #define NOCRYPT
 //#define NOUNCRYPT
 #include <unzip.h>
 
+namespace hge {
 
 bool HGE_CALL HGE_Impl::Resource_AttachPack(const char *filename, const char *password)
 {
@@ -257,3 +253,5 @@ char* HGE_CALL HGE_Impl::Resource_EnumFolders(const char *wildcard)
 		}
 	}
 }
+
+} // namespace hge

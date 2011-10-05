@@ -1,14 +1,12 @@
-/*
-** Haaf's Game Engine 1.8
-** Copyright (C) 2003-2007, Relish Games
-** hge.relishgames.com
-**
-** Core functions implementation: random number generation
-*/
-
-
+/* Part of HGEPP project, a HGE-rewrite https://github.com/kvakvs/hgepp
+ * Based on Haaf's Game Engine 1.8.1 (C) 2003-2007, Relish Games http://hge.relishgames.com
+ * Core functions implementation: random number generation
+ */
 #include "hge_impl.h"
 
+namespace hge {
+
+	// TODO: This needs to go, replace with Mersenne Twister
 
 unsigned int g_seed=0;
 
@@ -30,3 +28,6 @@ float HGE_CALL HGE_Impl::Random_Float(float min, float max)
 	//return min+g_seed*(1.0f/4294967295.0f)*(max-min);
 	return min+(g_seed>>16)*(1.0f/65535.0f)*(max-min);
 }
+
+
+} // namespace hge

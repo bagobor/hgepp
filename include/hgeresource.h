@@ -1,24 +1,19 @@
-/*
-** Haaf's Game Engine 1.7
-** Copyright (C) 2003-2007, Relish Games
-** hge.relishgames.com
-**
-** hgeResourceManager helper class header
-*/
+/* Part of HGEPP project, a HGE-rewrite https://github.com/kvakvs/hgepp
+ * Based on Haaf's Game Engine 1.8.1 (C) 2003-2007, Relish Games http://hge.relishgames.com
+ * hgeResourceManager helper class header
+ */
 
+#pragma once
 
-#ifndef HGERESOURCE_H
-#define HGERESOURCE_H
+#include <hge.h>
+#include <hgesprite.h>
+#include <hgeanim.h>
+#include <hgefont.h>
+#include <hgeparticle.h>
+#include <hgedistort.h>
+#include <hgestrings.h>
 
-
-#include "hge.h"
-#include "hgesprite.h"
-#include "hgeanim.h"
-#include "hgefont.h"
-#include "hgeparticle.h"
-#include "hgedistort.h"
-#include "hgestrings.h"
-
+namespace hge {
 
 #define RESTYPES 13
 #define MAXRESCHARS 128
@@ -26,27 +21,28 @@
 
 class hgeResourceManager;
 
-struct ResDesc
+struct HGE_EXPORT ResDesc
 {
 	char		name[MAXRESCHARS];
 	int			resgroup;
-	uint32_t		handle;
+	uint32_t	handle;
 	ResDesc*	next;
 
-	ResDesc()	{ hge=hgeCreate(HGE_VERSION); }
-	~ResDesc()	{ hge->Release(); }
+	ResDesc();
+	~ResDesc();
 
 	virtual uint32_t Get(hgeResourceManager *rm) = 0;
 	virtual void  Free() = 0;
 
 protected:
-	static HGE	*hge;
+	static HGE * get_hge();
+	//static HGE	*g_resdesc_hge;
 };
 
 /*
 ** HGE Resource manager class
 */
-class hgeResourceManager
+class HGE_EXPORT hgeResourceManager
 {
 public:
 	hgeResourceManager(const char *scriptname=0);
@@ -78,8 +74,8 @@ private:
 	void				_remove_all();
 	void				_parse_script(const char *scriptname=0);
 
-	static HGE			*hge;
+	//static HGE			* g_rmanager_hge;
+	static HGE * get_hge();
 };
 
-
-#endif
+} // namespace hge

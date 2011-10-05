@@ -1,7 +1,7 @@
 /*
 ** Haaf's Game Engine 1.8
 ** Copyright (C) 2003-2007, Relish Games
-** hge.relishgames.com
+** g_hge.relishgames.com
 **
 ** hge_tut03 - Using helper classes
 */
@@ -10,19 +10,20 @@
 // Copy the files "particles.png", "menu.wav",
 // "font1.fnt", "font1.png" and "trail.psi" from
 // the folder "precompiled" to the folder with
-// executable file. Also copy hge.dll and bass.dll
+// executable file. Also copy g_hge.dll and bass.dll
 // to the same folder.
 
 
-#include "..\..\include\hge.h"
-#include "..\..\include\hgesprite.h"
-#include "..\..\include\hgefont.h"
-#include "..\..\include\hgeparticle.h"
+#include <hge.h>
+#include <hgesprite.h>
+#include <hgefont.h>
+#include <hgeparticle.h>
 
+using namespace hge;
 
 // Pointer to the HGE interface.
 // Helper classes require this to work.
-HGE *hge=0;
+HGE * g_hge=0;
 
 
 // Pointers to the HGE objects we will use
@@ -46,19 +47,19 @@ const float friction=0.98f;
 void boom() {
 	int pan=int((x-400)/4);
 	float pitch=(dx*dx+dy*dy)*0.0005f+0.2f;
-	hge->Effect_PlayEx(snd,100,pan,pitch);
+	g_hge->Effect_PlayEx(snd,100,pan,pitch);
 }
 
 bool FrameFunc()
 {
-	float dt=hge->Timer_GetDelta();
+	float dt=g_hge->Timer_GetDelta();
 
 	// Process keys
-	if (hge->Input_GetKeyState(HGEK_ESCAPE)) return true;
-	if (hge->Input_GetKeyState(HGEK_LEFT)) dx-=speed*dt;
-	if (hge->Input_GetKeyState(HGEK_RIGHT)) dx+=speed*dt;
-	if (hge->Input_GetKeyState(HGEK_UP)) dy-=speed*dt;
-	if (hge->Input_GetKeyState(HGEK_DOWN)) dy+=speed*dt;
+	if (g_hge->Input_GetKeyState(HGEK_ESCAPE)) return true;
+	if (g_hge->Input_GetKeyState(HGEK_LEFT)) dx-=speed*dt;
+	if (g_hge->Input_GetKeyState(HGEK_RIGHT)) dx+=speed*dt;
+	if (g_hge->Input_GetKeyState(HGEK_UP)) dy-=speed*dt;
+	if (g_hge->Input_GetKeyState(HGEK_DOWN)) dy+=speed*dt;
 
 	// Do some movement calculations and collision detection	
 	dx*=friction; dy*=friction; x+=dx; y+=dy;
@@ -79,12 +80,12 @@ bool FrameFunc()
 bool RenderFunc()
 {
 	// Render graphics
-	hge->Gfx_BeginScene();
-	hge->Gfx_Clear(0);
+	g_hge->Gfx_BeginScene();
+	g_hge->Gfx_Clear(0);
 	par->Render();
 	spr->Render(x, y);
-	fnt->printf(5, 5, HGETEXT_LEFT, "dt:%.3f\nFPS:%d (constant)", hge->Timer_GetDelta(), hge->Timer_GetFPS());
-	hge->Gfx_EndScene();
+	fnt->printf(5, 5, HGETEXT_LEFT, "dt:%.3f\nFPS:%d (constant)", g_hge->Timer_GetDelta(), g_hge->Timer_GetFPS());
+	g_hge->Gfx_EndScene();
 
 	return false;
 }
@@ -92,30 +93,30 @@ bool RenderFunc()
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
-	hge = hgeCreate(HGE_VERSION);
+	g_hge = hgeCreate(HGE_VERSION);
 
-	hge->System_SetState(HGE_LOGFILE, "hge_tut03.log");
-	hge->System_SetState(HGE_FRAMEFUNC, FrameFunc);
-	hge->System_SetState(HGE_RENDERFUNC, RenderFunc);
-	hge->System_SetState(HGE_TITLE, "HGE Tutorial 03 - Using helper classes");
-	hge->System_SetState(HGE_FPS, 100);
-	hge->System_SetState(HGE_WINDOWED, true);
-	hge->System_SetState(HGE_SCREENWIDTH, 800);
-	hge->System_SetState(HGE_SCREENHEIGHT, 600);
-	hge->System_SetState(HGE_SCREENBPP, 32);
+	g_hge->System_SetState(HGE_LOGFILE, "hge_tut03.log");
+	g_hge->System_SetState(HGE_FRAMEFUNC, FrameFunc);
+	g_hge->System_SetState(HGE_RENDERFUNC, RenderFunc);
+	g_hge->System_SetState(HGE_TITLE, "HGE Tutorial 03 - Using helper classes");
+	g_hge->System_SetState(HGE_FPS, 100);
+	g_hge->System_SetState(HGE_WINDOWED, true);
+	g_hge->System_SetState(HGE_SCREENWIDTH, 800);
+	g_hge->System_SetState(HGE_SCREENHEIGHT, 600);
+	g_hge->System_SetState(HGE_SCREENBPP, 32);
 
-	if(hge->System_Initiate()) {
+	if(g_hge->System_Initiate()) {
 
 		// Load sound and texture
-		snd=hge->Effect_Load("menu.wav");
-		tex=hge->Texture_Load("particles.png");
+		snd=g_hge->Effect_Load("menu.wav");
+		tex=g_hge->Texture_Load("particles.png");
 		if(!snd || !tex)
 		{
 			// If one of the data files is not found, display
 			// an error message and shutdown.
 			MessageBox(NULL, "Can't load one of the following files:\nMENU.WAV, PARTICLES.PNG, FONT1.FNT, FONT1.PNG, TRAIL.PSI", "Error", MB_OK | MB_ICONERROR | MB_APPLMODAL);
-			hge->System_Shutdown();
-			hge->Release();
+			g_hge->System_Shutdown();
+			g_hge->Release();
 			return 0;
 		}
 
@@ -135,19 +136,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		par->Fire();
 
 		// Let's rock now!
-		hge->System_Start();
+		g_hge->System_Start();
 
 		// Delete created objects and free loaded resources
 		delete par;
 		delete fnt;
 		delete spt;
 		delete spr;
-		hge->Texture_Free(tex);
-		hge->Effect_Free(snd);
+		g_hge->Texture_Free(tex);
+		g_hge->Effect_Free(snd);
 	}
 
 	// Clean up and shutdown
-	hge->System_Shutdown();
-	hge->Release();
+	g_hge->System_Shutdown();
+	g_hge->Release();
 	return 0;
 }

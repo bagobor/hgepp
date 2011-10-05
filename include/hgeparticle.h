@@ -1,22 +1,17 @@
-/*
-** Haaf's Game Engine 1.7
-** Copyright (C) 2003-2007, Relish Games
-** hge.relishgames.com
-**
-** hgeParticleSystem helper class header
-*/
+/* Part of HGEPP project, a HGE-rewrite https://github.com/kvakvs/hgepp
+ * Based on Haaf's Game Engine 1.8.1 (C) 2003-2007, Relish Games http://hge.relishgames.com
+ * hgeParticleSystem helper class header
+ */
 
+#pragma once
 
-#ifndef HGEPARTICLE_H
-#define HGEPARTICLE_H
+#include <hge.h>
+#include <hgesprite.h>
+#include <hgevector.h>
+#include <hgecolor.h>
+#include <hgerect.h>
 
-
-#include "hge.h"
-#include "hgesprite.h"
-#include "hgevector.h"
-#include "hgecolor.h"
-#include "hgerect.h"
-
+namespace hge {
 
 #define MAX_PARTICLES	500
 #define MAX_PSYSTEMS	100
@@ -82,7 +77,7 @@ struct hgeParticleSystemInfo
 	float		fAlphaVar;
 };
 
-class hgeParticleSystem
+class HGE_EXPORT hgeParticleSystem
 {
 public:
 	hgeParticleSystemInfo info;
@@ -90,7 +85,7 @@ public:
 	hgeParticleSystem(const char *filename, hgeSprite *sprite);
 	hgeParticleSystem(hgeParticleSystemInfo *psi);
 	hgeParticleSystem(const hgeParticleSystem &ps);
-	~hgeParticleSystem() { hge->Release(); }
+	~hgeParticleSystem();
 
 	hgeParticleSystem&	operator= (const hgeParticleSystem &ps);
 
@@ -101,21 +96,22 @@ public:
 	void				Stop(bool bKillParticles=false);
 	void				Update(float fDeltaTime);
 	void				MoveTo(float x, float y, bool bMoveParticles=false);
-	void				Transpose(float x, float y) { fTx=x; fTy=y; }
-	void				SetScale(float scale) { fScale = scale; }
-	void				TrackBoundingBox(bool bTrack) { bUpdateBoundingBox=bTrack; }
+	void				Transpose(float x, float y);
+	void				SetScale(float scale);
+	void				TrackBoundingBox(bool bTrack);
 
-	int					GetParticlesAlive() const { return nParticlesAlive; }
-	float				GetAge() const { return fAge; }
-	void				GetPosition(float *x, float *y) const { *x=vecLocation.x; *y=vecLocation.y; }
-	void				GetTransposition(float *x, float *y) const { *x=fTx; *y=fTy; }
-	float				GetScale() { return fScale; }
+	int					GetParticlesAlive() const;
+	float				GetAge() const;
+	void				GetPosition(float *x, float *y) const;
+	void				GetTransposition(float *x, float *y) const;
+	float				GetScale();
 	hgeRect*			GetBoundingBox(hgeRect *rect) const;
 
 private:
 	hgeParticleSystem();
 
-	static HGE			*hge;
+	//static HGE			*g_hgeparticlesys_hge;
+	static HGE * get_hge();
 
 	float				fAge;
 	float				fEmissionResidue;
@@ -132,7 +128,7 @@ private:
 	hgeParticle			particles[MAX_PARTICLES];
 };
 
-class hgeParticleManager
+class HGE_EXPORT hgeParticleManager
 {
 public:
 	hgeParticleManager();
@@ -144,7 +140,7 @@ public:
 	hgeParticleSystem*	SpawnPS(hgeParticleSystemInfo *psi, float x, float y);
 	bool				IsPSAlive(hgeParticleSystem *ps) const;
 	void				Transpose(float x, float y);
-	void				GetTransposition(float *dx, float *dy) const {*dx=tX; *dy=tY;}
+	void				GetTransposition(float *dx, float *dy) const;
 	void				KillPS(hgeParticleSystem *ps);
 	void				KillAll();
 
@@ -158,5 +154,4 @@ private:
 	hgeParticleSystem*	psList[MAX_PSYSTEMS];
 };
 
-
-#endif
+} // namespace hge

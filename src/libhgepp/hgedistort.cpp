@@ -1,22 +1,20 @@
-/*
-** Haaf's Game Engine 1.7
-** Copyright (C) 2003-2007, Relish Games
-** hge.relishgames.com
-**
-** hgeDistortionMesh helper class implementation
-*/
+/* Part of HGEPP project, a HGE-rewrite https://github.com/kvakvs/hgepp
+ * Based on Haaf's Game Engine 1.8.1 (C) 2003-2007, Relish Games http://hge.relishgames.com
+ * hgeDistortionMesh helper class implementation
+ */
 
-#include "..\..\include\hgedistort.h"
+#include <hgedistort.h>
 
+namespace hge {
 
-HGE *hgeDistortionMesh::hge=0;
+HGE * g_hgedistort_hge=0;
 
 
 hgeDistortionMesh::hgeDistortionMesh(int cols, int rows)
 {
 	int i;
 	
-	hge=hgeCreate(HGE_VERSION);
+	g_hgedistort_hge=hgeCreate(HGE_VERSION);
 
 	nRows=rows;
 	nCols=cols;
@@ -39,7 +37,7 @@ hgeDistortionMesh::hgeDistortionMesh(int cols, int rows)
 
 hgeDistortionMesh::hgeDistortionMesh(const hgeDistortionMesh &dm)
 {
-	hge=hgeCreate(HGE_VERSION);
+	g_hgedistort_hge=hgeCreate(HGE_VERSION);
 
 	nRows=dm.nRows;
 	nCols=dm.nCols;
@@ -58,7 +56,7 @@ hgeDistortionMesh::hgeDistortionMesh(const hgeDistortionMesh &dm)
 hgeDistortionMesh::~hgeDistortionMesh()
 {
 	delete[] disp_array;
-	hge->Release();
+	g_hgedistort_hge->Release();
 }
 
 hgeDistortionMesh& hgeDistortionMesh::operator= (const hgeDistortionMesh &dm)
@@ -98,8 +96,8 @@ void hgeDistortionMesh::SetTextureRect(float x, float y, float w, float h)
 
 	if (quad.tex)
 	{
-		tw=(float)hge->Texture_GetWidth(quad.tex);
-		th=(float)hge->Texture_GetHeight(quad.tex);
+		tw=(float)g_hgedistort_hge->Texture_GetWidth(quad.tex);
+		th=(float)g_hgedistort_hge->Texture_GetHeight(quad.tex);
 	}
 	else
 	{
@@ -177,7 +175,7 @@ void hgeDistortionMesh::Render(float x, float y)
 			quad.v[3].z=disp_array[idx+nCols].z;
 			quad.v[3].col=disp_array[idx+nCols].col;
 
-			hge->Gfx_RenderQuad(&quad);
+			g_hgedistort_hge->Gfx_RenderQuad(&quad);
 		}
 }
 
@@ -240,3 +238,29 @@ void hgeDistortionMesh::GetDisplacement(int col, int row, float *dx, float *dy, 
 	}
 }
 
+HGE * hgeDistortionMesh::get_hge()
+{
+	return g_hgedistort_hge;
+}
+
+void hgeDistortionMesh::GetTextureRect( float *x, float *y, float *w, float *h ) const
+{
+	*x=tx; *y=ty; *w=width; *h=height;
+}
+
+int hgeDistortionMesh::GetBlendMode() const
+{
+	return quad.blend;
+}
+
+int hgeDistortionMesh::GetRows()
+{
+	return nRows;
+}
+
+int hgeDistortionMesh::GetCols()
+{
+	return nCols;
+}
+
+} // namespace hge

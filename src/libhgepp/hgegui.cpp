@@ -1,22 +1,19 @@
-/*
-** Haaf's Game Engine 1.7
-** Copyright (C) 2003-2007, Relish Games
-** hge.relishgames.com
-**
-** hgeGUI helper class implementation
-*/
+/* Part of HGEPP project, a HGE-rewrite https://github.com/kvakvs/hgepp
+ * Based on Haaf's Game Engine 1.8.1 (C) 2003-2007, Relish Games http://hge.relishgames.com
+ * hgeGUI helper class implementation
+ */
 
+#include <hgegui.h>
 
-#include "..\..\include\hgegui.h"
+namespace hge {
 
-
-HGE *hgeGUI::hge=0;
-HGE *hgeGUIObject::hge=0;
+HGE * g_hgegui_hge=0;
+HGE * g_hgeguiobject_hge=0;
 
 
 hgeGUI::hgeGUI()
 {
-	hge=hgeCreate(HGE_VERSION);
+	g_hgegui_hge=hgeCreate(HGE_VERSION);
 
 	ctrls=0;
 	ctrlLock=0;
@@ -42,7 +39,7 @@ hgeGUI::~hgeGUI()
 		ctrl=nextctrl;
 	}
 
-	hge->Release();
+	g_hgegui_hge->Release();
 }
 
 void hgeGUI::AddCtrl(hgeGUIObject *ctrl)
@@ -234,7 +231,7 @@ void hgeGUI::Render()
 		ctrl=ctrl->next;
 	}
 
-	if(hge->Input_IsMouseOver() && sprCursor) sprCursor->Render(mx,my);
+	if(g_hgegui_hge->Input_IsMouseOver() && sprCursor) sprCursor->Render(mx,my);
 }
 
 int hgeGUI::Update(float dt)
@@ -245,12 +242,12 @@ int hgeGUI::Update(float dt)
 
 // Update the mouse variables
 
-	hge->Input_GetMousePos(&mx, &my);
-	bLPressed  = hge->Input_KeyDown(HGEK_LBUTTON);
-	bLReleased = hge->Input_KeyUp(HGEK_LBUTTON);
-	bRPressed  = hge->Input_KeyDown(HGEK_RBUTTON);
-	bRReleased = hge->Input_KeyUp(HGEK_RBUTTON);
-	nWheel=hge->Input_GetMouseWheel();
+	g_hgegui_hge->Input_GetMousePos(&mx, &my);
+	bLPressed  = g_hgegui_hge->Input_KeyDown(HGEK_LBUTTON);
+	bLReleased = g_hgegui_hge->Input_KeyUp(HGEK_LBUTTON);
+	bRPressed  = g_hgegui_hge->Input_KeyDown(HGEK_RBUTTON);
+	bRReleased = g_hgegui_hge->Input_KeyUp(HGEK_RBUTTON);
+	nWheel=g_hgegui_hge->Input_GetMouseWheel();
 
 // Update all controls
 
@@ -281,7 +278,7 @@ int hgeGUI::Update(float dt)
 
 // Handle keys	
 
-	key=hge->Input_GetKey();
+	key=g_hgegui_hge->Input_GetKey();
 	if(((navmode & HGEGUI_LEFTRIGHT) && key==HGEK_LEFT) ||
 		((navmode & HGEGUI_UPDOWN) && key==HGEK_UP))
 	{
@@ -333,13 +330,13 @@ int hgeGUI::Update(float dt)
 	}
 	else if(ctrlFocus && key && key!=HGEK_LBUTTON && key!=HGEK_RBUTTON)
 	{
-		if(ctrlFocus->KeyClick(key, hge->Input_GetChar())) return ctrlFocus->id;
+		if(ctrlFocus->KeyClick(key, g_hgegui_hge->Input_GetChar())) return ctrlFocus->id;
 	}
 
 // Handle mouse
 
-	bool bLDown = hge->Input_GetKeyState(HGEK_LBUTTON);
-	bool bRDown = hge->Input_GetKeyState(HGEK_RBUTTON);
+	bool bLDown = g_hgegui_hge->Input_GetKeyState(HGEK_LBUTTON);
+	bool bRDown = g_hgegui_hge->Input_GetKeyState(HGEK_RBUTTON);
 
 	if(ctrlLock)
 	{
@@ -393,5 +390,35 @@ bool hgeGUI::ProcessCtrl(hgeGUIObject *ctrl)
 	return bResult;
 }
 
+HGE * hgeGUI::get_hge()
+{
+	return g_hgegui_hge;
+}
 
 
+HGE * hgeGUIObject::get_hge()
+{
+	return g_hgeguiobject_hge;
+}
+
+hgeGUIObject::hgeGUIObject()
+{
+	g_hgeguiobject_hge=hgeCreate(HGE_VERSION); color=0xFFFFFFFF;
+}
+
+hgeGUIObject::hgeGUIObject( const hgeGUIObject &go )
+{
+
+}
+
+hgeGUIObject::~hgeGUIObject()
+{
+	g_hgeguiobject_hge->Release();
+}
+
+hgeGUIObject& hgeGUIObject::operator=( const hgeGUIObject &go )
+{
+	return *this;
+}
+
+} // namespace hge

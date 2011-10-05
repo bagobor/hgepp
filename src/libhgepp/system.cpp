@@ -1,14 +1,10 @@
-/*
-** Haaf's Game Engine 1.8
-** Copyright (C) 2003-2007, Relish Games
-** hge.relishgames.com
-**
-** Core system functions
-*/
-
-
+/* Part of HGEPP project, a HGE-rewrite https://github.com/kvakvs/hgepp
+ * Based on Haaf's Game Engine 1.8.1 (C) 2003-2007, Relish Games http://hge.relishgames.com
+ * Core system functions
+ */
 #include "hge_impl.h"
 
+namespace hge {
 
 #define LOWORDINT(n) ((int)((signed short)(LOWORD(n))))
 #define HIWORDINT(n) ((int)((signed short)(HIWORD(n))))
@@ -168,7 +164,7 @@ bool HGE_CALL HGE_Impl::System_Initiate()
 
     // Show splash
 
-#ifdef DEMO
+#ifdef HGE_COMPILE_SPLASHSCREEN
 
     bool            (*func)();
     bool            (*rfunc)();
@@ -411,7 +407,7 @@ void HGE_CALL HGE_Impl::System_SetStateBool(hgeBoolState state, bool value)
 
         case HGE_DONTSUSPEND:   bDontSuspend=value; break;
 
-        #ifdef DEMO
+        #ifdef HGE_COMPILE_SPLASHSCREEN
         case HGE_SHOWSPLASH:    bDMO=value; break;
         #endif
     }
@@ -541,7 +537,7 @@ bool HGE_CALL HGE_Impl::System_GetStateBool(hgeBoolState state)
         case HGE_DONTSUSPEND:   return bDontSuspend;
         case HGE_HIDEMOUSE:     return bHideMouse;
 
-        #ifdef DEMO
+        #ifdef HGE_COMPILE_SPLASHSCREEN
         case HGE_SHOWSPLASH:    return bDMO;
         #endif
     }
@@ -737,7 +733,7 @@ HGE_Impl::HGE_Impl()
     hKrnl32 = NULL;
     lpfnGetSystemPowerStatus = NULL;
 
-#ifdef DEMO
+#ifdef HGE_COMPILE_SPLASHSCREEN
     bDMO=true;
 #endif
 
@@ -889,3 +885,4 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
     return DefWindowProc(hwnd, msg, wparam, lparam);
 }
 
+} // namespace hge

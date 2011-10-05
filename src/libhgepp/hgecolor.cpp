@@ -1,15 +1,13 @@
-/*
-** Haaf's Game Engine 1.7
-** Copyright (C) 2003-2007, Relish Games
-** hge.relishgames.com
-**
-** hgeColor*** helper classes implementation
-*/
+/* Part of HGEPP project, a HGE-rewrite https://github.com/kvakvs/hgepp
+ * Based on Haaf's Game Engine 1.8.1 (C) 2003-2007, Relish Games http://hge.relishgames.com
+ * hgeColor* helper classes implementation
+ */
 
 
-#include "..\..\include\hgecolor.h"
+#include <hgecolor.h>
 #include <math.h>
 
+namespace hge {
 
 void hgeColorHSV::SetHWColor(uint32_t col)
 {
@@ -80,3 +78,4 @@ uint32_t hgeColorHSV::GetHWColor() const
 	return (uint32_t(a*255.0f)<<24) + (uint32_t(r*255.0f)<<16) + (uint32_t(g*255.0f)<<8) + uint32_t(b*255.0f);
 }
 
+} // namespace hge

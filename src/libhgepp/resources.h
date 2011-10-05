@@ -1,18 +1,13 @@
-/*
-** Haaf's Game Engine 1.7
-** Copyright (C) 2003-2007, Relish Games
-** hge.relishgames.com
-**
-** hgeResourceManager resources header
-*/
+/* Part of HGEPP project, a HGE-rewrite https://github.com/kvakvs/hgepp
+ * Based on Haaf's Game Engine 1.8.1 (C) 2003-2007, Relish Games http://hge.relishgames.com
+ * hgeResourceManager resources header
+ */
+#pragma once
 
-#ifndef HGERESOURCES_H
-#define HGERESOURCES_H
-
-
-#include "..\..\include\hgeresource.h"
+#include <hgeresource.h>
 #include "parser.h"
 
+namespace hge {
 
 #define RES_SCRIPT		0
 
@@ -181,4 +176,4 @@ struct RStringTable : public ResDesc
 	virtual void  Free();
 };
 
-#endif
+} // namespace hge

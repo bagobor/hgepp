@@ -1,14 +1,10 @@
-/*
-** Haaf's Game Engine 1.8
-** Copyright (C) 2003-2007, Relish Games
-** hge.relishgames.com
-**
-** Core functions implementation: power status
-*/
-
-
+/* Part of HGEPP project, a HGE-rewrite https://github.com/kvakvs/hgepp
+ * Based on Haaf's Game Engine 1.8.1 (C) 2003-2007, Relish Games http://hge.relishgames.com
+ * Core functions implementation: power status
+ */
 #include "hge_impl.h"
 
+namespace hge {
 
 void HGE_Impl::_InitPowerStatus()
 {
@@ -51,3 +47,5 @@ void HGE_Impl::_DonePowerStatus()
 {
 	if(hKrnl32 != NULL) FreeLibrary(hKrnl32);
 }
+
+} // namespace hge

@@ -1,7 +1,7 @@
 /*
 ** Haaf's Game Engine 1.8
 ** Copyright (C) 2003-2007, Relish Games
-** hge.relishgames.com
+** g_hge.relishgames.com
 **
 ** hge_tut06 - Creating menus
 */
@@ -9,22 +9,23 @@
 
 // Copy the files "menu.wav", "font1.fnt", "font1.png",
 // "bg.png" and "cursor.png" from the folder "precompiled"
-// to the folder with executable file. Also copy hge.dll
+// to the folder with executable file. Also copy g_hge.dll
 // and bass.dll to the same folder.
 
 
-#include "..\..\include\hge.h"
-#include "..\..\include\hgefont.h"
-#include "..\..\include\hgegui.h"
+#include <hge.h>
+#include <hgefont.h>
+#include <hgegui.h>
 
 #include "menuitem.h"
 
 #include <math.h>
 
+using namespace hge;
 
 // Pointer to the HGE interface.
 // Helper classes require this to work.
-HGE *hge=0;
+HGE *g_hge=0;
 
 // Some resource handles
 HEFFECT				snd;
@@ -39,14 +40,14 @@ hgeSprite			*spr;
 
 bool FrameFunc()
 {
-	float dt=hge->Timer_GetDelta();
+	float dt=g_hge->Timer_GetDelta();
 	static float t=0.0f;
 	float tx,ty;
 	int id;
 	static int lastid=0;
 
 	// If ESCAPE was pressed, tell the GUI to finish
-	if(hge->Input_GetKeyState(HGEK_ESCAPE)) { lastid=5; gui->Leave(); }
+	if(g_hge->Input_GetKeyState(HGEK_ESCAPE)) { lastid=5; gui->Leave(); }
 	
 	// We update the GUI and take an action if
 	// one of the menu items was selected
@@ -85,12 +86,12 @@ bool FrameFunc()
 bool RenderFunc()
 {
 	// Render graphics
-	hge->Gfx_BeginScene();
-	hge->Gfx_RenderQuad(&quad);
+	g_hge->Gfx_BeginScene();
+	g_hge->Gfx_RenderQuad(&quad);
 	gui->Render();
 	fnt->SetColor(0xFFFFFFFF);
-	fnt->printf(5, 5, HGETEXT_LEFT, "dt:%.3f\nFPS:%d", hge->Timer_GetDelta(), hge->Timer_GetFPS());
-	hge->Gfx_EndScene();
+	fnt->printf(5, 5, HGETEXT_LEFT, "dt:%.3f\nFPS:%d", g_hge->Timer_GetDelta(), g_hge->Timer_GetFPS());
+	g_hge->Gfx_EndScene();
 
 	return false;
 }
@@ -98,31 +99,31 @@ bool RenderFunc()
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
-	hge = hgeCreate(HGE_VERSION);
+	g_hge = hgeCreate(HGE_VERSION);
 
-	hge->System_SetState(HGE_LOGFILE, "hge_tut06.log");
-	hge->System_SetState(HGE_FRAMEFUNC, FrameFunc);
-	hge->System_SetState(HGE_RENDERFUNC, RenderFunc);
-	hge->System_SetState(HGE_TITLE, "HGE Tutorial 06 - Creating menus");
-	hge->System_SetState(HGE_WINDOWED, true);
-	hge->System_SetState(HGE_SCREENWIDTH, 800);
-	hge->System_SetState(HGE_SCREENHEIGHT, 600);
-	hge->System_SetState(HGE_SCREENBPP, 32);
+	g_hge->System_SetState(HGE_LOGFILE, "hge_tut06.log");
+	g_hge->System_SetState(HGE_FRAMEFUNC, FrameFunc);
+	g_hge->System_SetState(HGE_RENDERFUNC, RenderFunc);
+	g_hge->System_SetState(HGE_TITLE, "HGE Tutorial 06 - Creating menus");
+	g_hge->System_SetState(HGE_WINDOWED, true);
+	g_hge->System_SetState(HGE_SCREENWIDTH, 800);
+	g_hge->System_SetState(HGE_SCREENHEIGHT, 600);
+	g_hge->System_SetState(HGE_SCREENBPP, 32);
 
-	if(hge->System_Initiate())
+	if(g_hge->System_Initiate())
 	{
 
 		// Load sound and textures
-		quad.tex=hge->Texture_Load("bg.png");
-		tex=hge->Texture_Load("cursor.png");
-		snd=hge->Effect_Load("menu.wav");
+		quad.tex=g_hge->Texture_Load("bg.png");
+		tex=g_hge->Texture_Load("cursor.png");
+		snd=g_hge->Effect_Load("menu.wav");
 		if(!quad.tex || !tex || !snd)
 		{
 			// If one of the data files is not found, display
 			// an error message and shutdown.
 			MessageBox(NULL, "Can't load BG.PNG, CURSOR.PNG or MENU.WAV", "Error", MB_OK | MB_ICONERROR | MB_APPLMODAL);
-			hge->System_Shutdown();
-			hge->Release();
+			g_hge->System_Shutdown();
+			g_hge->Release();
 			return 0;
 		}
 
@@ -162,19 +163,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		gui->Enter();
 
 		// Let's rock now!
-		hge->System_Start();
+		g_hge->System_Start();
 
 		// Delete created objects and free loaded resources
 		delete gui;
 		delete fnt;
 		delete spr;
-		hge->Effect_Free(snd);
-		hge->Texture_Free(tex);
-		hge->Texture_Free(quad.tex);
+		g_hge->Effect_Free(snd);
+		g_hge->Texture_Free(tex);
+		g_hge->Texture_Free(quad.tex);
 	}
 
 	// Clean up and shutdown
-	hge->System_Shutdown();
-	hge->Release();
+	g_hge->System_Shutdown();
+	g_hge->Release();
 	return 0;
 }

@@ -1,19 +1,17 @@
-/*
-** Haaf's Game Engine 1.7
-** Copyright (C) 2003-2007, Relish Games
-** hge.relishgames.com
-**
-** hgeAnimation helper class implementation
-*/
+/* Part of HGEPP project, a HGE-rewrite https://github.com/kvakvs/hgepp
+ * Based on Haaf's Game Engine 1.8.1 (C) 2003-2007, Relish Games http://hge.relishgames.com
+ * hgeAnimation helper class implementation
+ */
+
+#include <hgeanim.h>
 
 
-#include "..\..\include\hgeanim.h"
-
+namespace hge {
 
 hgeAnimation::hgeAnimation(HTEXTURE tex, int nframes, float FPS, float x, float y, float w, float h)
 	: hgeSprite(tex, x, y, w, h)
 {
-	orig_width = hge->Texture_GetWidth(tex, true);
+	orig_width = get_hge()->Texture_GetWidth(tex, true);
 
 	fSinceLastFrame=-1.0f;
 	fSpeed=1.0f/FPS;
@@ -163,3 +161,61 @@ void hgeAnimation::SetFrame(int n)
 	SetFlip(bX,bY,bHS);
 }
 
+void hgeAnimation::SetTexture( HTEXTURE tex )
+{
+	hgeSprite::SetTexture(tex);
+	orig_width = get_hge()->Texture_GetWidth(tex, true);
+}
+
+void hgeAnimation::SetTextureRect( float x1, float y1, float x2, float y2 )
+{
+	hgeSprite::SetTextureRect(x1,y1,x2,y2);
+	SetFrame(nCurFrame);
+}
+
+void hgeAnimation::SetFrames( int n )
+{
+	nFrames=n;
+}
+
+void hgeAnimation::SetSpeed( float FPS )
+{
+	fSpeed=1.0f/FPS;
+}
+
+int hgeAnimation::GetMode() const
+{
+	return Mode;
+}
+
+float hgeAnimation::GetSpeed() const
+{
+	return 1.0f/fSpeed;
+}
+
+int hgeAnimation::GetFrame() const
+{
+	return nCurFrame;
+}
+
+int hgeAnimation::GetFrames() const
+{
+	return nFrames;
+}
+
+bool hgeAnimation::IsPlaying() const
+{
+	return bPlaying;
+}
+
+void hgeAnimation::Resume()
+{
+	bPlaying=true;
+}
+
+void hgeAnimation::Stop()
+{
+	bPlaying=false;
+}
+
+} // namespace hge

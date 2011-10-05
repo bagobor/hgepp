@@ -1,18 +1,12 @@
-/*
-** Haaf's Game Engine 1.7
-** Copyright (C) 2003-2007, Relish Games
-** hge.relishgames.com
-**
-** hgeStringTable helper class header
-*/
+/* Part of HGEPP project, a HGE-rewrite https://github.com/kvakvs/hgepp
+ * Based on Haaf's Game Engine 1.8.1 (C) 2003-2007, Relish Games http://hge.relishgames.com
+ * hgeStringTable helper class header
+ */
+#pragma once
 
+#include <hge.h>
 
-#ifndef HGESTRINGS_H
-#define HGESTRINGS_H
-
-
-#include "hge.h"
-
+namespace hge {
 
 #define MAXSTRNAMELENGTH 64
 
@@ -27,7 +21,7 @@ struct NamedString
 /*
 ** HGE String table class
 */
-class hgeStringTable
+class HGE_EXPORT hgeStringTable
 {
 public:
 	hgeStringTable(const char *filename);
@@ -41,8 +35,8 @@ private:
 
 	NamedString		*strings;
 
-	static HGE		*hge;
+	//static HGE		*g_hgestringtab_hge;
+	static HGE * get_hge();
 };
 
-
-#endif
+} // namespace hge
