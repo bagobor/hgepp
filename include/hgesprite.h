@@ -28,7 +28,7 @@ public:
 	void		SetTextureRect(float x, float y, float w, float h, bool adjSize = true);
 	void		SetColor(uint32_t col, int i=-1);
 	void		SetZ(float z, int i=-1);
-	void		SetBlendMode(blend_mode_t blend);
+	void		SetBlendMode(uint32_t blend);
 	void		SetHotSpot(float x, float y);
 	void		SetFlip(bool bX, bool bY, bool bHotSpot = false);
 
@@ -36,7 +36,7 @@ public:
 	void		GetTextureRect(float *x, float *y, float *w, float *h) const;
 	uint32_t	GetColor(int i=0) const;
 	float		GetZ(int i=0) const;
-	blend_mode_t GetBlendMode() const;
+	uint32_t	GetBlendMode() const;
 	void		GetHotSpot(float *x, float *y) const;
 	void		GetFlip(bool *bX, bool *bY) const;
 

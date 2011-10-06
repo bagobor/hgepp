@@ -28,8 +28,8 @@
 using namespace hge;
 
 // Pointer to the HGE interface (helper classes require this to work)
-HGE			*g_hge=0;
-hgeFont		*fnt=0;
+HGE			*g_hge=nullptr;
+hgeFont		*fnt=nullptr;
 
 // Simulation constants
 
@@ -233,10 +233,10 @@ bool InitSimulation()
 
 	glow=new hgeSprite(texObjects,128,128,128,128);
 	glow->SetHotSpot(64,64);
-	glow->SetBlendMode((blend_mode_t)(BLEND_COLORADD | BLEND_ALPHABLEND | BLEND_NOZWRITE));
+	glow->SetBlendMode(BLEND_COLORADD | BLEND_ALPHABLEND | BLEND_NOZWRITE);
 	seaglow=new hgeSprite(texObjects,128,224,128,32);
 	seaglow->SetHotSpot(64,0);
-	seaglow->SetBlendMode((blend_mode_t)(BLEND_COLORADD | BLEND_ALPHAADD | BLEND_NOZWRITE));
+	seaglow->SetBlendMode(BLEND_COLORADD | BLEND_ALPHAADD | BLEND_NOZWRITE);
 
 	// Initialize simulation state
 

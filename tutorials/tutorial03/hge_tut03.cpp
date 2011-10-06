@@ -23,7 +23,7 @@ using namespace hge;
 
 // Pointer to the HGE interface.
 // Helper classes require this to work.
-HGE * g_hge=0;
+HGE * g_hge=nullptr;
 
 
 // Pointers to the HGE objects we will use
@@ -130,7 +130,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 		// Create and set up a particle system
 		spt=new hgeSprite(tex, 32, 32, 32, 32);
-		spt->SetBlendMode((blend_mode_t)(BLEND_COLORMUL | BLEND_ALPHAADD | BLEND_NOZWRITE));
+		spt->SetBlendMode(BLEND_COLORMUL | BLEND_ALPHAADD | BLEND_NOZWRITE);
 		spt->SetHotSpot(16,16);
 		par=new hgeParticleSystem("trail.psi",spt);
 		par->Fire();

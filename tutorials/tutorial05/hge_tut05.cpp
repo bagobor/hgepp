@@ -24,7 +24,7 @@ using namespace hge;
 
 // Pointer to the HGE interface.
 // Helper classes require this to work.
-HGE *g_hge=0;
+HGE *g_hge=nullptr;
 
 HTEXTURE			tex;
 
@@ -147,7 +147,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		dis=new hgeDistortionMesh(nCols, nRows);
 		dis->SetTexture(tex);
 		dis->SetTextureRect(0,0,512,512);
-		dis->SetBlendMode((blend_mode_t)(BLEND_COLORADD | BLEND_ALPHABLEND | BLEND_ZWRITE));
+		dis->SetBlendMode(BLEND_COLORADD | BLEND_ALPHABLEND | BLEND_ZWRITE);
 		dis->Clear(0xFF000000);
 
 		// Load a font

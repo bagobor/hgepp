@@ -128,7 +128,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		}
 
 		// Set up the quad we will use for background animation
-		quad.blend = (blend_mode_t)(BLEND_ALPHABLEND | BLEND_COLORMUL | BLEND_NOZWRITE);
+		quad.blend = BLEND_ALPHABLEND | BLEND_COLORMUL | BLEND_NOZWRITE;
 
 		for(int i=0;i<4;i++)
 		{

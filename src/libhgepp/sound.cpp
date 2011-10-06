@@ -67,7 +67,7 @@ HCHANNEL HGE_CALL HGE_Impl::Effect_Play(HEFFECT eff)
 	if(m_bassdll)
 	{
 		HCHANNEL chn;
-		chn=BASS_SampleGetChannel(eff, FALSE);
+		chn=BASS_SampleGetChannel(eff, false);
 		BASS_ChannelPlay(chn, TRUE);
 		return chn;
 	}
@@ -82,7 +82,7 @@ HCHANNEL HGE_CALL HGE_Impl::Effect_PlayEx(HEFFECT eff, int volume, int pan, floa
 		HCHANNEL chn;
 		BASS_SampleGetInfo(eff, &info);
 
-		chn=BASS_SampleGetChannel(eff, FALSE);
+		chn=BASS_SampleGetChannel(eff, false);
 		BASS_ChannelSetAttributes(chn, (int)(pitch*info.freq), volume, pan);
 
 		info.flags &= ~BASS_SAMPLE_LOOP;
@@ -145,7 +145,7 @@ HCHANNEL HGE_CALL HGE_Impl::Music_Play(HMUSIC mus, bool loop, int volume, int or
 		if(loop) info.flags |= BASS_SAMPLE_LOOP;
 		BASS_ChannelSetFlags(mus, info.flags);
 
-		BASS_ChannelPlay(mus, FALSE);
+		BASS_ChannelPlay(mus, false);
 
 		return mus;
 	}
@@ -337,7 +337,7 @@ void HGE_CALL HGE_Impl::Channel_Pause(HCHANNEL chn)
 
 void HGE_CALL HGE_Impl::Channel_Resume(HCHANNEL chn)
 {
-	if(m_bassdll) BASS_ChannelPlay(chn, FALSE);
+	if(m_bassdll) BASS_ChannelPlay(chn, false);
 }
 
 void HGE_CALL HGE_Impl::Channel_Stop(HCHANNEL chn)

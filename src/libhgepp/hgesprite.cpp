@@ -311,7 +311,7 @@ hgeSprite::~hgeSprite()
 	get_hge()->Release();
 }
 
-void hgeSprite::SetBlendMode( blend_mode_t blend )
+void hgeSprite::SetBlendMode( uint32_t blend )
 {
 	m_quad.blend=blend;
 }
@@ -341,7 +341,7 @@ float hgeSprite::GetZ( int i/*=0*/ ) const
 	return m_quad.v[i].z;
 }
 
-hge::blend_mode_t hgeSprite::GetBlendMode() const
+uint32_t hgeSprite::GetBlendMode() const
 {
 	return m_quad.blend;
 }

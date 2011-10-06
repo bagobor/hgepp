@@ -170,7 +170,7 @@ public:
     virtual void        HGE_CALL    Gfx_RenderLine(float x1, float y1, float x2, float y2, uint32_t color=0xFFFFFFFF, float z=0.5f);
     virtual void        HGE_CALL    Gfx_RenderTriple(const hgeTriple *triple);
     virtual void        HGE_CALL    Gfx_RenderQuad(const hgeQuad *quad);
-    virtual hgeVertex*  HGE_CALL    Gfx_StartBatch(int prim_type, HTEXTURE tex, int blend, int *max_prim);
+    virtual hgeVertex*  HGE_CALL    Gfx_StartBatch(primitive_mode_t prim_type, HTEXTURE tex, int blend, int *max_prim);
     virtual void        HGE_CALL    Gfx_FinishBatch(int nprim);
     virtual void        HGE_CALL    Gfx_SetClipping(int x=0, int y=0, int w=0, int h=0);
     virtual void        HGE_CALL    Gfx_SetTransform(float x=0, float y=0, float dx=0, float dy=0, float rot=0, float hscale=0, float vscale=0); 
@@ -282,7 +282,7 @@ public:
     hgeVertex*          m_vertices;
 
     int                 m_prim_count;
-    int                 m_cur_prim_type;
+    primitive_mode_t	m_cur_prim_type;
     int                 m_cur_blend_mode;
     HTEXTURE            m_cur_texture;
 #if HGE_DIRECTX_VER >= 9
@@ -328,7 +328,7 @@ public:
     void                _UpdateMouse();
     void                _InputInit();
     void                _ClearQueue();
-    void                _BuildEvent(int type, int key, int scan, int flags, int x, int y);
+    void                _BuildEvent(event_type_t type, int key, int scan, event_flags_t flags, int x, int y);
 
     // Resources
     char                m_tmp_filename[_MAX_PATH];

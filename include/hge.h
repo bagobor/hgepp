@@ -9,6 +9,10 @@
 
 #define HGE_VERSION 0x180
 
+#ifdef _UNICODE
+	#error Please change CHARACTER SET in project settings to MULTIBYTE, not UNICODE!
+#endif
+
 // CMake adds PROJECTNAME_EXPORTS when compiles DLL
 #ifdef hgepp_EXPORTS
     #define HGEDLL
@@ -113,7 +117,7 @@ inline uint32_t SETB( uint32_t col, uint8_t b) {
 /*
 ** HGE Blending constants
 */
-typedef enum {
+enum {
 	BLEND_COLORADD     = 1,
 	BLEND_COLORMUL     = 0,
 	BLEND_ALPHABLEND   = 2,
@@ -123,7 +127,7 @@ typedef enum {
 
 	BLEND_DEFAULT      = (BLEND_COLORMUL | BLEND_ALPHABLEND | BLEND_NOZWRITE),
 	BLEND_DEFAULT_Z    = (BLEND_COLORMUL | BLEND_ALPHABLEND | BLEND_ZWRITE)
-} blend_mode_t;
+};
 
 
 /*
@@ -221,11 +225,11 @@ enum {
 /*
 ** HGE Primitive type constants
 */
-enum {
+typedef enum {
 	HGEPRIM_LINES       = 2,
 	HGEPRIM_TRIPLES     = 3,
 	HGEPRIM_QUADS       = 4
-};
+} primitive_mode_t;
 
 
 /*
@@ -247,7 +251,7 @@ struct hgeTriple
 {
     hgeVertex		v[3];
     HTEXTURE		tex;
-    blend_mode_t	blend;
+    uint32_t		blend;
 };
 
 
@@ -258,7 +262,45 @@ struct hgeQuad
 {
     hgeVertex		v[4];
     HTEXTURE		tex;
-    blend_mode_t	blend;
+    uint32_t		blend;
+};
+
+
+/*
+** HGE Input Event type constants
+*/
+typedef enum {
+	INPUT_KEYDOWN      = 1,
+	INPUT_KEYUP        = 2,
+	INPUT_MBUTTONDOWN  = 3,
+	INPUT_MBUTTONUP    = 4,
+	INPUT_MOUSEMOVE    = 5,
+	INPUT_MOUSEWHEEL   = 6
+} event_type_t;
+
+
+/*
+** HGE Input Event flags
+*/
+struct event_flags_t
+{
+	bool	shift:1;
+	bool	ctrl:1;
+	bool	alt:1;
+	bool	caps_lock:1;
+	bool	scroll_lock:1;
+	bool	num_lock:1;
+	bool	repeat:1;
+
+	event_flags_t(): shift(false), ctrl(false), alt(false), caps_lock(false),
+		scroll_lock(false), num_lock(false), repeat(false)
+	{
+	}
+	event_flags_t( bool _r ): shift(false), ctrl(false), alt(false), caps_lock(false)
+		, scroll_lock(false), num_lock(false)
+		, repeat(_r)
+	{
+	}
 };
 
 
@@ -267,42 +309,14 @@ struct hgeQuad
 */
 struct hgeInputEvent
 {
-    int     type;           // event type
+    event_type_t type;      // event type
     int     key;            // key code
-    int     flags;          // event flags
+    event_flags_t flags;// event flags
     int     chr;            // character code
     int     wheel;          // wheel shift
     float   x;              // mouse cursor x-coordinate
     float   y;              // mouse cursor y-coordinate
 };
-
-
-/*
-** HGE Input Event type constants
-*/
-enum {
-	INPUT_KEYDOWN      = 1,
-	INPUT_KEYUP        = 2,
-	INPUT_MBUTTONDOWN  = 3,
-	INPUT_MBUTTONUP    = 4,
-	INPUT_MOUSEMOVE    = 5,
-	INPUT_MOUSEWHEEL   = 6
-};
-
-
-/*
-** HGE Input Event flags
-*/
-enum {
-	HGEINP_SHIFT       = 1,
-	HGEINP_CTRL        = 2,
-	HGEINP_ALT         = 4,
-	HGEINP_CAPSLOCK    = 8,
-	HGEINP_SCROLLLOCK  = 16,
-	HGEINP_NUMLOCK     = 32,
-	HGEINP_REPEAT      = 64
-};
-
 
 /*
 ** HGE Interface class
@@ -424,7 +438,7 @@ public:
     virtual void        HGE_CALL    Gfx_RenderLine(float x1, float y1, float x2, float y2, uint32_t color=0xFFFFFFFF, float z=0.5f) = 0;
     virtual void        HGE_CALL    Gfx_RenderTriple(const hgeTriple *triple) = 0;
     virtual void        HGE_CALL    Gfx_RenderQuad(const hgeQuad *quad) = 0;
-    virtual hgeVertex*  HGE_CALL    Gfx_StartBatch(int prim_type, HTEXTURE tex, int blend, int *max_prim) = 0;
+    virtual hgeVertex*  HGE_CALL    Gfx_StartBatch(primitive_mode_t prim_type, HTEXTURE tex, int blend, int *max_prim) = 0;
     virtual void        HGE_CALL    Gfx_FinishBatch(int nprim) = 0;
     virtual void        HGE_CALL    Gfx_SetClipping(int x=0, int y=0, int w=0, int h=0) = 0;
     virtual void        HGE_CALL    Gfx_SetTransform(float x=0, float y=0, float dx=0, float dy=0, float rot=0, float hscale=0, float vscale=0) = 0; 
@@ -448,7 +462,9 @@ public:
     virtual void		HGE_CALL    Texture_Unlock(HTEXTURE tex) = 0;
 };
 
-extern "C" { HGE_EXPORT HGE * HGE_CALL hgeCreate(int ver); }
+extern "C" {
+	HGE_EXPORT HGE * HGE_CALL hgeCreate(int ver);
+}
 
 
 /*

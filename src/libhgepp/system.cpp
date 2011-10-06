@@ -769,7 +769,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
     switch(msg)
     {   
         case WM_CREATE: 
-            return FALSE;
+            return false;
         
         case WM_PAINT:
             if(g_hge_singleton->m_d3d && g_hge_singleton->m_render_func && g_hge_singleton->m_windowed) g_hge_singleton->m_render_func();
@@ -777,7 +777,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 
         case WM_DESTROY:
             PostQuitMessage(0);
-            return FALSE;
+            return false;
 
 /*
         case WM_ACTIVATEAPP:
@@ -790,80 +790,96 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
             // but only if HIWORD(wParam) (fMinimized) == FALSE (0)
             bActivating = (LOWORD(wparam) != WA_INACTIVE) && (HIWORD(wparam) == 0);
             if(g_hge_singleton->m_d3d && g_hge_singleton->m_active != bActivating) g_hge_singleton->_FocusChange(bActivating);
-            return FALSE;
+            return false;
 
 
         case WM_SETCURSOR:
             if(g_hge_singleton->m_active && LOWORD(lparam)==HTCLIENT && g_hge_singleton->m_hide_mouse) SetCursor(NULL);
             else SetCursor(LoadCursor(NULL, IDC_ARROW));
-            return FALSE;
+            return false;
 
         case WM_SYSKEYDOWN:
             if(wparam == VK_F4)
             {
-                if(g_hge_singleton->m_exit_func && !g_hge_singleton->m_exit_func()) return FALSE;
+                if(g_hge_singleton->m_exit_func && !g_hge_singleton->m_exit_func()) return false;
                 return DefWindowProc(hwnd, msg, wparam, lparam);
             }
             else if(wparam == VK_RETURN)
             {
                 g_hge_singleton->System_SetState(HGE_WINDOWED, !g_hge_singleton->System_GetState(HGE_WINDOWED));
-                return FALSE;
+                return false;
             }
             else
             {
-                g_hge_singleton->_BuildEvent(INPUT_KEYDOWN, wparam, HIWORD(lparam) & 0xFF, (lparam & 0x40000000) ? HGEINP_REPEAT:0, -1, -1);
-                return FALSE;
+                g_hge_singleton->_BuildEvent(INPUT_KEYDOWN, wparam, HIWORD(lparam) & 0xFF,
+					(lparam & 0x40000000) ? event_flags_t(true):event_flags_t(),
+					-1, -1);
+                return false;
             }
 
         case WM_KEYDOWN:
-            g_hge_singleton->_BuildEvent(INPUT_KEYDOWN, wparam, HIWORD(lparam) & 0xFF, (lparam & 0x40000000) ? HGEINP_REPEAT:0, -1, -1);
-            return FALSE;
+            g_hge_singleton->_BuildEvent(INPUT_KEYDOWN, wparam, HIWORD(lparam) & 0xFF,
+				(lparam & 0x40000000) ? event_flags_t(true):event_flags_t(),
+				-1, -1);
+            return false;
+
         case WM_SYSKEYUP:
-            g_hge_singleton->_BuildEvent(INPUT_KEYUP, wparam, HIWORD(lparam) & 0xFF, 0, -1, -1);
-            return FALSE;
+            g_hge_singleton->_BuildEvent(INPUT_KEYUP, wparam, HIWORD(lparam) & 0xFF, event_flags_t(), -1, -1);
+            return false;
+
         case WM_KEYUP:
-            g_hge_singleton->_BuildEvent(INPUT_KEYUP, wparam, HIWORD(lparam) & 0xFF, 0, -1, -1);
-            return FALSE;
+            g_hge_singleton->_BuildEvent(INPUT_KEYUP, wparam, HIWORD(lparam) & 0xFF, event_flags_t(), -1, -1);
+            return false;
 
         case WM_LBUTTONDOWN:
             SetFocus(hwnd);
-            g_hge_singleton->_BuildEvent(INPUT_MBUTTONDOWN, HGEK_LBUTTON, 0, 0, LOWORDINT(lparam), HIWORDINT(lparam));
-            return FALSE;
+            g_hge_singleton->_BuildEvent(INPUT_MBUTTONDOWN, HGEK_LBUTTON, 0,
+				0, LOWORDINT(lparam), HIWORDINT(lparam));
+            return false;
         case WM_MBUTTONDOWN:
             SetFocus(hwnd);
-            g_hge_singleton->_BuildEvent(INPUT_MBUTTONDOWN, HGEK_MBUTTON, 0, 0, LOWORDINT(lparam), HIWORDINT(lparam));
-            return FALSE;
+            g_hge_singleton->_BuildEvent(INPUT_MBUTTONDOWN, HGEK_MBUTTON, 0,
+				0, LOWORDINT(lparam), HIWORDINT(lparam));
+            return false;
         case WM_RBUTTONDOWN:
             SetFocus(hwnd);
-            g_hge_singleton->_BuildEvent(INPUT_MBUTTONDOWN, HGEK_RBUTTON, 0, 0, LOWORDINT(lparam), HIWORDINT(lparam));
-            return FALSE;
+            g_hge_singleton->_BuildEvent(INPUT_MBUTTONDOWN, HGEK_RBUTTON, 0,
+				0, LOWORDINT(lparam), HIWORDINT(lparam));
+            return false;
 
         case WM_LBUTTONDBLCLK:
-            g_hge_singleton->_BuildEvent(INPUT_MBUTTONDOWN, HGEK_LBUTTON, 0, HGEINP_REPEAT, LOWORDINT(lparam), HIWORDINT(lparam));
-            return FALSE;
+            g_hge_singleton->_BuildEvent(INPUT_MBUTTONDOWN, HGEK_LBUTTON, 0,
+				event_flags_t(true), LOWORDINT(lparam), HIWORDINT(lparam));
+            return false;
         case WM_MBUTTONDBLCLK:
-            g_hge_singleton->_BuildEvent(INPUT_MBUTTONDOWN, HGEK_MBUTTON, 0, HGEINP_REPEAT, LOWORDINT(lparam), HIWORDINT(lparam));
-            return FALSE;
+            g_hge_singleton->_BuildEvent(INPUT_MBUTTONDOWN, HGEK_MBUTTON, 0,
+				event_flags_t(true), LOWORDINT(lparam), HIWORDINT(lparam));
+            return false;
         case WM_RBUTTONDBLCLK:
-            g_hge_singleton->_BuildEvent(INPUT_MBUTTONDOWN, HGEK_RBUTTON, 0, HGEINP_REPEAT, LOWORDINT(lparam), HIWORDINT(lparam));
-            return FALSE;
+            g_hge_singleton->_BuildEvent(INPUT_MBUTTONDOWN, HGEK_RBUTTON, 0,
+				event_flags_t(true), LOWORDINT(lparam), HIWORDINT(lparam));
+            return false;
 
         case WM_LBUTTONUP:
-            g_hge_singleton->_BuildEvent(INPUT_MBUTTONUP, HGEK_LBUTTON, 0, 0, LOWORDINT(lparam), HIWORDINT(lparam));
-            return FALSE;
+            g_hge_singleton->_BuildEvent(INPUT_MBUTTONUP, HGEK_LBUTTON, 0,
+				0, LOWORDINT(lparam), HIWORDINT(lparam));
+            return false;
         case WM_MBUTTONUP:
-            g_hge_singleton->_BuildEvent(INPUT_MBUTTONUP, HGEK_MBUTTON, 0, 0, LOWORDINT(lparam), HIWORDINT(lparam));
-            return FALSE;
+            g_hge_singleton->_BuildEvent(INPUT_MBUTTONUP, HGEK_MBUTTON, 0,
+				0, LOWORDINT(lparam), HIWORDINT(lparam));
+            return false;
         case WM_RBUTTONUP:
-            g_hge_singleton->_BuildEvent(INPUT_MBUTTONUP, HGEK_RBUTTON, 0, 0, LOWORDINT(lparam), HIWORDINT(lparam));
-            return FALSE;
+            g_hge_singleton->_BuildEvent(INPUT_MBUTTONUP, HGEK_RBUTTON, 0,
+				0, LOWORDINT(lparam), HIWORDINT(lparam));
+            return false;
 
         case WM_MOUSEMOVE:
-            g_hge_singleton->_BuildEvent(INPUT_MOUSEMOVE, 0, 0, 0, LOWORDINT(lparam), HIWORDINT(lparam));
-            return FALSE;
+            g_hge_singleton->_BuildEvent(INPUT_MOUSEMOVE, 0,
+				0, 0, LOWORDINT(lparam), HIWORDINT(lparam));
+            return false;
         case 0x020A: // WM_MOUSEWHEEL, GET_WHEEL_DELTA_WPARAM(wparam);
             g_hge_singleton->_BuildEvent(INPUT_MOUSEWHEEL, short(HIWORD(wparam))/120, 0, 0, LOWORDINT(lparam), HIWORDINT(lparam));
-            return FALSE;
+            return false;
 
         case WM_SIZE:
             if(g_hge_singleton->m_d3d && wparam==SIZE_RESTORED) g_hge_singleton->_Resize(LOWORD(lparam), HIWORD(lparam));
@@ -873,7 +889,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
         case WM_SYSCOMMAND:
             if(wparam==SC_CLOSE)
             {
-                if(g_hge_singleton->m_exit_func && !g_hge_singleton->m_exit_func()) return FALSE;
+                if(g_hge_singleton->m_exit_func && !g_hge_singleton->m_exit_func()) return false;
                 g_hge_singleton->m_active=false;
                 return DefWindowProc(hwnd, msg, wparam, lparam);
             }

@@ -100,8 +100,8 @@ struct RSprite : public ResDesc
 	char		texname[MAXRESCHARS];
 	float		tx, ty, w, h;
 	float		hotx, hoty;
-	blend_mode_t	blend;
-	uint32_t		color;
+	uint32_t	blend;
+	uint32_t	color;
 	float		z;
 	bool		bXFlip, bYFlip;
 //	float		x,y;
@@ -129,8 +129,8 @@ struct RFont : public ResDesc
 {
 	char		filename[MAXRESCHARS];
 	bool		mipmap;
-	blend_mode_t	blend;
-	uint32_t		color;
+	uint32_t	blend;
+	uint32_t	color;
 	float		z;
 	float		scale;
 	float		proportion;
@@ -158,7 +158,7 @@ struct RDistort : public ResDesc
 	char		texname[MAXRESCHARS];
 	float		tx, ty, w, h;
 	int			cols, rows;
-	blend_mode_t blend;
+	uint32_t	blend;
 	uint32_t	color;
 	float		z;
 

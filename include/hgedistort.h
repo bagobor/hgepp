@@ -31,14 +31,14 @@ public:
 
 	void		SetTexture(HTEXTURE tex);
 	void		SetTextureRect(float x, float y, float w, float h);
-	void		SetBlendMode(blend_mode_t blend);
+	void		SetBlendMode(uint32_t blend);
 	void		SetZ(int col, int row, float z);
 	void		SetColor(int col, int row, uint32_t color);
 	void		SetDisplacement(int col, int row, float dx, float dy, int ref);
 
 	HTEXTURE	GetTexture() const {return m_quad.tex;}
 	void		GetTextureRect(float *x, float *y, float *w, float *h) const;
-	blend_mode_t GetBlendMode() const;
+	uint32_t	GetBlendMode() const;
 	float		GetZ(int col, int row) const;
 	uint32_t	GetColor(int col, int row) const;
 	void		GetDisplacement(int col, int row, float *dx, float *dy, int ref) const;

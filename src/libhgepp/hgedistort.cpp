@@ -20,7 +20,7 @@ hgeDistortionMesh::hgeDistortionMesh(int cols, int rows)
 	m_col_count=cols;
 	m_cell_width=m_cell_height=0;
 	m_quad.tex = nullptr;
-	m_quad.blend = (blend_mode_t)(BLEND_COLORMUL | BLEND_ALPHABLEND | BLEND_ZWRITE);
+	m_quad.blend = BLEND_COLORMUL | BLEND_ALPHABLEND | BLEND_ZWRITE;
 	m_disp_array=new hgeVertex[rows*cols];
 
 	for(i=0;i<rows*cols;i++)
@@ -119,7 +119,7 @@ void hgeDistortionMesh::SetTextureRect(float x, float y, float w, float h)
 		}
 }
 
-void hgeDistortionMesh::SetBlendMode(blend_mode_t blend)
+void hgeDistortionMesh::SetBlendMode(uint32_t blend)
 {
 	m_quad.blend=blend;
 }
@@ -248,7 +248,7 @@ void hgeDistortionMesh::GetTextureRect( float *x, float *y, float *w, float *h )
 	*x=m_tex_x; *y=m_tex_y; *w=m_width; *h=m_height;
 }
 
-blend_mode_t hgeDistortionMesh::GetBlendMode() const
+uint32_t hgeDistortionMesh::GetBlendMode() const
 {
 	return m_quad.blend;
 }

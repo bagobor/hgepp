@@ -42,7 +42,7 @@ hgeFont::hgeFont(const char *szFont, bool bMipmap)
 	m_texture = nullptr;
 
 	m_depth=0.5f;
-	m_blending = (blend_mode_t)(BLEND_COLORMUL | BLEND_ALPHABLEND | BLEND_NOZWRITE);
+	m_blending = BLEND_COLORMUL | BLEND_ALPHABLEND | BLEND_NOZWRITE;
 	m_color=0xFFFFFFFF;
 
 	ZeroMemory( &m_letters, sizeof(m_letters) );
@@ -304,7 +304,7 @@ void hgeFont::SetZ(float z)
 			m_letters[i]->SetZ(z);
 }
 
-void hgeFont::SetBlendMode(blend_mode_t blend)
+void hgeFont::SetBlendMode(uint32_t blend)
 {
 	m_blending = blend;
 
@@ -371,7 +371,7 @@ float hgeFont::GetZ() const
 	return m_depth;
 }
 
-blend_mode_t hgeFont::GetBlendMode() const
+uint32_t hgeFont::GetBlendMode() const
 {
 	return m_blending;
 }

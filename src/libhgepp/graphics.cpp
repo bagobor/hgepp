@@ -259,7 +259,7 @@ void HGE_CALL HGE_Impl::Gfx_RenderQuad(const hgeQuad *quad)
     }
 }
 
-hgeVertex* HGE_CALL HGE_Impl::Gfx_StartBatch(int prim_type, HTEXTURE tex, int blend, int *max_prim)
+hgeVertex* HGE_CALL HGE_Impl::Gfx_StartBatch(primitive_mode_t prim_type, HTEXTURE tex, int blend, int *max_prim)
 {
     if(m_vertices)
     {
@@ -609,7 +609,7 @@ void HGE_Impl::_SetBlendMode(int blend)
     if((blend & BLEND_ZWRITE) != (m_cur_blend_mode & BLEND_ZWRITE))
     {
         if(blend & BLEND_ZWRITE) m_d3d_device->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
-        else m_d3d_device->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
+        else m_d3d_device->SetRenderState(D3DRS_ZWRITEENABLE, false);
     }           
     
     if((blend & BLEND_COLORADD) != (m_cur_blend_mode & BLEND_COLORADD))
@@ -743,7 +743,7 @@ bool HGE_Impl::_GfxInit()
     m_d3dppFS.BackBufferCount  = 1;
     m_d3dppFS.MultiSampleType  = D3DMULTISAMPLE_NONE;
     m_d3dppFS.hDeviceWindow    = m_hwnd;
-    m_d3dppFS.Windowed         = FALSE;
+    m_d3dppFS.Windowed         = false;
 
     m_d3dppFS.SwapEffect       = D3DSWAPEFFECT_FLIP;
     m_d3dppFS.FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
@@ -1085,7 +1085,7 @@ bool HGE_Impl::_init_lost()
 
     //pD3DDevice->SetRenderState( D3DRS_LASTPIXEL, FALSE );
     m_d3d_device->SetRenderState( D3DRS_CULLMODE, D3DCULL_NONE );
-    m_d3d_device->SetRenderState( D3DRS_LIGHTING, FALSE );
+    m_d3d_device->SetRenderState( D3DRS_LIGHTING, false );
     
     m_d3d_device->SetRenderState( D3DRS_ALPHABLENDENABLE,   TRUE );
     m_d3d_device->SetRenderState( D3DRS_SRCBLEND,  D3DBLEND_SRCALPHA );

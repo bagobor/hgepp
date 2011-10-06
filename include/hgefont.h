@@ -34,7 +34,7 @@ public:
 
 	void		SetColor(uint32_t col);
 	void		SetZ(float z);
-	void		SetBlendMode(blend_mode_t blend);
+	void		SetBlendMode(uint32_t blend);
 	void		SetScale(float scale);
 	void		SetProportion(float prop);
 	void		SetRotation(float rot);
@@ -43,7 +43,7 @@ public:
 
 	uint32_t	GetColor() const;
 	float		GetZ() const;
-	blend_mode_t GetBlendMode() const;
+	uint32_t	GetBlendMode() const;
 	float		GetScale() const;
 	float		GetProportion() const;
 	float		GetRotation() const;
@@ -79,9 +79,9 @@ private:
 	float		m_tracking;
 	float		m_spacing;
 
-	uint32_t		m_color;
-	float			m_depth;
-	blend_mode_t	m_blending;
+	uint32_t	m_color;
+	float		m_depth;
+	uint32_t	m_blending;
 };
 
 } // namespace hge

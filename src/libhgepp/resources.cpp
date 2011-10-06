@@ -99,7 +99,7 @@ void ScriptParseFileResource(hgeResourceManager *rm, RScriptParser *sp, const ch
 	AddRes(rm, restype, rc);
 }
 
-void ScriptParseBlendMode(RScriptParser *sp, blend_mode_t *blend)
+void ScriptParseBlendMode(RScriptParser *sp, uint32_t *blend)
 {
 	for(;;)
 	{
@@ -108,30 +108,12 @@ void ScriptParseBlendMode(RScriptParser *sp, blend_mode_t *blend)
 		
 		switch(sp->get_token())
 		{
-			case TTCON_COLORMUL:
-				*blend = (blend_mode_t)(*blend & ~BLEND_COLORADD);
-				break;
-
-			case TTCON_COLORADD:
-				*blend = (blend_mode_t)(*blend | BLEND_COLORADD);
-				break;
-
-			case TTCON_ALPHABLND:
-				*blend = (blend_mode_t)(*blend | BLEND_ALPHABLEND);
-				break;
-
-			case TTCON_ALPHAADD:
-				*blend = (blend_mode_t)(*blend & ~BLEND_ALPHABLEND);
-				break;
-
-			case TTCON_ZWRITE:
-				*blend = (blend_mode_t)(*blend | BLEND_ZWRITE);
-				break;
-
-			case TTCON_NOZWRITE:
-				*blend = (blend_mode_t)(*blend & ~BLEND_ZWRITE);
-				break;
-
+			case TTCON_COLORMUL:	*blend &= ~BLEND_COLORADD;		break;
+			case TTCON_COLORADD:	*blend |= BLEND_COLORADD;		break;
+			case TTCON_ALPHABLND:	*blend |= BLEND_ALPHABLEND;		break;
+			case TTCON_ALPHAADD:	*blend &= ~BLEND_ALPHABLEND;	break;
+			case TTCON_ZWRITE:		*blend |= BLEND_ZWRITE;			break;
+			case TTCON_NOZWRITE:	*blend &= ~BLEND_ZWRITE;		break;
 			default:
 				sp->ScriptPostError("Unsupported value ",".");
 				break;
@@ -628,7 +610,7 @@ void RSprite::Parse(hgeResourceManager *rm, RScriptParser *sp, const char *name,
 		rc->tx=rc->ty=0;
 		rc->w=rc->h=0;
 		rc->hotx=rc->hoty=0;
-		rc->blend = (blend_mode_t)(BLEND_COLORMUL | BLEND_ALPHABLEND | BLEND_NOZWRITE);
+		rc->blend = BLEND_COLORMUL | BLEND_ALPHABLEND | BLEND_NOZWRITE;
 		rc->color=0xFFFFFFFF;
 		rc->z=0.5f;
 		rc->bXFlip=false;
@@ -689,7 +671,7 @@ void RAnimation::Parse(hgeResourceManager *rm, RScriptParser *sp, const char *na
 		rc->tx=rc->ty=0;
 		rc->w=rc->h=0;
 		rc->hotx=rc->hoty=0;
-		rc->blend = (blend_mode_t)(BLEND_COLORMUL | BLEND_ALPHABLEND | BLEND_NOZWRITE);
+		rc->blend = BLEND_COLORMUL | BLEND_ALPHABLEND | BLEND_NOZWRITE;
 		rc->color=0xFFFFFFFF;
 		rc->z=0.5f;
 		rc->bXFlip=false;
@@ -752,7 +734,7 @@ void RFont::Parse(hgeResourceManager *rm, RScriptParser *sp, const char *name, c
 		rc->resgroup=0;
 		rc->mipmap=false;
 		rc->filename[0]=0;
-		rc->blend = (blend_mode_t)(BLEND_COLORMUL | BLEND_ALPHABLEND | BLEND_NOZWRITE);
+		rc->blend = BLEND_COLORMUL | BLEND_ALPHABLEND | BLEND_NOZWRITE;
 		rc->color=0xFFFFFFFF;
 		rc->z=0.5f;
 		rc->scale=1.0f;
@@ -935,7 +917,7 @@ void RDistort::Parse(hgeResourceManager *rm, RScriptParser *sp, const char *name
 		rc->tx=rc->ty=0;
 		rc->w=rc->h=0;
 		rc->cols=rc->rows=2;
-		rc->blend = (blend_mode_t)(BLEND_COLORMUL | BLEND_ALPHABLEND | BLEND_NOZWRITE);
+		rc->blend = BLEND_COLORMUL | BLEND_ALPHABLEND | BLEND_NOZWRITE;
 		rc->color=0xFFFFFFFF;
 		rc->z=0.5f;
 	}

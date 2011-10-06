@@ -17,7 +17,7 @@
 
 using namespace hge;
 
-HGE *g_hge=0;
+HGE *g_hge=nullptr;
 
 // Quad is the basic primitive in HGE
 // used for rendering graphics.
@@ -132,7 +132,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		}
 
 		// Set up quad which we will use for rendering sprite
-		quad.blend = (blend_mode_t)(BLEND_ALPHAADD | BLEND_COLORMUL | BLEND_ZWRITE);
+		quad.blend = BLEND_ALPHAADD | BLEND_COLORMUL | BLEND_ZWRITE;
 
 		for(int i=0;i<4;i++)
 		{
