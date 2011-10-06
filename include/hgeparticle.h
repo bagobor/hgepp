@@ -81,31 +81,30 @@ class HGE_EXPORT hgeParticleSystem
 {
 public:
 	hgeParticleSystemInfo info;
-	
+
 	hgeParticleSystem(const char *filename, hgeSprite *sprite);
 	hgeParticleSystem(hgeParticleSystemInfo *psi);
 	hgeParticleSystem(const hgeParticleSystem &ps);
 	~hgeParticleSystem();
 
-	hgeParticleSystem&	operator= (const hgeParticleSystem &ps);
+	hgeParticleSystem& operator=(const hgeParticleSystem &ps);
 
+	void Render();
+	void FireAt(float x, float y);
+	void Fire();
+	void Stop(bool bKillParticles = false);
+	void Update(float fDeltaTime);
+	void MoveTo(float x, float y, bool bMoveParticles = false);
+	void Transpose(float x, float y);
+	void SetScale(float scale);
+	void TrackBoundingBox(bool bTrack);
 
-	void		Render();
-	void		FireAt(float x, float y);
-	void		Fire();
-	void		Stop(bool bKillParticles=false);
-	void		Update(float fDeltaTime);
-	void		MoveTo(float x, float y, bool bMoveParticles=false);
-	void		Transpose(float x, float y);
-	void		SetScale(float scale);
-	void		TrackBoundingBox(bool bTrack);
-
-	int			GetParticlesAlive() const;
-	float		GetAge() const;
-	void		GetPosition(float *x, float *y) const;
-	void		GetTransposition(float *x, float *y) const;
-	float		GetScale();
-	hgeRect*	GetBoundingBox(hgeRect *rect) const;
+	int GetParticlesAlive() const;
+	float GetAge() const;
+	void GetPosition(float *x, float *y) const;
+	void GetTransposition(float *x, float *y) const;
+	float GetScale();
+	hgeRect* GetBoundingBox(hgeRect *rect) const;
 
 private:
 	hgeParticleSystem();
@@ -113,20 +112,20 @@ private:
 	//static HGE			*g_hgeparticlesys_hge;
 	static HGE * get_hge();
 
-	float				m_age;
-	float				m_emission_residue;
+	float m_age;
+	float m_emission_residue;
 
-	hgeVector			m_prev_location;
-	hgeVector			m_location;
-	float				m_tx, m_ty;
-	float				m_scale;
+	hgeVector m_prev_location;
+	hgeVector m_location;
+	float m_tx, m_ty;
+	float m_scale;
 
-	int					m_alive_count;
-	hgeRect				m_bounding_box;
-	bool				m_update_bbox;
+	int m_alive_count;
+	hgeRect m_bounding_box;
+	bool m_update_bbox;
 
 	// TODO: replace with pool or something resizable and fast
-	hgeParticle			m_particles[MAX_PARTICLES];
+	hgeParticle m_particles[MAX_PARTICLES];
 };
 
 
@@ -136,26 +135,26 @@ public:
 	hgeParticleManager();
 	~hgeParticleManager();
 
-	void				Update(float dt);
-	void				Render();
+	void Update(float dt);
+	void Render();
 
-	hgeParticleSystem*	SpawnPS(hgeParticleSystemInfo *psi, float x, float y);
-	bool				IsPSAlive(hgeParticleSystem *ps) const;
-	void				Transpose(float x, float y);
-	void				GetTransposition(float *dx, float *dy) const;
-	void				KillPS(hgeParticleSystem *ps);
-	void				KillAll();
+	hgeParticleSystem* SpawnPS(hgeParticleSystemInfo *psi, float x, float y);
+	bool IsPSAlive(hgeParticleSystem *ps) const;
+	void Transpose(float x, float y);
+	void GetTransposition(float *dx, float *dy) const;
+	void KillPS(hgeParticleSystem *ps);
+	void KillAll();
 
 private:
 	hgeParticleManager(const hgeParticleManager &);
-	hgeParticleManager&	operator= (const hgeParticleManager &);
+	hgeParticleManager& operator=(const hgeParticleManager &);
 
-	int					m_systems_count;
-	float				m_tx;
-	float				m_ty;
+	int m_systems_count;
+	float m_tx;
+	float m_ty;
 
 	// TODO: replace with STL vector or list
-	hgeParticleSystem*	m_systems[MAX_PSYSTEMS];
+	hgeParticleSystem* m_systems[MAX_PSYSTEMS];
 };
 
 } // namespace hge

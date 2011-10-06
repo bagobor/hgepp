@@ -4,30 +4,31 @@
  */
 #include "hge_impl.h"
 
-namespace hge {
+namespace hge
+{
 
 void HGE_Impl::_InitPowerStatus()
 {
 	m_kernel32 = LoadLibrary("kernel32.dll");
 
-	if(m_kernel32 != NULL)
-		m_getsystempowerstatus_func = (GetSystemPowerStatusFunc)GetProcAddress(m_kernel32, "GetSystemPowerStatus");
+	if (m_kernel32 != NULL)
+		m_getsystempowerstatus_func = (GetSystemPowerStatusFunc) GetProcAddress(m_kernel32,
+				"GetSystemPowerStatus");
 
 	_UpdatePowerStatus();
 }
-
 
 void HGE_Impl::_UpdatePowerStatus()
 {
 	SYSTEM_POWER_STATUS ps;
 
-	if(m_getsystempowerstatus_func != NULL && m_getsystempowerstatus_func(&ps))
+	if (m_getsystempowerstatus_func != NULL && m_getsystempowerstatus_func(&ps))
 	{
-		if(ps.ACLineStatus == 1)
+		if (ps.ACLineStatus == 1)
 		{
 			m_power_status = HGEPWR_AC;
 		}
-		else if(ps.BatteryFlag < 128)
+		else if (ps.BatteryFlag < 128)
 		{
 			m_power_status = ps.BatteryLifePercent;
 		}
@@ -42,10 +43,10 @@ void HGE_Impl::_UpdatePowerStatus()
 	}
 }
 
-
 void HGE_Impl::_DonePowerStatus()
 {
-	if(m_kernel32 != NULL) FreeLibrary(m_kernel32);
+	if (m_kernel32 != NULL)
+		FreeLibrary(m_kernel32);
 }
 
 } // namespace hge

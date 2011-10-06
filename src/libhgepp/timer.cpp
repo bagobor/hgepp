@@ -4,7 +4,8 @@
  */
 #include "hge_impl.h"
 
-namespace hge {
+namespace hge
+{
 
 float HGE_CALL HGE_Impl::Timer_GetTime()
 {
@@ -16,11 +17,9 @@ float HGE_CALL HGE_Impl::Timer_GetDelta()
 	return m_time_delta;
 }
 
-
 int HGE_CALL HGE_Impl::Timer_GetFPS()
 {
 	return m_time_fps;
 }
-
 
 } // namespace hge

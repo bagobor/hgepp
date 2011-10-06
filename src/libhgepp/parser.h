@@ -9,7 +9,8 @@
 #include <string.h>
 #include <stdlib.h>
 
-namespace hge {
+namespace hge
+{
 
 enum
 {
@@ -44,27 +45,27 @@ public:
 	RScriptParser(char *name, char *scr);
 	~RScriptParser();
 
-	int		get_token();
-	void	put_back();
-	int		get_line();
-	char*	get_name();
+	int get_token();
+	void put_back();
+	int get_line();
+	char* get_name();
 
-	char*	tkn_string();
-	int		tkn_int();
-	float	tkn_float();
-	bool	tkn_bool();
-	uint32_t	tkn_hex();
+	char* tkn_string();
+	int tkn_int();
+	float tkn_float();
+	bool tkn_bool();
+	uint32_t tkn_hex();
 
-	void	ScriptPostError(char *msg1, char *msg2);
+	void ScriptPostError(char *msg1, char *msg2);
 
-	int		tokentype;
-	char	tokenvalue[128];
-	char*	script;
-	char*	scriptname;
-	int		line;
+	int tokentype;
+	char tokenvalue[128];
+	char* script;
+	char* scriptname;
+	int line;
 
 private:
-	bool	strtkcmp(char *str, char *mem);
+	bool strtkcmp(char *str, char *mem);
 
 	//static HGE *g_scriptparser_hge;
 };

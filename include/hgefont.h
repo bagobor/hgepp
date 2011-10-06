@@ -28,60 +28,60 @@ public:
 	hgeFont(const char *filename, bool bMipmap=false);
 	~hgeFont();
 
-	void		Render(float x, float y, int align, const char *string);
-	void		printf(float x, float y, int align, const char *format, ...);
-	void		printfb(float x, float y, float w, float h, int align, const char *format, ...);
+	void Render(float x, float y, int align, const char *string);
+	void printf(float x, float y, int align, const char *format, ...);
+	void printfb(float x, float y, float w, float h, int align, const char *format, ...);
 
-	void		SetColor(uint32_t col);
-	void		SetZ(float z);
-	void		SetBlendMode(uint32_t blend);
-	void		SetScale(float scale);
-	void		SetProportion(float prop);
-	void		SetRotation(float rot);
-	void		SetTracking(float tracking);
-	void		SetSpacing(float spacing);
+	void SetColor(uint32_t col);
+	void SetZ(float z);
+	void SetBlendMode(uint32_t blend);
+	void SetScale(float scale);
+	void SetProportion(float prop);
+	void SetRotation(float rot);
+	void SetTracking(float tracking);
+	void SetSpacing(float spacing);
 
-	uint32_t	GetColor() const;
-	float		GetZ() const;
-	uint32_t	GetBlendMode() const;
-	float		GetScale() const;
-	float		GetProportion() const;
-	float		GetRotation() const;
-	float		GetTracking() const;
-	float		GetSpacing() const;
+	uint32_t GetColor() const;
+	float GetZ() const;
+	uint32_t GetBlendMode() const;
+	float GetScale() const;
+	float GetProportion() const;
+	float GetRotation() const;
+	float GetTracking() const;
+	float GetSpacing() const;
 
-	hgeSprite*	GetSprite(char chr) const;
-	float		GetPreWidth(char chr) const;
-	float		GetPostWidth(char chr) const;
-	float		GetHeight() const;
-	float		GetStringWidth(const char *string, bool bMultiline=true) const;
+	hgeSprite* GetSprite(char chr) const;
+	float GetPreWidth(char chr) const;
+	float GetPostWidth(char chr) const;
+	float GetHeight() const;
+	float GetStringWidth(const char *string, bool bMultiline = true) const;
 
 private:
 	hgeFont();
 	hgeFont(const hgeFont &fnt);
-	hgeFont&	operator= (const hgeFont &fnt);
+	hgeFont& operator=(const hgeFont &fnt);
 
-	char*		_get_line(char *file, char *line);
+	char* _get_line(char *file, char *line);
 
 	//static HGE	*g_hgefont_hge;
 	static HGE * get_hge();
 
 	//static char	g_hgefont_buffer[1024];
 
-	HTEXTURE	m_texture;
-	hgeSprite*	m_letters[256];
-	float		m_pre_margin[256];
-	float		m_post_margin[256];
-	float		m_height;
-	float		m_scale;
-	float		m_proportion;
-	float		m_rotation;
-	float		m_tracking;
-	float		m_spacing;
+	HTEXTURE m_texture;
+	hgeSprite* m_letters[256];
+	float m_pre_margin[256];
+	float m_post_margin[256];
+	float m_height;
+	float m_scale;
+	float m_proportion;
+	float m_rotation;
+	float m_tracking;
+	float m_spacing;
 
-	uint32_t	m_color;
-	float		m_depth;
-	uint32_t	m_blending;
+	uint32_t m_color;
+	float m_depth;
+	uint32_t m_blending;
 };
 
 } // namespace hge

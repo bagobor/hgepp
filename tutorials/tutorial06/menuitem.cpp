@@ -17,33 +17,33 @@ hgeGUIMenuItem::hgeGUIMenuItem(int _id, hgeFont *_fnt, HEFFECT _snd, float _x, f
 {
 	float w;
 	
-	id=_id;
+	m_object_id=_id;
 	fnt=_fnt;
 	snd=_snd;
 	delay=_delay;
 	title=_title;
 
-	color.SetHWColor(0xFFFFE060);
+	m_color.SetHWColor(0xFFFFE060);
 	shadow.SetHWColor(0x30000000);
 	offset=0.0f;
 	timer=-1.0f;
 	timer2=-1.0f;
 
-	bStatic=false;
-	bVisible=true;
-	bEnabled=true;
+	m_is_static=false;
+	m_is_visible=true;
+	m_is_enabled=true;
 
 	w=fnt->GetStringWidth(title);
-	rect.Set(_x-w/2, _y, _x+w/2, _y+fnt->GetHeight());
+	m_rect.Set(_x-w/2, _y, _x+w/2, _y+fnt->GetHeight());
 }
 
 // This method is called when the control should be rendered
 void hgeGUIMenuItem::Render()
 {
 	fnt->SetColor(shadow.GetHWColor());
-	fnt->Render(rect.x1+offset+3, rect.y1+3, HGETEXT_LEFT, title);
-	fnt->SetColor(color.GetHWColor());
-	fnt->Render(rect.x1-offset, rect.y1-offset, HGETEXT_LEFT, title);
+	fnt->Render(m_rect.x1+offset+3, m_rect.y1+3, HGETEXT_LEFT, title);
+	fnt->SetColor(m_color.GetHWColor());
+	fnt->Render(m_rect.x1-offset, m_rect.y1-offset, HGETEXT_LEFT, title);
 }
 
 // This method is called each frame,
@@ -55,15 +55,15 @@ void hgeGUIMenuItem::Update(float dt)
 		timer2+=dt;
 		if(timer2 >= delay+0.1f)
 		{
-			color=scolor2+dcolor2;
+			m_color=scolor2+dcolor2;
 			shadow=sshadow+dshadow;
 			offset=0.0f;
 			timer2=-1.0f;
 		}
 		else
 		{
-			if(timer2 < delay) { color=scolor2; shadow=sshadow; }
-			else { color=scolor2+dcolor2*(timer2-delay)*10; shadow=sshadow+dshadow*(timer2-delay)*10; }
+			if(timer2 < delay) { m_color=scolor2; shadow=sshadow; }
+			else { m_color=scolor2+dcolor2*(timer2-delay)*10; shadow=sshadow+dshadow*(timer2-delay)*10; }
 		}
 	}
 	else if(timer != -1.0f)
@@ -71,13 +71,13 @@ void hgeGUIMenuItem::Update(float dt)
 		timer+=dt;
 		if(timer >= 0.2f)
 		{
-			color=scolor+dcolor;
+			m_color=scolor+dcolor;
 			offset=soffset+doffset;
 			timer=-1.0f;
 		}
 		else
 		{
-			color=scolor+dcolor*timer*5;
+			m_color=scolor+dcolor*timer*5;
 			offset=soffset+doffset*timer*5;
 		}
 	}
@@ -155,7 +155,7 @@ void hgeGUIMenuItem::Focus(bool bFocused)
 // that the mouse cursor has entered or left it's area
 void hgeGUIMenuItem::MouseOver(bool bOver)
 {
-	if(bOver) gui->SetFocus(id);
+	if(bOver) m_gui->SetFocus(m_object_id);
 }
 
 // This method is called to notify the control

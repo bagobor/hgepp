@@ -40,7 +40,7 @@ private:
 	char		*title;
 
 	hgeColor	scolor, dcolor, scolor2, dcolor2, sshadow, dshadow;
-	hgeColor	color, shadow;
+	hgeColor	m_color, shadow;
 	float		soffset, doffset, offset;
 	float		timer, timer2;
 };

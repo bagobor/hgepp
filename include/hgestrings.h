@@ -13,9 +13,9 @@ namespace hge {
 
 struct NamedString
 {
-	char			name[MAXSTRNAMELENGTH];
-	char			*string;
-	NamedString		*next;
+	char name[MAXSTRNAMELENGTH];
+	char *string;
+	NamedString *next;
 };
 
 /*
@@ -27,13 +27,13 @@ public:
 	hgeStringTable(const char *filename);
 	~hgeStringTable();
 
-	char			*GetString(const char *name);
+	char *GetString(const char *name);
 
 private:
 	hgeStringTable(const hgeStringTable &);
-	hgeStringTable&	operator= (const hgeStringTable &);
+	hgeStringTable& operator=(const hgeStringTable &);
 
-	NamedString		*strings;
+	NamedString *strings;
 
 	//static HGE		*g_hgestringtab_hge;
 	static HGE * get_hge();

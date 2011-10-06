@@ -34,38 +34,38 @@ public:
 	hgeAnimation(HTEXTURE tex, int nframes, float FPS, float x, float y, float w, float h);
 	hgeAnimation(const hgeAnimation &anim);
 	
-	void		Play();
-	void		Stop();
-	void		Resume();
-	void		Update(float fDeltaTime);
-	bool		IsPlaying() const;
+	void Play();
+	void Stop();
+	void Resume();
+	void Update(float fDeltaTime);
+	bool IsPlaying() const;
 
-	void		SetTexture(HTEXTURE tex);
-	void		SetTextureRect(float x1, float y1, float x2, float y2);
-	void		SetMode(anim_mode_t mode);
-	void		SetSpeed(float FPS);
-	void		SetFrame(int n);
-	void		SetFrames(int n);
+	void SetTexture(HTEXTURE tex);
+	void SetTextureRect(float x1, float y1, float x2, float y2);
+	void SetMode(anim_mode_t mode);
+	void SetSpeed(float FPS);
+	void SetFrame(int n);
+	void SetFrames(int n);
 
 	anim_mode_t GetMode() const;
-	float		GetSpeed() const;
-	int			GetFrame() const;
-	int			GetFrames() const;
+	float GetSpeed() const;
+	int GetFrame() const;
+	int GetFrames() const;
 
 private:
 	hgeAnimation();
 
-	int			m_orig_width;
+	int m_orig_width;
 
-	bool		m_playing_flag;
+	bool m_playing_flag;
 
-	float		m_speed;
-	float		m_since_last_frame;
+	float m_speed;
+	float m_since_last_frame;
 
-	anim_mode_t	m_play_mode;
-	int			m_delta;
-	int			m_frame_count;
-	int			m_cur_frame;
+	anim_mode_t m_play_mode;
+	int m_delta;
+	int m_frame_count;
+	int m_cur_frame;
 };
 
 } // namespace hge
