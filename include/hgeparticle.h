@@ -90,22 +90,22 @@ public:
 	hgeParticleSystem&	operator= (const hgeParticleSystem &ps);
 
 
-	void				Render();
-	void				FireAt(float x, float y);
-	void				Fire();
-	void				Stop(bool bKillParticles=false);
-	void				Update(float fDeltaTime);
-	void				MoveTo(float x, float y, bool bMoveParticles=false);
-	void				Transpose(float x, float y);
-	void				SetScale(float scale);
-	void				TrackBoundingBox(bool bTrack);
+	void		Render();
+	void		FireAt(float x, float y);
+	void		Fire();
+	void		Stop(bool bKillParticles=false);
+	void		Update(float fDeltaTime);
+	void		MoveTo(float x, float y, bool bMoveParticles=false);
+	void		Transpose(float x, float y);
+	void		SetScale(float scale);
+	void		TrackBoundingBox(bool bTrack);
 
-	int					GetParticlesAlive() const;
-	float				GetAge() const;
-	void				GetPosition(float *x, float *y) const;
-	void				GetTransposition(float *x, float *y) const;
-	float				GetScale();
-	hgeRect*			GetBoundingBox(hgeRect *rect) const;
+	int			GetParticlesAlive() const;
+	float		GetAge() const;
+	void		GetPosition(float *x, float *y) const;
+	void		GetTransposition(float *x, float *y) const;
+	float		GetScale();
+	hgeRect*	GetBoundingBox(hgeRect *rect) const;
 
 private:
 	hgeParticleSystem();
@@ -113,20 +113,22 @@ private:
 	//static HGE			*g_hgeparticlesys_hge;
 	static HGE * get_hge();
 
-	float				fAge;
-	float				fEmissionResidue;
+	float				m_age;
+	float				m_emission_residue;
 
-	hgeVector			vecPrevLocation;
-	hgeVector			vecLocation;
-	float				fTx, fTy;
-	float				fScale;
+	hgeVector			m_prev_location;
+	hgeVector			m_location;
+	float				m_tx, m_ty;
+	float				m_scale;
 
-	int					nParticlesAlive;
-	hgeRect				rectBoundingBox;
-	bool				bUpdateBoundingBox;
+	int					m_alive_count;
+	hgeRect				m_bounding_box;
+	bool				m_update_bbox;
 
-	hgeParticle			particles[MAX_PARTICLES];
+	// TODO: replace with pool or something resizable and fast
+	hgeParticle			m_particles[MAX_PARTICLES];
 };
+
 
 class HGE_EXPORT hgeParticleManager
 {
@@ -148,10 +150,12 @@ private:
 	hgeParticleManager(const hgeParticleManager &);
 	hgeParticleManager&	operator= (const hgeParticleManager &);
 
-	int					nPS;
-	float				tX;
-	float				tY;
-	hgeParticleSystem*	psList[MAX_PSYSTEMS];
+	int					m_systems_count;
+	float				m_tx;
+	float				m_ty;
+
+	// TODO: replace with STL vector or list
+	hgeParticleSystem*	m_systems[MAX_PSYSTEMS];
 };
 
 } // namespace hge

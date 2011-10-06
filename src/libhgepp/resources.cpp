@@ -12,15 +12,15 @@ namespace hge {
 
 void AddRes(hgeResourceManager *rm, int type, ResDesc *resource)
 {
-	resource->next=rm->res[type];
-	rm->res[type]=resource;
+	resource->next=rm->m_resources[type];
+	rm->m_resources[type]=resource;
 }
 
 ResDesc *FindRes(hgeResourceManager *rm, int type, const char *name)
 {
 	ResDesc *rc;
 
-	rc=rm->res[type];
+	rc=rm->m_resources[type];
 	while(rc)
 	{
 		if(!strcmp(name, rc->name)) return rc;

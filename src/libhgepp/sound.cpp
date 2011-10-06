@@ -9,26 +9,26 @@ namespace hge {
 #define BASSDEF(f) (WINAPI *f)	// define the functions as pointers
 #include "BASS\bass.h"
 
-#define LOADBASSFUNCTION(f) *((void**)&f)=(void*)GetProcAddress(hBass,#f)
+#define LOADBASSFUNCTION(f) *((void**)&f)=(void*)GetProcAddress(m_bassdll,#f)
 
 
 HEFFECT HGE_CALL HGE_Impl::Effect_Load(const char *filename, uint32_t size)
 {
 	uint32_t _size, length, samples;
-	HSAMPLE hs;
+	bass_HSAMPLE hs;
 	HSTREAM hstrm;
 	BASS_CHANNELINFO info;
 	void *buffer, *data;
 
-	if(hBass)
+	if(m_bassdll)
 	{
-		if(bSilent) return 1;
+		if(m_no_sound) return 1;
 
 		if(size) { data=(void *)filename; _size=size; }
 		else
 		{
 			data=Resource_Load(filename, &_size);
-			if(!data) return NULL;
+			if(!data) return nullptr;
 		}
 	
 		hs=BASS_SampleLoad(TRUE, data, 0, _size, 4, BASS_SAMPLE_OVER_VOL);
@@ -59,24 +59,24 @@ HEFFECT HGE_CALL HGE_Impl::Effect_Load(const char *filename, uint32_t size)
 		if(!size) Resource_Free(data);
 		return hs;
 	}
-	else return 0;
+	else return nullptr;
 }
 
 HCHANNEL HGE_CALL HGE_Impl::Effect_Play(HEFFECT eff)
 {
-	if(hBass)
+	if(m_bassdll)
 	{
 		HCHANNEL chn;
 		chn=BASS_SampleGetChannel(eff, FALSE);
 		BASS_ChannelPlay(chn, TRUE);
 		return chn;
 	}
-	else return 0;
+	else return nullptr;
 }
 
 HCHANNEL HGE_CALL HGE_Impl::Effect_PlayEx(HEFFECT eff, int volume, int pan, float pitch, bool loop)
 {
-	if(hBass)
+	if(m_bassdll)
 	{
 		BASS_SAMPLE info;
 		HCHANNEL chn;
@@ -91,13 +91,13 @@ HCHANNEL HGE_CALL HGE_Impl::Effect_PlayEx(HEFFECT eff, int volume, int pan, floa
 		BASS_ChannelPlay(chn, TRUE);
 		return chn;
 	}
-	else return 0;
+	else return nullptr;
 }
 
 
 void HGE_CALL HGE_Impl::Effect_Free(HEFFECT eff)
 {
-	if(hBass) BASS_SampleFree(eff);
+	if(m_bassdll) BASS_SampleFree(eff);
 }
 
 
@@ -107,7 +107,7 @@ HMUSIC HGE_CALL HGE_Impl::Music_Load(const char *filename, uint32_t size)
 	uint32_t _size;
 	HMUSIC hm;
 
-	if(hBass)
+	if(m_bassdll)
 	{
 		if(size)
 		{
@@ -117,7 +117,7 @@ HMUSIC HGE_CALL HGE_Impl::Music_Load(const char *filename, uint32_t size)
 		else
 		{
 			data=Resource_Load(filename, &_size);
-			if(!data) return 0;
+			if(!data) return nullptr;
 		}
 
 		hm=BASS_MusicLoad(TRUE, data, 0, 0, BASS_MUSIC_PRESCAN | BASS_MUSIC_POSRESETEX | BASS_MUSIC_RAMP, 0);
@@ -125,12 +125,12 @@ HMUSIC HGE_CALL HGE_Impl::Music_Load(const char *filename, uint32_t size)
 		if(!size) Resource_Free(data);
 		return hm;
 	}
-	else return 0;
+	else return nullptr;
 }
 
 HCHANNEL HGE_CALL HGE_Impl::Music_Play(HMUSIC mus, bool loop, int volume, int order, int row)
 {
-	if(hBass)
+	if(m_bassdll)
 	{
 		uint32_t pos = BASS_MusicGetOrderPosition(mus);
 		if(order == -1) order = LOWORD(pos);
@@ -149,28 +149,28 @@ HCHANNEL HGE_CALL HGE_Impl::Music_Play(HMUSIC mus, bool loop, int volume, int or
 
 		return mus;
 	}
-	else return 0;
+	else return nullptr;
 }
 
 void HGE_CALL HGE_Impl::Music_Free(HMUSIC mus)
 {
-	if(hBass) BASS_MusicFree(mus);
+	if(m_bassdll) BASS_MusicFree(mus);
 }
 
 void HGE_CALL HGE_Impl::Music_SetAmplification(HMUSIC music, int ampl)
 {
-	if(hBass) BASS_MusicSetAttribute(music, BASS_MUSIC_ATTRIB_AMPLIFY, ampl);
+	if(m_bassdll) BASS_MusicSetAttribute(music, BASS_MUSIC_ATTRIB_AMPLIFY, ampl);
 }
 
 int HGE_CALL HGE_Impl::Music_GetAmplification(HMUSIC music)
 {
-	if(hBass) return BASS_MusicGetAttribute(music, BASS_MUSIC_ATTRIB_AMPLIFY);
+	if(m_bassdll) return BASS_MusicGetAttribute(music, BASS_MUSIC_ATTRIB_AMPLIFY);
 	else return -1;
 }
 
 int HGE_CALL HGE_Impl::Music_GetLength(HMUSIC music)
 {
-	if(hBass)
+	if(m_bassdll)
 	{
 		return BASS_MusicGetOrders(music);
 	}
@@ -179,7 +179,7 @@ int HGE_CALL HGE_Impl::Music_GetLength(HMUSIC music)
 
 void HGE_CALL HGE_Impl::Music_SetPos(HMUSIC music, int order, int row)
 {
-	if(hBass)
+	if(m_bassdll)
 	{
 		BASS_ChannelSetPosition(music, MAKEMUSICPOS(order, row));
 	}
@@ -187,7 +187,7 @@ void HGE_CALL HGE_Impl::Music_SetPos(HMUSIC music, int order, int row)
 
 bool HGE_CALL HGE_Impl::Music_GetPos(HMUSIC music, int *order, int *row)
 {
-	if(hBass)
+	if(m_bassdll)
 	{
 		uint32_t pos;
 		pos = BASS_MusicGetOrderPosition(music);
@@ -201,7 +201,7 @@ bool HGE_CALL HGE_Impl::Music_GetPos(HMUSIC music, int *order, int *row)
 
 void HGE_CALL HGE_Impl::Music_SetInstrVolume(HMUSIC music, int instr, int volume)
 {
-	if(hBass)
+	if(m_bassdll)
 	{
 		BASS_MusicSetAttribute(music, BASS_MUSIC_ATTRIB_VOL_INST + instr, volume);		
 	}
@@ -209,7 +209,7 @@ void HGE_CALL HGE_Impl::Music_SetInstrVolume(HMUSIC music, int instr, int volume
 
 int HGE_CALL HGE_Impl::Music_GetInstrVolume(HMUSIC music, int instr)
 {
-	if(hBass)
+	if(m_bassdll)
 	{
 		return BASS_MusicGetAttribute(music, BASS_MUSIC_ATTRIB_VOL_INST + instr);		
 	}
@@ -218,7 +218,7 @@ int HGE_CALL HGE_Impl::Music_GetInstrVolume(HMUSIC music, int instr)
 
 void HGE_CALL HGE_Impl::Music_SetChannelVolume(HMUSIC music, int channel, int volume)
 {
-	if(hBass)
+	if(m_bassdll)
 	{
 		BASS_MusicSetAttribute(music, BASS_MUSIC_ATTRIB_VOL_CHAN + channel, volume);		
 	}
@@ -226,7 +226,7 @@ void HGE_CALL HGE_Impl::Music_SetChannelVolume(HMUSIC music, int channel, int vo
 
 int HGE_CALL HGE_Impl::Music_GetChannelVolume(HMUSIC music, int channel)
 {
-	if(hBass)
+	if(m_bassdll)
 	{
 		return BASS_MusicGetAttribute(music, BASS_MUSIC_ATTRIB_VOL_CHAN + channel);		
 	}
@@ -240,48 +240,48 @@ HSTREAM HGE_CALL HGE_Impl::Stream_Load(const char *filename, uint32_t size)
 	HSTREAM hs;
 	CStreamList *stmItem;
 
-	if(hBass)
+	if(m_bassdll)
 	{
-		if(bSilent) return 1;
+		if(m_no_sound) return 1;
 
 		if(size) { data=(void *)filename; _size=size; }
 		else
 		{
 			data=Resource_Load(filename, &_size);
-			if(!data) return 0;
+			if(!data) return nullptr;
 		}
 		hs=BASS_StreamCreateFile(TRUE, data, 0, _size, 0);
 		if(!hs)
 		{
 			_PostError("Can't load stream");
 			if(!size) Resource_Free(data);
-			return 0;
+			return nullptr;
 		}
 		if(!size)
 		{
 			stmItem=new CStreamList;
 			stmItem->hstream=hs;
 			stmItem->data=data;
-			stmItem->next=streams;
-			streams=stmItem;
+			stmItem->next=m_streams_list;
+			m_streams_list=stmItem;
 		}
 		return hs;
 	}
-	else return 0;
+	else return nullptr;
 }
 
 void HGE_CALL HGE_Impl::Stream_Free(HSTREAM stream)
 {
-	CStreamList *stmItem=streams, *stmPrev=0;
+	CStreamList *stmItem=m_streams_list, *stmPrev=0;
 
-	if(hBass)
+	if(m_bassdll)
 	{
 		while(stmItem)
 		{
 			if(stmItem->hstream==stream)
 			{
 				if(stmPrev) stmPrev->next=stmItem->next;
-				else streams=stmItem->next;
+				else m_streams_list=stmItem->next;
 				Resource_Free(stmItem->data);
 				delete stmItem;
 				break;
@@ -295,7 +295,7 @@ void HGE_CALL HGE_Impl::Stream_Free(HSTREAM stream)
 
 HCHANNEL HGE_CALL HGE_Impl::Stream_Play(HSTREAM stream, bool loop, int volume)
 {
-	if(hBass)
+	if(m_bassdll)
 	{
 		BASS_CHANNELINFO info;
 		BASS_ChannelGetInfo(stream, &info);
@@ -307,22 +307,22 @@ HCHANNEL HGE_CALL HGE_Impl::Stream_Play(HSTREAM stream, bool loop, int volume)
 		BASS_ChannelPlay(stream, TRUE);
 		return stream;
 	}
-	else return 0;
+	else return nullptr;
 }
 
 void HGE_CALL HGE_Impl::Channel_SetPanning(HCHANNEL chn, int pan)
 {
-	if(hBass) BASS_ChannelSetAttributes(chn, -1, -1, pan);
+	if(m_bassdll) BASS_ChannelSetAttributes(chn, -1, -1, pan);
 }
 
 void HGE_CALL HGE_Impl::Channel_SetVolume(HCHANNEL chn, int volume)
 {
-	if(hBass) BASS_ChannelSetAttributes(chn, -1, volume, -101);
+	if(m_bassdll) BASS_ChannelSetAttributes(chn, -1, volume, -101);
 }
 
 void HGE_CALL HGE_Impl::Channel_SetPitch(HCHANNEL chn, float pitch)
 {
-	if(hBass)
+	if(m_bassdll)
 	{
 		BASS_CHANNELINFO info;
 		BASS_ChannelGetInfo(chn, &info);
@@ -332,32 +332,32 @@ void HGE_CALL HGE_Impl::Channel_SetPitch(HCHANNEL chn, float pitch)
 
 void HGE_CALL HGE_Impl::Channel_Pause(HCHANNEL chn)
 {
-	if(hBass) BASS_ChannelPause(chn);
+	if(m_bassdll) BASS_ChannelPause(chn);
 }
 
 void HGE_CALL HGE_Impl::Channel_Resume(HCHANNEL chn)
 {
-	if(hBass) BASS_ChannelPlay(chn, FALSE);
+	if(m_bassdll) BASS_ChannelPlay(chn, FALSE);
 }
 
 void HGE_CALL HGE_Impl::Channel_Stop(HCHANNEL chn)
 {
-	if(hBass) BASS_ChannelStop(chn);
+	if(m_bassdll) BASS_ChannelStop(chn);
 }
 
 void HGE_CALL HGE_Impl::Channel_PauseAll()
 {
-	if(hBass) BASS_Pause();
+	if(m_bassdll) BASS_Pause();
 }
 
 void HGE_CALL HGE_Impl::Channel_ResumeAll()
 {
-	if(hBass) BASS_Start();
+	if(m_bassdll) BASS_Start();
 }
 
 void HGE_CALL HGE_Impl::Channel_StopAll()
 {
-	if(hBass)
+	if(m_bassdll)
 	{
 		BASS_Stop();
 		BASS_Start();
@@ -366,7 +366,7 @@ void HGE_CALL HGE_Impl::Channel_StopAll()
 
 bool HGE_CALL HGE_Impl::Channel_IsPlaying(HCHANNEL chn)
 {
-	if(hBass)
+	if(m_bassdll)
 	{
 		if(BASS_ChannelIsActive(chn)==BASS_ACTIVE_PLAYING) return true;
 		else return false;
@@ -375,7 +375,7 @@ bool HGE_CALL HGE_Impl::Channel_IsPlaying(HCHANNEL chn)
 }
 
 float HGE_CALL HGE_Impl::Channel_GetLength(HCHANNEL chn) {
-	if(hBass)
+	if(m_bassdll)
 	{
 		return BASS_ChannelBytes2Seconds(chn, BASS_ChannelGetLength(chn));
 	}
@@ -383,7 +383,7 @@ float HGE_CALL HGE_Impl::Channel_GetLength(HCHANNEL chn) {
 }
 
 float HGE_CALL HGE_Impl::Channel_GetPos(HCHANNEL chn) {
-	if(hBass)
+	if(m_bassdll)
 	{
 		return BASS_ChannelBytes2Seconds(chn, BASS_ChannelGetPosition(chn));
 	}
@@ -391,7 +391,7 @@ float HGE_CALL HGE_Impl::Channel_GetPos(HCHANNEL chn) {
 }
 
 void HGE_CALL HGE_Impl::Channel_SetPos(HCHANNEL chn, float fSeconds) {
-	if(hBass)
+	if(m_bassdll)
 	{
 		BASS_ChannelSetPosition(chn, BASS_ChannelSeconds2Bytes(chn, fSeconds));
 	}
@@ -399,7 +399,7 @@ void HGE_CALL HGE_Impl::Channel_SetPos(HCHANNEL chn, float fSeconds) {
 
 void HGE_CALL HGE_Impl::Channel_SlideTo(HCHANNEL channel, float time, int volume, int pan, float pitch)
 {
-	if(hBass)
+	if(m_bassdll)
 	{
 		BASS_CHANNELINFO info;
 		BASS_ChannelGetInfo(channel, &info);
@@ -414,7 +414,7 @@ void HGE_CALL HGE_Impl::Channel_SlideTo(HCHANNEL channel, float time, int volume
 
 bool HGE_CALL HGE_Impl::Channel_IsSliding(HCHANNEL channel)
 {
-	if(hBass)
+	if(m_bassdll)
 	{
 		if(BASS_ChannelIsSliding(channel)) return true;
 		else return false;
@@ -428,10 +428,10 @@ bool HGE_CALL HGE_Impl::Channel_IsSliding(HCHANNEL channel)
 
 bool HGE_Impl::_SoundInit()
 {
-	if(!bUseSound || hBass) return true;
+	if(!m_use_sound || m_bassdll) return true;
 
-	hBass=LoadLibrary("bass.dll");
-	if (!hBass)
+	m_bassdll=LoadLibrary("bass.dll");
+	if (!m_bassdll)
 	{
 		_PostError("Can't load BASS.DLL");
 		return false;
@@ -488,42 +488,42 @@ bool HGE_Impl::_SoundInit()
 	LOADBASSFUNCTION(BASS_ChannelSeconds2Bytes);
 	LOADBASSFUNCTION(BASS_ChannelBytes2Seconds);
 
-	bSilent=false;
-	if (!BASS_Init(-1,nSampleRate,0,hwnd,NULL))
+	m_no_sound=false;
+	if (!BASS_Init(-1,m_sample_rate,0,m_hwnd,NULL))
 	{
 		System_Log("BASS Init failed, using no sound");
-		BASS_Init(0,nSampleRate,0,hwnd,NULL);
-		bSilent=true;
+		BASS_Init(0,m_sample_rate,0,m_hwnd,NULL);
+		m_no_sound=true;
 	}
 	else
 	{
 		System_Log("Sound Device: %s",BASS_GetDeviceDescription(1));
-		System_Log("Sample rate: %ld\n", nSampleRate);
+		System_Log("Sample rate: %ld\n", m_sample_rate);
 	}
 
 	//BASS_SetConfig(BASS_CONFIG_BUFFER, 5000);
 	//BASS_SetConfig(BASS_CONFIG_UPDATEPERIOD, 50);
 
-	_SetFXVolume(nFXVolume);
-	_SetMusVolume(nMusVolume);
-	_SetStreamVolume(nStreamVolume);
+	_SetFXVolume(m_fx_vol);
+	_SetMusVolume(m_mus_vol);
+	_SetStreamVolume(m_stream_vol);
 
 	return true;
 }
 
 void HGE_Impl::_SoundDone()
 {
-	CStreamList *stmItem=streams, *stmNext;
+	CStreamList *stmItem=m_streams_list, *stmNext;
 	
-	if(hBass)
+	if(m_bassdll)
 	{
 		BASS_Stop();
 		BASS_Free();
 
 		//int err = BASS_ErrorGetCode(); 
 
-		FreeLibrary(hBass);
-		hBass=0;
+		FreeLibrary(m_bassdll);
+		m_bassdll=0;
 
 		while(stmItem)
 		{
@@ -532,23 +532,23 @@ void HGE_Impl::_SoundDone()
 			delete stmItem;
 			stmItem=stmNext;
 		}
-		streams=0;
+		m_streams_list=0;
 	}
 }
 
 void HGE_Impl::_SetMusVolume(int vol)
 {
-	if(hBass) BASS_SetConfig(BASS_CONFIG_GVOL_MUSIC, vol);
+	if(m_bassdll) BASS_SetConfig(BASS_CONFIG_GVOL_MUSIC, vol);
 }
 
 void HGE_Impl::_SetStreamVolume(int vol)
 {
-	if(hBass) BASS_SetConfig(BASS_CONFIG_GVOL_STREAM, vol);
+	if(m_bassdll) BASS_SetConfig(BASS_CONFIG_GVOL_STREAM, vol);
 }
 
 void HGE_Impl::_SetFXVolume(int vol)
 {
-	if(hBass) BASS_SetConfig(BASS_CONFIG_GVOL_SAMPLE, vol);
+	if(m_bassdll) BASS_SetConfig(BASS_CONFIG_GVOL_SAMPLE, vol);
 }
 
 } // namespace hge

@@ -15,7 +15,7 @@ const char FNTBITMAPTAG[] = "Bitmap";
 const char FNTCHARTAG[]   = "Char";
 
 
-HGE * g_hgefont_hge = 0;
+HGE * g_hgefont_hge = nullptr;
 char g_hgefont_buffer[1024];
 
 
@@ -33,21 +33,21 @@ hgeFont::hgeFont(const char *szFont, bool bMipmap)
 	
 	g_hgefont_hge=hgeCreate(HGE_VERSION);
 
-	fHeight=0.0f;
-	fScale=1.0f;
-	fProportion=1.0f;
-	fRot=0.0f;
-	fTracking=0.0f;
-	fSpacing=1.0f;
-	hTexture=0;
+	m_height=0.0f;
+	m_scale=1.0f;
+	m_proportion=1.0f;
+	m_rotation=0.0f;
+	m_tracking=0.0f;
+	m_spacing=1.0f;
+	m_texture = nullptr;
 
-	fZ=0.5f;
-	nBlend = (blend_mode_t)(BLEND_COLORMUL | BLEND_ALPHABLEND | BLEND_NOZWRITE);
-	dwCol=0xFFFFFFFF;
+	m_depth=0.5f;
+	m_blending = (blend_mode_t)(BLEND_COLORMUL | BLEND_ALPHABLEND | BLEND_NOZWRITE);
+	m_color=0xFFFFFFFF;
 
-	ZeroMemory( &letters, sizeof(letters) );
-	ZeroMemory( &pre, sizeof(letters) );
-	ZeroMemory( &post, sizeof(letters) );
+	ZeroMemory( &m_letters, sizeof(m_letters) );
+	ZeroMemory( &m_pre_margin, sizeof(m_letters) );
+	ZeroMemory( &m_post_margin, sizeof(m_letters) );
 	
 	// Load font description
 
@@ -80,8 +80,8 @@ hgeFont::hgeFont(const char *szFont, bool bMipmap)
 			else pbuf++;
 			if(!sscanf(linebuf, "Bitmap = %s", pbuf)) continue;
 
-			hTexture=g_hgefont_hge->Texture_Load(buf, 0, bMipmap);
-			if(!hTexture)
+			m_texture=g_hgefont_hge->Texture_Load(buf, 0, bMipmap);
+			if(!m_texture)
 			{
 				delete[] desc;	
 				return;
@@ -117,10 +117,10 @@ hgeFont::hgeFont(const char *szFont, bool bMipmap)
 			}
 			sscanf(pbuf, " , %d , %d , %d , %d , %d , %d", &x, &y, &w, &h, &a, &c);
 
-			letters[i] = new hgeSprite(hTexture, (float)x, (float)y, (float)w, (float)h);
-			pre[i]=(float)a;
-			post[i]=(float)c;
-			if(h>fHeight) fHeight=(float)h;
+			m_letters[i] = new hgeSprite(m_texture, (float)x, (float)y, (float)w, (float)h);
+			m_pre_margin[i]=(float)a;
+			m_post_margin[i]=(float)c;
+			if(h>m_height) m_height=(float)h;
 		}
 	}
 
@@ -131,8 +131,8 @@ hgeFont::hgeFont(const char *szFont, bool bMipmap)
 hgeFont::~hgeFont()
 {
 	for(int i=0; i<256; i++)
-		if(letters[i]) delete letters[i];
-	if(hTexture) g_hgefont_hge->Texture_Free(hTexture);
+		if(m_letters[i]) delete m_letters[i];
+	if(m_texture) g_hgefont_hge->Texture_Free(m_texture);
 	g_hgefont_hge->Release();
 }
 
@@ -149,7 +149,7 @@ void hgeFont::Render(float x, float y, int align, const char *string)
 	{
 		if(*string=='\n')
 		{
-			y += int(fHeight*fScale*fSpacing);
+			y += int(m_height*m_scale*m_spacing);
 			fx = x;
 			if(align == HGETEXT_RIGHT)  fx -= GetStringWidth(string+1, false);
 			if(align == HGETEXT_CENTER) fx -= int(GetStringWidth(string+1, false)/2.0f);
@@ -157,12 +157,12 @@ void hgeFont::Render(float x, float y, int align, const char *string)
 		else
 		{
 			i=(unsigned char)*string;
-			if(!letters[i]) i='?';
-			if(letters[i])
+			if(!m_letters[i]) i='?';
+			if(m_letters[i])
 			{
-				fx += pre[i]*fScale*fProportion;
-				letters[i]->RenderEx(fx, y, fRot, fScale*fProportion, fScale);
-				fx += (letters[i]->GetWidth()+post[i]+fTracking)*fScale*fProportion;
+				fx += m_pre_margin[i]*m_scale*m_proportion;
+				m_letters[i]->RenderEx(fx, y, m_rotation, m_scale*m_proportion, m_scale);
+				fx += (m_letters[i]->GetWidth()+m_post_margin[i]+m_tracking)*m_scale*m_proportion;
 			}
 		}
 		string++;
@@ -238,7 +238,7 @@ void hgeFont::printfb(float x, float y, float w, float h, int align, const char 
 	
 	tx=x;
 	ty=y;
-	hh=fHeight*fSpacing*fScale*lines;
+	hh=m_height*m_spacing*m_scale*lines;
 
 	switch(align & HGETEXT_HORZMASK)
 	{
@@ -269,48 +269,48 @@ float hgeFont::GetStringWidth(const char *string, bool bMultiline) const
 		while(*string && *string != '\n')
 		{
 			i=(unsigned char)*string;
-			if(!letters[i]) i='?';
-			if(letters[i])
-				linew += letters[i]->GetWidth() + pre[i] + post[i] + fTracking;
+			if(!m_letters[i]) i='?';
+			if(m_letters[i])
+				linew += m_letters[i]->GetWidth() + m_pre_margin[i] + m_post_margin[i] + m_tracking;
 
 			string++;
 		}
 
-		if(!bMultiline) return linew*fScale*fProportion;
+		if(!bMultiline) return linew*m_scale*m_proportion;
 
 		if(linew > w) w = linew;
 
 		while (*string == '\n' || *string == '\r') string++;
 	}
 
-	return w*fScale*fProportion;
+	return w*m_scale*m_proportion;
 }
 
 void hgeFont::SetColor(uint32_t col)
 {
-	dwCol = col;
+	m_color = col;
 
 	for(int i=0; i<256; i++)
-		if(letters[i])
-			letters[i]->SetColor(col);
+		if(m_letters[i])
+			m_letters[i]->SetColor(col);
 }
 
 void hgeFont::SetZ(float z)
 {
-	fZ = z;
+	m_depth = z;
 
 	for(int i=0; i<256; i++)
-		if(letters[i])
-			letters[i]->SetZ(z);
+		if(m_letters[i])
+			m_letters[i]->SetZ(z);
 }
 
 void hgeFont::SetBlendMode(blend_mode_t blend)
 {
-	nBlend = blend;
+	m_blending = blend;
 
 	for(int i=0; i<256; i++)
-		if(letters[i])
-			letters[i]->SetBlendMode(blend);
+		if(m_letters[i])
+			m_letters[i]->SetBlendMode(blend);
 }
 
 char *hgeFont::_get_line(char *file, char *line)
@@ -338,87 +338,87 @@ HGE * hgeFont::get_hge()
 
 void hgeFont::SetScale( float scale )
 {
-	fScale=scale;
+	m_scale=scale;
 }
 
 void hgeFont::SetProportion( float prop )
 {
-	fProportion=prop;
+	m_proportion=prop;
 }
 
 void hgeFont::SetRotation( float rot )
 {
-	fRot=rot;
+	m_rotation=rot;
 }
 
 void hgeFont::SetTracking( float tracking )
 {
-	fTracking=tracking;
+	m_tracking=tracking;
 }
 
 void hgeFont::SetSpacing( float spacing )
 {
-	fSpacing=spacing;
+	m_spacing=spacing;
 }
 
 uint32_t hgeFont::GetColor() const
 {
-	return dwCol;
+	return m_color;
 }
 
 float hgeFont::GetZ() const
 {
-	return fZ;
+	return m_depth;
 }
 
 blend_mode_t hgeFont::GetBlendMode() const
 {
-	return nBlend;
+	return m_blending;
 }
 
 float hgeFont::GetScale() const
 {
-	return fScale;
+	return m_scale;
 }
 
 float hgeFont::GetProportion() const
 {
-	return fProportion;
+	return m_proportion;
 }
 
 float hgeFont::GetRotation() const
 {
-	return fRot;
+	return m_rotation;
 }
 
 float hgeFont::GetTracking() const
 {
-	return fTracking;
+	return m_tracking;
 }
 
 float hgeFont::GetSpacing() const
 {
-	return fSpacing;
+	return m_spacing;
 }
 
 hgeSprite* hgeFont::GetSprite( char chr ) const
 {
-	return letters[(unsigned char)chr];
+	return m_letters[(unsigned char)chr];
 }
 
 float hgeFont::GetPreWidth( char chr ) const
 {
-	return pre[(unsigned char)chr];
+	return m_pre_margin[(unsigned char)chr];
 }
 
 float hgeFont::GetPostWidth( char chr ) const
 {
-	return post[(unsigned char)chr];
+	return m_post_margin[(unsigned char)chr];
 }
 
 float hgeFont::GetHeight() const
 {
-	return fHeight;
+	return m_height;
 }
 
 } // namespace hge

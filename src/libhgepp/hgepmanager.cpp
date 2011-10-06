@@ -8,27 +8,27 @@ namespace hge {
 
 hgeParticleManager::hgeParticleManager()
 {
-	nPS=0;
-	tX=tY=0.0f;
+	m_systems_count=0;
+	m_tx=m_ty=0.0f;
 }
 
 hgeParticleManager::~hgeParticleManager()
 {
 	int i;
-	for(i=0;i<nPS;i++) delete psList[i];
+	for(i=0;i<m_systems_count;i++) delete m_systems[i];
 }
 
 void hgeParticleManager::Update(float dt)
 {
 	int i;
-	for(i=0;i<nPS;i++)
+	for(i=0;i<m_systems_count;i++)
 	{
-		psList[i]->Update(dt);
-		if(psList[i]->GetAge()==-2.0f && psList[i]->GetParticlesAlive()==0)
+		m_systems[i]->Update(dt);
+		if(m_systems[i]->GetAge()==-2.0f && m_systems[i]->GetParticlesAlive()==0)
 		{
-			delete psList[i];
-			psList[i]=psList[nPS-1];
-			nPS--;
+			delete m_systems[i];
+			m_systems[i]=m_systems[m_systems_count-1];
+			m_systems_count--;
 			i--;
 		}
 	}
@@ -37,43 +37,43 @@ void hgeParticleManager::Update(float dt)
 void hgeParticleManager::Render()
 {
 	int i;
-	for(i=0;i<nPS;i++) psList[i]->Render();
+	for(i=0;i<m_systems_count;i++) m_systems[i]->Render();
 }
 
 hgeParticleSystem* hgeParticleManager::SpawnPS(hgeParticleSystemInfo *psi, float x, float y)
 {
-	if(nPS==MAX_PSYSTEMS) return 0;
-	psList[nPS]=new hgeParticleSystem(psi);
-	psList[nPS]->FireAt(x,y);
-	psList[nPS]->Transpose(tX,tY);
-	nPS++;
-	return psList[nPS-1];
+	if(m_systems_count==MAX_PSYSTEMS) return 0;
+	m_systems[m_systems_count]=new hgeParticleSystem(psi);
+	m_systems[m_systems_count]->FireAt(x,y);
+	m_systems[m_systems_count]->Transpose(m_tx,m_ty);
+	m_systems_count++;
+	return m_systems[m_systems_count-1];
 }
 
 bool hgeParticleManager::IsPSAlive(hgeParticleSystem *ps) const
 {
 	int i;
-	for(i=0;i<nPS;i++) if(psList[i]==ps) return true;
+	for(i=0;i<m_systems_count;i++) if(m_systems[i]==ps) return true;
 	return false;
 }
 
 void hgeParticleManager::Transpose(float x, float y)
 {
 	int i;
-	for(i=0;i<nPS;i++) psList[i]->Transpose(x,y);
-	tX=x; tY=y;
+	for(i=0;i<m_systems_count;i++) m_systems[i]->Transpose(x,y);
+	m_tx=x; m_ty=y;
 }
 
 void hgeParticleManager::KillPS(hgeParticleSystem *ps)
 {
 	int i;
-	for(i=0;i<nPS;i++)
+	for(i=0;i<m_systems_count;i++)
 	{
-		if(psList[i]==ps)
+		if(m_systems[i]==ps)
 		{
-			delete psList[i];
-			psList[i]=psList[nPS-1];
-			nPS--;
+			delete m_systems[i];
+			m_systems[i]=m_systems[m_systems_count-1];
+			m_systems_count--;
 			return;
 		}
 	}
@@ -82,8 +82,8 @@ void hgeParticleManager::KillPS(hgeParticleSystem *ps)
 void hgeParticleManager::KillAll()
 {
 	int i;
-	for(i=0;i<nPS;i++) delete psList[i];
-	nPS=0;
+	for(i=0;i<m_systems_count;i++) delete m_systems[i];
+	m_systems_count=0;
 }
 
 } // namespace hge

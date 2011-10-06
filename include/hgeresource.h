@@ -15,8 +15,10 @@
 
 namespace hge {
 
-#define RESTYPES 13
-#define MAXRESCHARS 128
+enum {
+	RESTYPES = 13,
+	MAXRESCHARS = 128
+};
 
 
 class hgeResourceManager;
@@ -26,7 +28,7 @@ struct HGE_EXPORT ResDesc
 	char		name[MAXRESCHARS];
 	int			resgroup;
 	uint32_t	handle;
-	ResDesc*	next;
+	ResDesc *	next;
 
 	ResDesc();
 	~ResDesc();
@@ -66,7 +68,8 @@ public:
 	hgeDistortionMesh*	GetDistortionMesh(const char *name);
 	hgeStringTable*		GetStringTable(const char *name, int resgroup=0);
 
-	ResDesc*			res[RESTYPES];
+	// TODO: replace with STL container
+	ResDesc*			m_resources[RESTYPES];
 
 private:
 	hgeResourceManager(const hgeResourceManager &);

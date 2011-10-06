@@ -13,7 +13,7 @@ namespace hge {
 bool HGE_CALL HGE_Impl::Resource_AttachPack(const char *filename, const char *password)
 {
 	char *szName;
-	CResourceList *resItem=res;
+	CResourceList *resItem=m_res_list;
 	unzFile zip;
 
 	szName=Resource_MakePath(filename);
@@ -33,8 +33,8 @@ bool HGE_CALL HGE_Impl::Resource_AttachPack(const char *filename, const char *pa
 	strcpy(resItem->filename, szName);
 	if(password) strcpy(resItem->password, password);
 	else resItem->password[0]=0;
-	resItem->next=res;
-	res=resItem;
+	resItem->next=m_res_list;
+	m_res_list=resItem;
 
 	return true;
 }
@@ -42,7 +42,7 @@ bool HGE_CALL HGE_Impl::Resource_AttachPack(const char *filename, const char *pa
 void HGE_CALL HGE_Impl::Resource_RemovePack(const char *filename)
 {
 	char *szName;
-	CResourceList *resItem=res, *resPrev=0;
+	CResourceList *resItem=m_res_list, *resPrev=0;
 
 	szName=Resource_MakePath(filename);
 	strupr(szName);
@@ -52,7 +52,7 @@ void HGE_CALL HGE_Impl::Resource_RemovePack(const char *filename)
 		if(!strcmp(szName,resItem->filename))
 		{
 			if(resPrev) resPrev->next=resItem->next;
-			else res=resItem->next;
+			else m_res_list=resItem->next;
 			delete resItem;
 			break;
 		}
@@ -64,7 +64,7 @@ void HGE_CALL HGE_Impl::Resource_RemovePack(const char *filename)
 
 void HGE_CALL HGE_Impl::Resource_RemoveAllPacks()
 {
-	CResourceList *resItem=res, *resNextItem;
+	CResourceList *resItem=m_res_list, *resNextItem;
 
 	while(resItem)
 	{
@@ -73,14 +73,14 @@ void HGE_CALL HGE_Impl::Resource_RemoveAllPacks()
 		resItem=resNextItem;
 	}
 
-	res=0;
+	m_res_list=0;
 }
 
 void* HGE_CALL HGE_Impl::Resource_Load(const char *filename, uint32_t *size)
 {
 	static char *res_err="Can't load resource: %s";
 
-	CResourceList *resItem=res;
+	CResourceList *resItem=m_res_list;
 	char szName[_MAX_PATH];
 	char szZipName[_MAX_PATH];
 	unzFile zip;
@@ -193,37 +193,37 @@ char* HGE_CALL HGE_Impl::Resource_MakePath(const char *filename)
 	int i;
 
 	if(!filename)
-		strcpy(szTmpFilename, szAppPath);
+		strcpy(m_tmp_filename, m_app_path);
 	else if(filename[0]=='\\' || filename[0]=='/' || filename[1]==':')
-		strcpy(szTmpFilename, filename);
+		strcpy(m_tmp_filename, filename);
 	else
 	{
-		strcpy(szTmpFilename, szAppPath);
-		if(filename) strcat(szTmpFilename, filename);
+		strcpy(m_tmp_filename, m_app_path);
+		if(filename) strcat(m_tmp_filename, filename);
 	}
 
-	for(i=0; szTmpFilename[i]; i++) { if(szTmpFilename[i]=='/') szTmpFilename[i]='\\'; }
-	return szTmpFilename;
+	for(i=0; m_tmp_filename[i]; i++) { if(m_tmp_filename[i]=='/') m_tmp_filename[i]='\\'; }
+	return m_tmp_filename;
 }
 
 char* HGE_CALL HGE_Impl::Resource_EnumFiles(const char *wildcard)
 {
 	if(wildcard)
 	{
-		if(hSearch) { FindClose(hSearch); hSearch=0; }
-		hSearch=FindFirstFile(Resource_MakePath(wildcard), &SearchData);
-		if(hSearch==INVALID_HANDLE_VALUE) { hSearch=0; return 0; }
+		if(m_hsearch) { FindClose(m_hsearch); m_hsearch=0; }
+		m_hsearch=FindFirstFile(Resource_MakePath(wildcard), &m_search_data);
+		if(m_hsearch==INVALID_HANDLE_VALUE) { m_hsearch=0; return 0; }
 
-		if(!(SearchData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) return SearchData.cFileName;
+		if(!(m_search_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) return m_search_data.cFileName;
 		else return Resource_EnumFiles();
 	}
 	else
 	{
-		if(!hSearch) return 0;
+		if(!m_hsearch) return 0;
 		for(;;)
 		{
-			if(!FindNextFile(hSearch, &SearchData))	{ FindClose(hSearch); hSearch=0; return 0; }
-			if(!(SearchData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) return SearchData.cFileName;
+			if(!FindNextFile(m_hsearch, &m_search_data))	{ FindClose(m_hsearch); m_hsearch=0; return 0; }
+			if(!(m_search_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) return m_search_data.cFileName;
 		}
 	}
 }
@@ -232,24 +232,24 @@ char* HGE_CALL HGE_Impl::Resource_EnumFolders(const char *wildcard)
 {
 	if(wildcard)
 	{
-		if(hSearch) { FindClose(hSearch); hSearch=0; }
-		hSearch=FindFirstFile(Resource_MakePath(wildcard), &SearchData);
-		if(hSearch==INVALID_HANDLE_VALUE) { hSearch=0; return 0; }
+		if(m_hsearch) { FindClose(m_hsearch); m_hsearch=0; }
+		m_hsearch=FindFirstFile(Resource_MakePath(wildcard), &m_search_data);
+		if(m_hsearch==INVALID_HANDLE_VALUE) { m_hsearch=0; return 0; }
 
-		if((SearchData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) &&
-		   strcmp(SearchData.cFileName,".") && strcmp(SearchData.cFileName,".."))
-				return SearchData.cFileName;
+		if((m_search_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) &&
+		   strcmp(m_search_data.cFileName,".") && strcmp(m_search_data.cFileName,".."))
+				return m_search_data.cFileName;
 		else return Resource_EnumFolders();
 	}
 	else
 	{
-		if(!hSearch) return 0;
+		if(!m_hsearch) return 0;
 		for(;;)
 		{
-			if(!FindNextFile(hSearch, &SearchData))	{ FindClose(hSearch); hSearch=0; return 0; }
-			if((SearchData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) &&
-			   strcmp(SearchData.cFileName,".") && strcmp(SearchData.cFileName,".."))
-					return SearchData.cFileName;
+			if(!FindNextFile(m_hsearch, &m_search_data))	{ FindClose(m_hsearch); m_hsearch=0; return 0; }
+			if((m_search_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) &&
+			   strcmp(m_search_data.cFileName,".") && strcmp(m_search_data.cFileName,".."))
+					return m_search_data.cFileName;
 		}
 	}
 }

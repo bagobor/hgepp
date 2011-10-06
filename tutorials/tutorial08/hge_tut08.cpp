@@ -220,7 +220,7 @@ bool InitSimulation()
 
 	// Create sprites
 
-	sky=new hgeSprite(0, 0, 0, SCREEN_WIDTH, SKY_HEIGHT);
+	sky=new hgeSprite(nullptr, 0, 0, SCREEN_WIDTH, SKY_HEIGHT);
 	sea=new hgeDistortionMesh(SEA_SUBDIVISION, SEA_SUBDIVISION);
 	sea->SetTextureRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT-SKY_HEIGHT);
 

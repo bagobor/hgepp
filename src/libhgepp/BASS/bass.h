@@ -37,15 +37,15 @@ extern "C" {
 #define BASSDEF(f) WINAPI f
 #endif
 
-typedef uint32_t HMUSIC;		// MOD music handle
-typedef uint32_t HSAMPLE;		// sample handle
-typedef uint32_t HCHANNEL;		// playing sample's channel handle
-typedef uint32_t HSTREAM;		// sample stream handle
-typedef uint32_t HRECORD;		// recording handle
-typedef uint32_t HSYNC;		// synchronizer handle
-typedef uint32_t HDSP;			// DSP handle
-typedef uint32_t HFX;			// DX8 effect handle
-typedef uint32_t HPLUGIN;		// Plugin handle
+typedef uint32_t bass_HMUSIC;		// MOD music handle
+typedef uint32_t bass_HSAMPLE;		// sample handle
+typedef uint32_t bass_HCHANNEL;		// playing sample's channel handle
+typedef uint32_t bass_HSTREAM;		// sample stream handle
+typedef uint32_t bass_HRECORD;		// recording handle
+typedef uint32_t bass_HSYNC;		// synchronizer handle
+typedef uint32_t bass_HDSP;			// DSP handle
+typedef uint32_t bass_HFX;			// DX8 effect handle
+typedef uint32_t bass_HPLUGIN;		// Plugin handle
 
 // Error codes returned by BASS_ErrorGetCode
 #define BASS_OK				0	// all is OK
@@ -282,7 +282,7 @@ typedef struct {
 	uint32_t flags;	// BASS_SAMPLE/STREAM/MUSIC/SPEAKER flags
 	uint32_t ctype;	// type of channel
 	uint32_t origres;	// original resolution
-	HPLUGIN plugin;	// plugin
+	bass_HPLUGIN plugin;	// plugin
 } BASS_CHANNELINFO;
 
 // BASS_CHANNELINFO types
@@ -423,7 +423,7 @@ mode is not available then BASS_3DALG_OFF will be used instead. */
 mode. Requires Windows 98 2nd Edition or Windows 2000 that uses WDM drivers, if
 this mode is not available then BASS_3DALG_OFF will be used instead. */
 
-typedef uint32_t (CALLBACK STREAMPROC)(HSTREAM handle, void *buffer, uint32_t length, uint32_t user);
+typedef uint32_t (CALLBACK STREAMPROC)(bass_HSTREAM handle, void *buffer, uint32_t length, uint32_t user);
 /* User stream callback function. NOTE: A stream function should obviously be as quick
 as possible, other streams (and MOD musics) can't be mixed until it's finished.
 handle : The stream that needs writing
@@ -512,7 +512,7 @@ call. The message parameters are: WPARAM = data, LPARAM = user. */
 #define BASS_SYNC_MIXTIME	0x40000000	// FLAG: sync at mixtime, else at playtime
 #define BASS_SYNC_ONETIME	0x80000000	// FLAG: sync only once, else continuously
 
-typedef void (CALLBACK SYNCPROC)(HSYNC handle, uint32_t channel, uint32_t data, uint32_t user);
+typedef void (CALLBACK SYNCPROC)(bass_HSYNC handle, uint32_t channel, uint32_t data, uint32_t user);
 /* Sync callback function. NOTE: a sync callback function should be very
 quick as other syncs can't be processed until it has finished. If the sync
 is a "mixtime" sync, then other streams and MOD musics can't be mixed until
@@ -522,7 +522,7 @@ channel: Channel that the sync occured in
 data   : Additional data associated with the sync's occurance
 user   : The 'user' parameter given when calling BASS_ChannelSetSync */
 
-typedef void (CALLBACK DSPPROC)(HDSP handle, uint32_t channel, void *buffer, uint32_t length, uint32_t user);
+typedef void (CALLBACK DSPPROC)(bass_HDSP handle, uint32_t channel, void *buffer, uint32_t length, uint32_t user);
 /* DSP callback function. NOTE: A DSP function should obviously be as quick as
 possible... other DSP functions, streams and MOD musics can not be processed
 until it's finished.
@@ -532,7 +532,7 @@ buffer : Buffer to apply the DSP to
 length : Number of bytes in the buffer
 user   : The 'user' parameter given when calling BASS_ChannelSetDSP */
 
-typedef BOOL (CALLBACK RECORDPROC)(HRECORD handle, const void *buffer, uint32_t length, uint32_t user);
+typedef BOOL (CALLBACK RECORDPROC)(bass_HRECORD handle, const void *buffer, uint32_t length, uint32_t user);
 /* Recording callback function.
 handle : The recording handle
 buffer : Buffer containing the recorded sample data
@@ -749,9 +749,9 @@ BOOL BASSDEF(BASS_Pause)();
 BOOL BASSDEF(BASS_SetVolume)(uint32_t volume);
 uint32_t BASSDEF(BASS_GetVolume)();
 
-HPLUGIN BASSDEF(BASS_PluginLoad)(const char *file, uint32_t flags);
-BOOL BASSDEF(BASS_PluginFree)(HPLUGIN handle);
-const BASS_PLUGININFO *BASSDEF(BASS_PluginGetInfo)(HPLUGIN handle);
+bass_HPLUGIN BASSDEF(BASS_PluginLoad)(const char *file, uint32_t flags);
+BOOL BASSDEF(BASS_PluginFree)(bass_HPLUGIN handle);
+const BASS_PLUGININFO *BASSDEF(BASS_PluginGetInfo)(bass_HPLUGIN handle);
 
 BOOL BASSDEF(BASS_Set3DFactors)(float distf, float rollf, float doppf);
 BOOL BASSDEF(BASS_Get3DFactors)(float *distf, float *rollf, float *doppf);
@@ -763,29 +763,29 @@ BOOL BASSDEF(BASS_SetEAXParameters)(int env, float vol, float decay, float damp)
 BOOL BASSDEF(BASS_GetEAXParameters)(uint32_t *env, float *vol, float *decay, float *damp);
 #endif
 
-HMUSIC BASSDEF(BASS_MusicLoad)(BOOL mem, const void *file, uint32_t offset, uint32_t length, uint32_t flags, uint32_t freq);
-BOOL BASSDEF(BASS_MusicFree)(HMUSIC handle);
-uint32_t BASSDEF(BASS_MusicSetAttribute)(HMUSIC handle, uint32_t attrib, uint32_t value);
-uint32_t BASSDEF(BASS_MusicGetAttribute)(HMUSIC handle, uint32_t attrib);
-uint32_t BASSDEF(BASS_MusicGetOrders)(HMUSIC handle);
-uint32_t BASSDEF(BASS_MusicGetOrderPosition)(HMUSIC handle);
+bass_HMUSIC BASSDEF(BASS_MusicLoad)(BOOL mem, const void *file, uint32_t offset, uint32_t length, uint32_t flags, uint32_t freq);
+BOOL BASSDEF(BASS_MusicFree)(bass_HMUSIC handle);
+uint32_t BASSDEF(BASS_MusicSetAttribute)(bass_HMUSIC handle, uint32_t attrib, uint32_t value);
+uint32_t BASSDEF(BASS_MusicGetAttribute)(bass_HMUSIC handle, uint32_t attrib);
+uint32_t BASSDEF(BASS_MusicGetOrders)(bass_HMUSIC handle);
+uint32_t BASSDEF(BASS_MusicGetOrderPosition)(bass_HMUSIC handle);
 
-HSAMPLE BASSDEF(BASS_SampleLoad)(BOOL mem, const void *file, uint32_t offset, uint32_t length, uint32_t max, uint32_t flags);
+bass_HSAMPLE BASSDEF(BASS_SampleLoad)(BOOL mem, const void *file, uint32_t offset, uint32_t length, uint32_t max, uint32_t flags);
 void* BASSDEF(BASS_SampleCreate)(uint32_t length, uint32_t freq, uint32_t chans, uint32_t max, uint32_t flags);
-HSAMPLE BASSDEF(BASS_SampleCreateDone)();
-BOOL BASSDEF(BASS_SampleFree)(HSAMPLE handle);
-BOOL BASSDEF(BASS_SampleGetInfo)(HSAMPLE handle, BASS_SAMPLE *info);
-BOOL BASSDEF(BASS_SampleSetInfo)(HSAMPLE handle, const BASS_SAMPLE *info);
-HCHANNEL BASSDEF(BASS_SampleGetChannel)(HSAMPLE handle, BOOL onlynew);
-uint32_t BASSDEF(BASS_SampleGetChannels)(HSAMPLE handle, HCHANNEL *channels);
-BOOL BASSDEF(BASS_SampleStop)(HSAMPLE handle);
+bass_HSAMPLE BASSDEF(BASS_SampleCreateDone)();
+BOOL BASSDEF(BASS_SampleFree)(bass_HSAMPLE handle);
+BOOL BASSDEF(BASS_SampleGetInfo)(bass_HSAMPLE handle, BASS_SAMPLE *info);
+BOOL BASSDEF(BASS_SampleSetInfo)(bass_HSAMPLE handle, const BASS_SAMPLE *info);
+bass_HCHANNEL BASSDEF(BASS_SampleGetChannel)(bass_HSAMPLE handle, BOOL onlynew);
+uint32_t BASSDEF(BASS_SampleGetChannels)(bass_HSAMPLE handle, bass_HCHANNEL *channels);
+BOOL BASSDEF(BASS_SampleStop)(bass_HSAMPLE handle);
 
-HSTREAM BASSDEF(BASS_StreamCreate)(uint32_t freq, uint32_t chans, uint32_t flags, STREAMPROC *proc, uint32_t user);
-HSTREAM BASSDEF(BASS_StreamCreateFile)(BOOL mem, const void *file, uint32_t offset, uint32_t length, uint32_t flags);
-HSTREAM BASSDEF(BASS_StreamCreateURL)(const char *url, uint32_t offset, uint32_t flags, DOWNLOADPROC *proc, uint32_t user);
-HSTREAM BASSDEF(BASS_StreamCreateFileUser)(BOOL buffered, uint32_t flags, STREAMFILEPROC *proc, uint32_t user);
-BOOL BASSDEF(BASS_StreamFree)(HSTREAM handle);
-uint32_t BASSDEF(BASS_StreamGetFilePosition)(HSTREAM handle, uint32_t mode);
+bass_HSTREAM BASSDEF(BASS_StreamCreate)(uint32_t freq, uint32_t chans, uint32_t flags, STREAMPROC *proc, uint32_t user);
+bass_HSTREAM BASSDEF(BASS_StreamCreateFile)(BOOL mem, const void *file, uint32_t offset, uint32_t length, uint32_t flags);
+bass_HSTREAM BASSDEF(BASS_StreamCreateURL)(const char *url, uint32_t offset, uint32_t flags, DOWNLOADPROC *proc, uint32_t user);
+bass_HSTREAM BASSDEF(BASS_StreamCreateFileUser)(BOOL buffered, uint32_t flags, STREAMFILEPROC *proc, uint32_t user);
+BOOL BASSDEF(BASS_StreamFree)(bass_HSTREAM handle);
+uint32_t BASSDEF(BASS_StreamGetFilePosition)(bass_HSTREAM handle, uint32_t mode);
 
 const char *BASSDEF(BASS_RecordGetDeviceDescription)(uint32_t device);
 BOOL BASSDEF(BASS_RecordInit)(int device);
@@ -796,7 +796,7 @@ BOOL BASSDEF(BASS_RecordGetInfo)(BASS_RECORDINFO *info);
 const char *BASSDEF(BASS_RecordGetInputName)(int input);
 BOOL BASSDEF(BASS_RecordSetInput)(int input, uint32_t setting);
 uint32_t BASSDEF(BASS_RecordGetInput)(int input);
-HRECORD BASSDEF(BASS_RecordStart)(uint32_t freq, uint32_t chans, uint32_t flags, RECORDPROC *proc, uint32_t user);
+bass_HRECORD BASSDEF(BASS_RecordStart)(uint32_t freq, uint32_t chans, uint32_t flags, RECORDPROC *proc, uint32_t user);
 
 float BASSDEF(BASS_ChannelBytes2Seconds)(uint32_t handle, QWORD pos);
 QWORD BASSDEF(BASS_ChannelSeconds2Bytes)(uint32_t handle, float pos);
@@ -823,20 +823,20 @@ BOOL BASSDEF(BASS_ChannelSetPosition)(uint32_t handle, QWORD pos);
 QWORD BASSDEF(BASS_ChannelGetPosition)(uint32_t handle);
 uint32_t BASSDEF(BASS_ChannelGetLevel)(uint32_t handle);
 uint32_t BASSDEF(BASS_ChannelGetData)(uint32_t handle, void *buffer, uint32_t length);
-HSYNC BASSDEF(BASS_ChannelSetSync)(uint32_t handle, uint32_t type, QWORD param, SYNCPROC *proc, uint32_t user);
-BOOL BASSDEF(BASS_ChannelRemoveSync)(uint32_t handle, HSYNC sync);
-HDSP BASSDEF(BASS_ChannelSetDSP)(uint32_t handle, DSPPROC *proc, uint32_t user, int priority);
-BOOL BASSDEF(BASS_ChannelRemoveDSP)(uint32_t handle, HDSP dsp);
+bass_HSYNC BASSDEF(BASS_ChannelSetSync)(uint32_t handle, uint32_t type, QWORD param, SYNCPROC *proc, uint32_t user);
+BOOL BASSDEF(BASS_ChannelRemoveSync)(uint32_t handle, bass_HSYNC sync);
+bass_HDSP BASSDEF(BASS_ChannelSetDSP)(uint32_t handle, DSPPROC *proc, uint32_t user, int priority);
+BOOL BASSDEF(BASS_ChannelRemoveDSP)(uint32_t handle, bass_HDSP dsp);
 BOOL BASSDEF(BASS_ChannelSetLink)(uint32_t handle, uint32_t chan);
 BOOL BASSDEF(BASS_ChannelRemoveLink)(uint32_t handle, uint32_t chan);
 #ifdef _WIN32
 BOOL BASSDEF(BASS_ChannelSetEAXMix)(uint32_t handle, float mix);
 BOOL BASSDEF(BASS_ChannelGetEAXMix)(uint32_t handle, float *mix);
-HFX BASSDEF(BASS_ChannelSetFX)(uint32_t handle, uint32_t type, uint32_t priority);
-BOOL BASSDEF(BASS_ChannelRemoveFX)(uint32_t handle, HFX fx);
+bass_HFX BASSDEF(BASS_ChannelSetFX)(uint32_t handle, uint32_t type, uint32_t priority);
+BOOL BASSDEF(BASS_ChannelRemoveFX)(uint32_t handle, bass_HFX fx);
 
-BOOL BASSDEF(BASS_FXSetParameters)(HFX handle, const void *par);
-BOOL BASSDEF(BASS_FXGetParameters)(HFX handle, void *par);
+BOOL BASSDEF(BASS_FXSetParameters)(bass_HFX handle, const void *par);
+BOOL BASSDEF(BASS_FXGetParameters)(bass_HFX handle, void *par);
 #endif
 
 #ifdef __cplusplus

@@ -27,6 +27,9 @@
 
 #define HGE_CALL  __stdcall
 
+#if defined(_IA64)||defined(_M_IA64)||defined(_M_X64)||defined(__amd64__)
+	#define HGE_64BIT
+#endif
 
 /*
 ** Common math constants
@@ -44,15 +47,33 @@ namespace hge {
 /*
 ** HGE Handle types
 */
-// FIXME: Won't compile in 64-bit mode due to handles (4 bytes) holding a pointer (8 bytes)
-typedef uint32_t HTEXTURE;
-typedef uint32_t HTARGET;
-typedef uint32_t HEFFECT;
-typedef uint32_t HMUSIC;
-typedef uint32_t HSTREAM;
-typedef uint32_t HCHANNEL;
+struct HGE_EXPORT handle_t
+{
+	union {
+		void * ptr;
+		uint32_t u32;
+	};
+	handle_t(): ptr(nullptr) {}
+	handle_t( void * x ): ptr(x) {}
+	handle_t( uint32_t x ): u32(x) {}
+
+	inline operator bool() const {
+		return ptr != nullptr;
+	}
+
+	inline bool operator == (const handle_t & other) const {
+		return ptr == other.ptr;
+	}
+};
+
+typedef handle_t HTEXTURE;
+typedef handle_t HTARGET;
+typedef handle_t HEFFECT;
+typedef handle_t HMUSIC;
+typedef handle_t HSTREAM;
+typedef handle_t HCHANNEL;
 #if HGE_DIRECTX_VER >= 9
-	typedef uint32_t HSHADER;
+	typedef handle_t HSHADER;
 #endif
 
 
@@ -397,7 +418,7 @@ public:
     virtual int         HGE_CALL    Input_GetChar() = 0;
     virtual bool        HGE_CALL    Input_GetEvent(hgeInputEvent *event) = 0;
 
-    virtual bool        HGE_CALL    Gfx_BeginScene(HTARGET target=0) = 0;
+    virtual bool        HGE_CALL    Gfx_BeginScene(HTARGET target=nullptr) = 0;
     virtual void        HGE_CALL    Gfx_EndScene() = 0;
     virtual void        HGE_CALL    Gfx_Clear(uint32_t color) = 0;
     virtual void        HGE_CALL    Gfx_RenderLine(float x1, float y1, float x2, float y2, uint32_t color=0xFFFFFFFF, float z=0.5f) = 0;

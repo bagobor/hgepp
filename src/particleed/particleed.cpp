@@ -151,7 +151,7 @@ void InitEditor()
 	char *bgName;
 	int bgw, bgh;
 
-	state.texBG = 0;
+	state.texBG = nullptr;
 	state.sprBG = 0;
 
 	bgName = g_hge->Ini_GetString("HGE", "Background", 0);

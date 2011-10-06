@@ -11,10 +11,12 @@
 
 namespace hge {
 
-#define HGEGUI_NONAVKEYS		0
-#define HGEGUI_LEFTRIGHT		1
-#define HGEGUI_UPDOWN			2
-#define HGEGUI_CYCLED			4
+enum {
+	HGEGUI_NONAVKEYS	= 0,
+	HGEGUI_LEFTRIGHT	= 1,
+	HGEGUI_UPDOWN		= 2,
+	HGEGUI_CYCLED		= 4
+};
 
 class hgeGUI;
 
@@ -50,7 +52,7 @@ public:
 	bool			bVisible;
 	bool			bEnabled;
 	hgeRect			rect;
-	uint32_t			color;
+	uint32_t		color;
 
 	hgeGUI			*gui;
 	hgeGUIObject	*next;
@@ -104,19 +106,20 @@ private:
 	//static HGE		*g_hgegui_hge;
 	static HGE * get_hge();
 
-	hgeGUIObject	*ctrls;
-	hgeGUIObject	*ctrlLock;
-	hgeGUIObject	*ctrlFocus;
-	hgeGUIObject	*ctrlOver;
+	hgeGUIObject	* m_controls;
+	hgeGUIObject	* m_ctrl_lock;
+	hgeGUIObject	* m_ctrl_focus;
+	hgeGUIObject	* m_ctrl_over;
 
-	int				navmode;
-	int				nEnterLeave;
-	hgeSprite		*sprCursor;
+	int				m_navmode;
+	int				m_enter_leave;
+	hgeSprite		* m_cursor_sprite;
 
-	float			mx,my;
-	int				nWheel;
-	bool			bLPressed, bLReleased;
-	bool			bRPressed, bRReleased;
+	float			m_mouse_x;
+	float			m_mouse_y;
+	int				m_wheel;
+	bool			m_lpressed, m_lreleased;
+	bool			m_rpressed, m_rreleased;
 };
 
 

@@ -19,7 +19,7 @@ hgeDistortionMesh::hgeDistortionMesh(int cols, int rows)
 	m_row_count=rows;
 	m_col_count=cols;
 	m_cell_width=m_cell_height=0;
-	m_quad.tex=0;
+	m_quad.tex = nullptr;
 	m_quad.blend = (blend_mode_t)(BLEND_COLORMUL | BLEND_ALPHABLEND | BLEND_ZWRITE);
 	m_disp_array=new hgeVertex[rows*cols];
 

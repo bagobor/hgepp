@@ -128,7 +128,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	g_hge->System_SetState(HGE_SCREENBPP, 32);
 
 	tar=0;
-	target=0;
+	target=nullptr;
 
 	if(g_hge->System_Initiate()) {
 		snd=g_hge->Effect_Load("menu.wav");

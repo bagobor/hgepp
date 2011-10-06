@@ -68,20 +68,20 @@ private:
 
 	//static char	g_hgefont_buffer[1024];
 
-	HTEXTURE	hTexture;
-	hgeSprite*	letters[256];
-	float		pre[256];
-	float		post[256];
-	float		fHeight;
-	float		fScale;
-	float		fProportion;
-	float		fRot;
-	float		fTracking;
-	float		fSpacing;
+	HTEXTURE	m_texture;
+	hgeSprite*	m_letters[256];
+	float		m_pre_margin[256];
+	float		m_post_margin[256];
+	float		m_height;
+	float		m_scale;
+	float		m_proportion;
+	float		m_rotation;
+	float		m_tracking;
+	float		m_spacing;
 
-	uint32_t		dwCol;
-	float			fZ;
-	blend_mode_t	nBlend;
+	uint32_t		m_color;
+	float			m_depth;
+	blend_mode_t	m_blending;
 };
 
 } // namespace hge

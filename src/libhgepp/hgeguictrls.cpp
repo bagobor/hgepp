@@ -23,35 +23,42 @@ hgeGUIText::hgeGUIText(int _id, float x, float y, float w, float h, hgeFont *fnt
 	bEnabled=true;
 	rect.Set(x, y, x+w, y+h);
 
-	font=fnt;
-	tx=x;
-	ty=y+(h-fnt->GetHeight())/2.0f;
+	m_font=fnt;
+	m_draw_x=x;
+	m_draw_y=y+(h-fnt->GetHeight())/2.0f;
 
-	text[0]=0;
+	//m_text.clear();
 }
 
 void hgeGUIText::SetMode(int _align)
 {
-	align=_align;
-	if(align==HGETEXT_RIGHT) tx=rect.x2;
-	else if(align==HGETEXT_CENTER) tx=(rect.x1+rect.x2)/2.0f;
-	else tx=rect.x1;
+	m_align=_align;
+	if(m_align==HGETEXT_RIGHT) m_draw_x=rect.x2;
+	else if(m_align==HGETEXT_CENTER) m_draw_x=(rect.x1+rect.x2)/2.0f;
+	else m_draw_x=rect.x1;
 }
 
 void hgeGUIText::SetText(const char *_text)
 {
-	strcpy(text, _text);
+	m_text = _text;
 }
 
 void hgeGUIText::printf(const char *format, ...)
 {
-	vsprintf(text, format, (char *)&format+sizeof(format));
+	char tmp[1024];
+
+	auto r = _snprintf( tmp, sizeof tmp, format, (char *)&format+sizeof(format) );
+	if( r == -1 ) {
+		m_text = std::string( tmp, sizeof tmp );
+	} else {
+		m_text = std::string( tmp, r );
+	}
 }
 
 void hgeGUIText::Render()
 {
-	font->SetColor(color);
-	font->Render(tx,ty,align,text);
+	m_font->SetColor(color);
+	m_font->Render( m_draw_x, m_draw_y, m_align, m_text.c_str());
 }
 
 /*
@@ -66,71 +73,87 @@ hgeGUIButton::hgeGUIButton(int _id, float x, float y, float w, float h, HTEXTURE
 	bEnabled=true;
 	rect.Set(x, y, x+w, y+h);
 
-	bPressed=false;
-	bTrigger=false;
+	m_pressed=false;
+	m_trigger=false;
 
-	sprUp = new hgeSprite(tex, tx, ty, w, h);
-	sprDown = new hgeSprite(tex, tx+w, ty, w, h);
+	m_sprite_up = new hgeSprite(tex, tx, ty, w, h);
+	m_sprite_down = new hgeSprite(tex, tx+w, ty, w, h);
 }
 
 hgeGUIButton::~hgeGUIButton()
 {
-	if(sprUp) delete sprUp;
-	if(sprDown) delete sprDown;
+	if(m_sprite_up) delete m_sprite_up;
+	if(m_sprite_down) delete m_sprite_down;
 }
 
 void hgeGUIButton::Render()
 {
-	if(bPressed) sprDown->Render(rect.x1, rect.y1);
-	else sprUp->Render(rect.x1, rect.y1);
+	if(m_pressed) m_sprite_down->Render(rect.x1, rect.y1);
+	else m_sprite_up->Render(rect.x1, rect.y1);
 }
 
 bool hgeGUIButton::MouseLButton(bool bDown)
 {
 	if(bDown)
 	{
-		bOldState=bPressed; bPressed=true;
+		m_old_state=m_pressed; m_pressed=true;
 		return false;
 	}
 	else
 	{
-		if(bTrigger) bPressed=!bOldState;
-		else bPressed=false;
+		if(m_trigger) m_pressed=!m_old_state;
+		else m_pressed=false;
 		return true; 
 	}
+}
+
+void hgeGUIButton::SetMode( bool _bTrigger )
+{
+	m_trigger=_bTrigger;
+}
+
+void hgeGUIButton::SetState( bool _bPressed )
+{
+	m_pressed=_bPressed;
+}
+
+bool hgeGUIButton::GetState() const
+{
+	return m_pressed;
 }
 
 /*
 ** hgeGUISlider
 */
 
-hgeGUISlider::hgeGUISlider(int _id, float x, float y, float w, float h, HTEXTURE tex, float tx, float ty, float sw, float sh, bool vertical)
+hgeGUISlider::hgeGUISlider(int _id, float x, float y, float w, float h,
+	HTEXTURE tex, float tx, float ty, float sw, float sh, bool vertical)
 {
 	id=_id;
 	bStatic=false;
 	bVisible=true;
 	bEnabled=true;
-	bPressed=false;
-	bVertical=vertical;
+	m_pressed=false;
+	m_vertical=vertical;
 	rect.Set(x, y, x+w, y+h);
 
-	mode=HGESLIDER_BAR;
-	fMin=0; fMax=100; fVal=50;
-	sl_w=sw; sl_h=sh;
+	m_slider_mode=HGESLIDER_BAR;
+	m_min=0; m_max=100; m_value=50;
+	m_slider_width=sw; m_slider_height=sh;
 
-	sprSlider=new hgeSprite(tex, tx, ty, sw, sh);
+	m_slider_sprite=new hgeSprite(tex, tx, ty, sw, sh);
 }
 
 hgeGUISlider::~hgeGUISlider()
 {
-	if(sprSlider) delete sprSlider;
+	if(m_slider_sprite) delete m_slider_sprite;
 }
 
-void hgeGUISlider::SetValue(float _fVal)
+void hgeGUISlider::SetValue(float value)
 {
-	if(_fVal<fMin) fVal=fMin;
-	else if(_fVal>fMax) fVal=fMax;
-	else fVal=_fVal;
+	if(value<m_min) m_value=m_min;
+	else if(value>m_max) m_value=m_max;
+	else m_value=value;
 }
 
 void hgeGUISlider::Render()
@@ -138,53 +161,65 @@ void hgeGUISlider::Render()
 	float xx, yy;
 	float x1,y1,x2,y2;
 
-	xx=rect.x1+(rect.x2-rect.x1)*(fVal-fMin)/(fMax-fMin);
-	yy=rect.y1+(rect.y2-rect.y1)*(fVal-fMin)/(fMax-fMin);
+	xx=rect.x1+(rect.x2-rect.x1)*(m_value-m_min)/(m_max-m_min);
+	yy=rect.y1+(rect.y2-rect.y1)*(m_value-m_min)/(m_max-m_min);
 	
-	if(bVertical)
-		switch(mode)
+	if(m_vertical)
+		switch(m_slider_mode)
 		{
 			case HGESLIDER_BAR: x1=rect.x1; y1=rect.y1; x2=rect.x2; y2=yy; break;
 			case HGESLIDER_BARRELATIVE: x1=rect.x1; y1=(rect.y1+rect.y2)/2; x2=rect.x2; y2=yy; break;
-			case HGESLIDER_SLIDER: x1=(rect.x1+rect.x2-sl_w)/2; y1=yy-sl_h/2; x2=(rect.x1+rect.x2+sl_w)/2; y2=yy+sl_h/2; break;
+			case HGESLIDER_SLIDER: x1=(rect.x1+rect.x2-m_slider_width)/2; y1=yy-m_slider_height/2; x2=(rect.x1+rect.x2+m_slider_width)/2; y2=yy+m_slider_height/2; break;
 		}
 	else
-		switch(mode)
+		switch(m_slider_mode)
 		{
 			case HGESLIDER_BAR: x1=rect.x1; y1=rect.y1; x2=xx; y2=rect.y2; break;
 			case HGESLIDER_BARRELATIVE: x1=(rect.x1+rect.x2)/2; y1=rect.y1; x2=xx; y2=rect.y2; break;
-			case HGESLIDER_SLIDER: x1=xx-sl_w/2; y1=(rect.y1+rect.y2-sl_h)/2; x2=xx+sl_w/2; y2=(rect.y1+rect.y2+sl_h)/2; break;
+			case HGESLIDER_SLIDER: x1=xx-m_slider_width/2; y1=(rect.y1+rect.y2-m_slider_height)/2; x2=xx+m_slider_width/2; y2=(rect.y1+rect.y2+m_slider_height)/2; break;
 		}
 
-	sprSlider->RenderStretch(x1, y1, x2, y2);
+	m_slider_sprite->RenderStretch(x1, y1, x2, y2);
 }
 
 bool hgeGUISlider::MouseLButton(bool bDown)
 {
-	bPressed=bDown;
+	m_pressed=bDown;
 	return false;
 }
 
 bool hgeGUISlider::MouseMove(float x, float y)
 {
-	if(bPressed)
+	if(m_pressed)
 	{
-		if(bVertical)
+		if(m_vertical)
 		{
 			if(y>rect.y2-rect.y1) y=rect.y2-rect.y1;
 			if(y<0) y=0;
-			fVal=fMin+(fMax-fMin)*y/(rect.y2-rect.y1);
+			m_value=m_min+(m_max-m_min)*y/(rect.y2-rect.y1);
 		}
 		else
 		{
 			if(x>rect.x2-rect.x1) x=rect.x2-rect.x1;
 			if(x<0) x=0;
-			fVal=fMin+(fMax-fMin)*x/(rect.x2-rect.x1);
+			m_value=m_min+(m_max-m_min)*x/(rect.x2-rect.x1);
 		}
 		return true;
 	}
 
 	return false;
+}
+
+void hgeGUISlider::SetMode( float minv, float maxv, int _mode )
+{
+	m_min=minv;
+	m_max=maxv;
+	m_slider_mode=_mode;
+}
+
+float hgeGUISlider::GetValue() const
+{
+	return m_value;
 }
 
 
@@ -199,75 +234,76 @@ hgeGUIListbox::hgeGUIListbox(int _id, float x, float y, float w, float h, hgeFon
 	bVisible=true;
 	bEnabled=true;
 	rect.Set(x, y, x+w, y+h);
-	font=fnt;
-	sprHighlight=new hgeSprite(0, 0, 0, w, fnt->GetHeight());
-	sprHighlight->SetColor(hColor);
-	textColor=tColor;
-	texthilColor=thColor;
-	pItems=0;
-	nItems=0;
+	m_font=fnt;
+	m_hilite_sprite = new hgeSprite(nullptr, 0, 0, w, fnt->GetHeight());
+	m_hilite_sprite->SetColor(hColor);
+	m_text_color=tColor;
+	m_hi_text_color=thColor;
+	m_items=0;
+	m_item_count=0;
 
-	nSelectedItem=0;
-	nTopItem=0;
-	mx=0; my=0;
+	m_selected_item=0;
+	m_top_item=0;
+	m_mouse_x=0; m_mouse_y=0;
 }
 
 hgeGUIListbox::~hgeGUIListbox()
 {
 	Clear();
-	if(sprHighlight) delete sprHighlight;
+	if(m_hilite_sprite) delete m_hilite_sprite;
 }
 
 
 int hgeGUIListbox::AddItem(char *item)
 {
-	hgeGUIListboxItem *pItem=pItems, *pPrev=0, *pNew;
+	hgeGUIListboxItem *pItem=m_items, *pPrev=0, *pNew;
 
 	pNew = new hgeGUIListboxItem;
-	memcpy(pNew->text, item, min(sizeof(pNew->text), strlen(item)+1));
-	pNew->text[sizeof(pNew->text)-1]='\0';
+	//memcpy(pNew->text, item, min(sizeof(pNew->text), strlen(item)+1));
+	//pNew->text[sizeof(pNew->text)-1]='\0';
+	pNew->text = item;
 	pNew->next=0;
 
 	while(pItem) { pPrev=pItem;	pItem=pItem->next; }
 
 	if(pPrev) pPrev->next=pNew;
-	else pItems=pNew;
-	nItems++;
+	else m_items=pNew;
+	m_item_count++;
 
-	return nItems-1;
+	return m_item_count-1;
 }
 
 void hgeGUIListbox::DeleteItem(int n)
 {
 	int i;
-	hgeGUIListboxItem *pItem=pItems, *pPrev=0;
+	hgeGUIListboxItem *pItem=m_items, *pPrev=0;
 
 	if(n<0 || n>=GetNumItems()) return;
 
 	for(i=0;i<n;i++) { pPrev=pItem;	pItem=pItem->next; }
 
 	if(pPrev) pPrev->next=pItem->next;
-	else pItems=pItem->next;
+	else m_items=pItem->next;
 
 	delete pItem;
-	nItems--;
+	m_item_count--;
 }
 
-char *hgeGUIListbox::GetItemText(int n)
+const char *hgeGUIListbox::GetItemText(int n) const
 {
 	int i;
-	hgeGUIListboxItem *pItem=pItems;
+	hgeGUIListboxItem *pItem=m_items;
 
 	if(n<0 || n>=GetNumItems()) return 0;
 
 	for(i=0;i<n;i++) pItem=pItem->next;
 
-	return pItem->text;
+	return pItem->text.c_str();
 }
 
 void hgeGUIListbox::Clear()
 {
-	hgeGUIListboxItem *pItem=pItems, *pNext;
+	hgeGUIListboxItem *pItem=m_items, *pNext;
 
 	while(pItem)
 	{
@@ -276,29 +312,29 @@ void hgeGUIListbox::Clear()
 		pItem=pNext;
 	}
 	
-	pItems=0;
-	nItems=0;
+	m_items=0;
+	m_item_count=0;
 }
 
 void hgeGUIListbox::Render()
 {
 	int i;
-	hgeGUIListboxItem *pItem=pItems;
+	hgeGUIListboxItem *pItem=m_items;
 
-	for(i=0;i<nTopItem;i++) pItem=pItem->next;
+	for(i=0;i<m_top_item;i++) pItem=pItem->next;
 	for(i=0;i<GetNumRows();i++)
 	{
-		if(i>=nItems) return;
+		if(i>=m_item_count) return;
 
-		if(nTopItem+i == nSelectedItem)
+		if(m_top_item+i == m_selected_item)
 		{
-			sprHighlight->Render(rect.x1,rect.y1+i*font->GetHeight());
-			font->SetColor(texthilColor);
+			m_hilite_sprite->Render(rect.x1,rect.y1+i*m_font->GetHeight());
+			m_font->SetColor(m_hi_text_color);
 		}
 		else
-			font->SetColor(textColor);
+			m_font->SetColor(m_text_color);
 
-		font->Render(rect.x1+3, rect.y1+i*font->GetHeight(), HGETEXT_LEFT, pItem->text);
+		m_font->Render(rect.x1+3, rect.y1+i*m_font->GetHeight(), HGETEXT_LEFT, pItem->text.c_str());
 		pItem=pItem->next;
 	}
 }
@@ -309,10 +345,10 @@ bool hgeGUIListbox::MouseLButton(bool bDown)
 
 	if(bDown)
 	{
-		nItem=nTopItem+int(my)/int(font->GetHeight());
-		if(nItem<nItems)
+		nItem=m_top_item+int(m_mouse_y)/int(m_font->GetHeight());
+		if(nItem<m_item_count)
 		{
-			nSelectedItem=nItem;
+			m_selected_item=nItem;
 			return true;
 		}
 	}
@@ -322,9 +358,9 @@ bool hgeGUIListbox::MouseLButton(bool bDown)
 
 bool hgeGUIListbox::MouseWheel(int nNotches)
 {
-	nTopItem-=nNotches;
-	if(nTopItem<0) nTopItem=0;
-	if(nTopItem>GetNumItems()-GetNumRows()) nTopItem=GetNumItems()-GetNumRows();
+	m_top_item-=nNotches;
+	if(m_top_item<0) m_top_item=0;
+	if(m_top_item>GetNumItems()-GetNumRows()) m_top_item=GetNumItems()-GetNumRows();
 
 	return true;
 }
@@ -334,19 +370,19 @@ bool hgeGUIListbox::KeyClick(int key, int chr)
 	switch(key)
 	{
 		case HGEK_DOWN:
-			if(nSelectedItem < nItems-1)
+			if(m_selected_item < m_item_count-1)
 			{
-				nSelectedItem++;
-				if(nSelectedItem > nTopItem+GetNumRows()-1) nTopItem=nSelectedItem-GetNumRows()+1;
+				m_selected_item++;
+				if(m_selected_item > m_top_item+GetNumRows()-1) m_top_item=m_selected_item-GetNumRows()+1;
 				return true;
 			}
 			break;
 
 		case HGEK_UP:
-			if(nSelectedItem > 0)
+			if(m_selected_item > 0)
 			{
-				nSelectedItem--;
-				if(nSelectedItem < nTopItem) nTopItem=nSelectedItem;
+				m_selected_item--;
+				if(m_selected_item < m_top_item) m_top_item=m_selected_item;
 				return true;
 			}
 			break;
@@ -354,39 +390,39 @@ bool hgeGUIListbox::KeyClick(int key, int chr)
 	return false;
 }
 
-int hgeGUIListbox::GetSelectedItem()
+int hgeGUIListbox::GetSelectedItem() const
 {
-	return nSelectedItem;
+	return m_selected_item;
 }
 
 void hgeGUIListbox::SetSelectedItem( int n )
 {
-	if(n>=0 && n<GetNumItems()) nSelectedItem=n;
+	if(n>=0 && n<GetNumItems()) m_selected_item=n;
 }
 
-int hgeGUIListbox::GetTopItem()
+int hgeGUIListbox::GetTopItem() const
 {
-	return nTopItem;
+	return m_top_item;
 }
 
 void hgeGUIListbox::SetTopItem( int n )
 {
-	if(n>=0 && n<=GetNumItems()-GetNumRows()) nTopItem=n;
+	if(n>=0 && n<=GetNumItems()-GetNumRows()) m_top_item=n;
 }
 
-int hgeGUIListbox::GetNumItems()
+int hgeGUIListbox::GetNumItems() const
 {
-	return nItems;
+	return m_item_count;
 }
 
-int hgeGUIListbox::GetNumRows()
+int hgeGUIListbox::GetNumRows() const
 {
-	return int((rect.y2-rect.y1)/font->GetHeight());
+	return int((rect.y2-rect.y1)/m_font->GetHeight());
 }
 
 bool hgeGUIListbox::MouseMove( float x, float y )
 {
-	mx=x; my=y; return false;
+	m_mouse_x=x; m_mouse_y=y; return false;
 }
 
 } // namespace hge

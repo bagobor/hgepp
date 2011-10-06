@@ -11,15 +11,15 @@
 
 namespace hge {
 
-HGE * g_rmanager_hge=0;
-HGE * g_resdesc_hge=0;
+HGE * g_rmanager_hge = nullptr;
+HGE * g_resdesc_hge = nullptr;
 
 
 hgeResourceManager::hgeResourceManager(const char *scriptname)
 {
-	g_rmanager_hge=hgeCreate(HGE_VERSION);
+	g_rmanager_hge = hgeCreate(HGE_VERSION);
 
-	for(int i=0;i<RESTYPES;i++) res[i]=0;
+	for(int i=0;i<RESTYPES;i++) m_resources[i] = nullptr;
 	_parse_script(scriptname);
 }
 
@@ -37,7 +37,7 @@ void hgeResourceManager::_parse_script(const char *scriptname)
 	{
 		RScript::Parse(this, NULL, scriptname, NULL);
 		
-		rc=res[RES_SCRIPT];
+		rc=m_resources[RES_SCRIPT];
 		while(rc)
 		{
 			rc->Free();
@@ -45,7 +45,7 @@ void hgeResourceManager::_parse_script(const char *scriptname)
 			delete rc;
 			rc=rcnext;
 		}
-		res[RES_SCRIPT]=0;
+		m_resources[RES_SCRIPT] = nullptr;
 	}
 }
 
@@ -56,7 +56,7 @@ void hgeResourceManager::_remove_all()
 
 	for(i=0;i<RESTYPES;i++)
 	{
-		rc=res[i];
+		rc=m_resources[i];
 		while(rc)
 		{
 			rc->Free();
@@ -64,7 +64,7 @@ void hgeResourceManager::_remove_all()
 			delete rc;
 			rc=rcnext;
 		}
-		res[i]=0;
+		m_resources[i] = nullptr;
 	}
 }
 
@@ -82,7 +82,7 @@ bool hgeResourceManager::Precache(int groupid)
 
 	for(i=0;i<RESTYPES;i++)
 	{
-		rc=res[i];
+		rc=m_resources[i];
 		while(rc)
 		{
 			if(!groupid || groupid==rc->resgroup) bResult=bResult && (rc->Get(this)!=0);
@@ -100,7 +100,7 @@ void hgeResourceManager::Purge(int groupid)
 
 	for(i=0;i<RESTYPES;i++)
 	{
-		rc=res[i];
+		rc=m_resources[i];
 		while(rc)
 		{
 			if(!groupid || groupid==rc->resgroup) rc->Free();
@@ -132,7 +132,7 @@ void* hgeResourceManager::GetResource(const char *name, int resgroup)
 		}
 	}
 
-	return 0;
+	return nullptr;
 }
 
 HTEXTURE hgeResourceManager::GetTexture(const char *name, int resgroup)
@@ -158,7 +158,7 @@ HTEXTURE hgeResourceManager::GetTexture(const char *name, int resgroup)
 		}
 	}
 
-	return 0;
+	return nullptr;
 }
 
 HEFFECT hgeResourceManager::GetEffect(const char *name, int resgroup)
@@ -183,7 +183,7 @@ HEFFECT hgeResourceManager::GetEffect(const char *name, int resgroup)
 		}
 	}
 
-	return 0;
+	return nullptr;
 }
 
 HMUSIC hgeResourceManager::GetMusic(const char *name, int resgroup)
@@ -208,7 +208,7 @@ HMUSIC hgeResourceManager::GetMusic(const char *name, int resgroup)
 		}
 	}
 
-	return 0;
+	return nullptr;
 }
 
 HSTREAM hgeResourceManager::GetStream(const char *name, int resgroup)
@@ -233,49 +233,49 @@ HSTREAM hgeResourceManager::GetStream(const char *name, int resgroup)
 		}
 	}
 
-	return 0;
+	return nullptr;
 }
 
 HTARGET hgeResourceManager::GetTarget(const char *name)
 {
 	ResDesc *Res=FindRes(this, RES_TARGET, name);
 	if(Res) return (HTARGET)Res->Get(this);
-	else return 0;
+	else return nullptr;
 }
 
 hgeSprite* hgeResourceManager::GetSprite(const char *name)
 {
 	ResDesc *Res=FindRes(this, RES_SPRITE, name);
 	if(Res) return (hgeSprite *)Res->Get(this);
-	else return 0;
+	else return nullptr;
 }
 
 hgeAnimation* hgeResourceManager::GetAnimation(const char *name)
 {
 	ResDesc *Res=FindRes(this, RES_ANIMATION, name);
 	if(Res) return (hgeAnimation *)Res->Get(this);
-	else return 0;
+	else return nullptr;
 }
 
 hgeFont* hgeResourceManager::GetFont(const char *name)
 {
 	ResDesc *Res=FindRes(this, RES_FONT, name);
 	if(Res) return (hgeFont *)Res->Get(this);
-	else return 0;
+	else return nullptr;
 }
 
 hgeParticleSystem* hgeResourceManager::GetParticleSystem(const char *name)
 {
 	ResDesc *Res=FindRes(this, RES_PARTICLE, name);
 	if(Res) return (hgeParticleSystem *)Res->Get(this);
-	else return 0;
+	else return nullptr;
 }
 
 hgeDistortionMesh* hgeResourceManager::GetDistortionMesh(const char *name)
 {
 	ResDesc *Res=FindRes(this, RES_DISTORT, name);
 	if(Res) return (hgeDistortionMesh *)Res->Get(this);
-	else return 0;
+	else return nullptr;
 }
 
 hgeStringTable* hgeResourceManager::GetStringTable(const char *name, int resgroup)
@@ -300,7 +300,7 @@ hgeStringTable* hgeResourceManager::GetStringTable(const char *name, int resgrou
 		}
 	}
 
-	return 0;
+	return nullptr;
 }
 
 HGE * hgeResourceManager::get_hge()
