@@ -24,8 +24,9 @@ enum {
 typedef BOOL (WINAPI *GetSystemPowerStatusFunc)(LPSYSTEM_POWER_STATUS);
 
 
-struct render_target_t
+class render_target_t
 {
+public:
 	int width;
 	int height;
 	hgeGAPITexture * pTex;

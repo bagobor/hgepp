@@ -176,7 +176,7 @@ HCHANNEL HGE_CALL HGE_Impl::Music_Play(HMUSIC mus, bool loop, int volume, int or
 
 		BASS_ChannelPlay(mus, false);
 
-		return mus;
+		return HCHANNEL(mus.get());
 	}
 	else
 		return HCHANNEL();
@@ -357,7 +357,7 @@ HCHANNEL HGE_CALL HGE_Impl::Stream_Play(HSTREAM stream, bool loop, int volume)
 			info.flags |= BASS_SAMPLE_LOOP;
 		BASS_ChannelSetFlags(stream, info.flags);
 		BASS_ChannelPlay(stream, TRUE);
-		return stream;
+		return HCHANNEL(stream.get());
 	}
 	else
 		return HCHANNEL();

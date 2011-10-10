@@ -296,8 +296,7 @@ void HGE_CALL HGE_Impl::Gfx_RenderQuad(const hgeQuad *quad)
 			}
 		}
 
-		memcpy(&m_vertices[m_prim_count * HGEPRIM_QUADS], quad->v, sizeof(hgeVertex)
-				* HGEPRIM_QUADS);
+		memcpy(&m_vertices[m_prim_count * HGEPRIM_QUADS], quad->v, sizeof(hgeVertex) * HGEPRIM_QUADS);
 		m_prim_count++;
 	}
 }

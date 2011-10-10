@@ -102,7 +102,7 @@ bool hgeResourceManager::Precache(int groupid)
 #define PRECACHE_FOREACH(MAPVAR,MAPTYPE) \
 	std::for_each( MAPVAR.begin(), MAPVAR.end(), \
 		[&result,groupid,this]( const MAPTYPE::pair_t & rc ) { \
-			if (! groupid || groupid == rc.second->resgroup) result &= (rc.second->Get(this) != 0); \
+			if (! groupid || groupid == rc.second->resgroup) result &= bool(rc.second->Get(this)); \
 		})
 
 	PRECACHE_FOREACH(m_textures, texture_resource_t);

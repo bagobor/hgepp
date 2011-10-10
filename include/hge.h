@@ -63,6 +63,8 @@ private:
 	handle_type_t	m_value;
 
 public:
+	typedef handle_t <handle_type_t, flavour_t> this_class_t;
+
 	handle_t(): m_value(handle_type_t())
 	{
 	}
@@ -83,12 +85,23 @@ public:
 		return m_value != handle_type_t();
 	}
 
-	inline bool operator == (const handle_t <handle_type_t, flavour_t> & other) const
+	inline bool operator == (const this_class_t & other) const
 	{
 		return m_value == other.m_value;
 	}
-	
-	inline bool operator < (const handle_t <handle_type_t, flavour_t> & other) const
+
+	inline bool operator != (const this_class_t & other) const
+	{
+		return m_value != other.m_value;
+	}
+
+ 	inline this_class_t & operator = (const this_class_t & other) 
+ 	{
+ 		m_value = other.m_value;
+ 		return * this;
+ 	}
+
+	inline bool operator < (const this_class_t & other) const
 	{
 		return m_value < other.m_value;
 	}
