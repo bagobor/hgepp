@@ -40,5 +40,6 @@
     typedef D3DVIEWPORT9            hgeGAPIViewport;
     typedef D3DADAPTER_IDENTIFIER9  hgeGAPIAdapterIdentifier;
 	typedef D3DCAPS9				hgeGAPICaps;
+	typedef IDirect3DPixelShader9	hgeGAPIPixelShader;
 #endif
 

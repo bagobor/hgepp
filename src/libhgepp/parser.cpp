@@ -83,7 +83,7 @@ keyword keytable[]=
 	{ NULL,			TTNONE			}
 };
 
-RScriptParser::RScriptParser(char *name, char *scr)
+RScriptParser::RScriptParser(const char *name, const char *scr)
 {
 	g_scriptparser_hge = hgeCreate(HGE_VERSION);
 
@@ -181,7 +181,7 @@ int RScriptParser::get_token()
 	return tokentype;
 }
 
-bool RScriptParser::strtkcmp(char *str, char *mem)
+bool RScriptParser::strtkcmp(const char *str, const char *mem)
 {
 	int i, len = strlen(str);
 	for (i = 0; i < len; i++)
@@ -194,7 +194,7 @@ bool RScriptParser::strtkcmp(char *str, char *mem)
 	return false;
 }
 
-uint32_t RScriptParser::tkn_hex()
+uint32_t RScriptParser::token_as_hex()
 {
 	int i;
 	uint32_t dw = 0;
@@ -217,7 +217,7 @@ uint32_t RScriptParser::tkn_hex()
 void RScriptParser::ScriptPostError(char *msg1, char *msg2)
 {
 	g_scriptparser_hge->System_Log("%s, line %d: %s'%s'%s", get_name(), get_line(), msg1,
-			tokenvalue[0] ? tkn_string() : "<EOF>", msg2);
+			tokenvalue[0] ? token_as_cstring() : "<EOF>", msg2);
 }
 
 RScriptParser::~RScriptParser()
@@ -235,27 +235,27 @@ int RScriptParser::get_line()
 	return line;
 }
 
-char* RScriptParser::get_name()
+const std::string & RScriptParser::get_name()
 {
 	return scriptname;
 }
 
-char* RScriptParser::tkn_string()
+char* RScriptParser::token_as_cstring()
 {
 	return tokenvalue;
 }
 
-int RScriptParser::tkn_int()
+int RScriptParser::token_as_int()
 {
 	return atoi(tokenvalue);
 }
 
-float RScriptParser::tkn_float()
+float RScriptParser::token_as_float()
 {
 	return (float) atof(tokenvalue);
 }
 
-bool RScriptParser::tkn_bool()
+bool RScriptParser::token_as_bool()
 {
 	return (tokenvalue[0] == 't' || tokenvalue[0] == 'T') ? true : false;
 }

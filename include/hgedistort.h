@@ -26,7 +26,7 @@ public:
 	hgeDistortionMesh& operator=(const hgeDistortionMesh &dm);
 
 	void Render(float x, float y);
-	void Clear(uint32_t col = 0xFFFFFFFF, float z = 0.5f);
+	void Clear(uint32_t col = hge::COLOR_WHITE, float z = 0.5f);
 
 	void SetTexture(HTEXTURE tex);
 	void SetTextureRect(float x, float y, float w, float h);
@@ -35,10 +35,7 @@ public:
 	void SetColor(int col, int row, uint32_t color);
 	void SetDisplacement(int col, int row, float dx, float dy, int ref);
 
-	HTEXTURE GetTexture() const
-	{
-		return m_quad.tex;
-	}
+	HTEXTURE GetTexture() const;
 	void GetTextureRect(float *x, float *y, float *w, float *h) const;
 	uint32_t GetBlendMode() const;
 	float GetZ(int col, int row) const;

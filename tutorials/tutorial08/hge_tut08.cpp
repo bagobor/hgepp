@@ -220,7 +220,7 @@ bool InitSimulation()
 
 	// Create sprites
 
-	sky=new hgeSprite(nullptr, 0, 0, SCREEN_WIDTH, SKY_HEIGHT);
+	sky=new hgeSprite(HTEXTURE(), 0, 0, SCREEN_WIDTH, SKY_HEIGHT);
 	sea=new hgeDistortionMesh(SEA_SUBDIVISION, SEA_SUBDIVISION);
 	sea->SetTextureRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT-SKY_HEIGHT);
 
@@ -240,7 +240,7 @@ bool InitSimulation()
 
 	// Initialize simulation state
 
-	colWhite.SetHWColor(0xFFFFFFFF);
+	colWhite.SetHWColor(hge::COLOR_WHITE);
 	time=GetTime();
 	speed=0.0f;
 

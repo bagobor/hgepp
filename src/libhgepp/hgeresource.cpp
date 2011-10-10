@@ -7,64 +7,84 @@
 #include "parser.h"
 #include "resources.h"
 
+#include <algorithm>
+
 namespace hge
 {
 
-HGE * g_rmanager_hge = nullptr;
-HGE * g_resdesc_hge = nullptr;
+	class HGE_Impl;
+	extern HGE_Impl * g_hge_singleton;
+
+//HGE * g_rmanager_hge = nullptr;
+//HGE * g_resdesc_hge = nullptr;
 
 hgeResourceManager::hgeResourceManager(const char *scriptname)
 {
-	g_rmanager_hge = hgeCreate(HGE_VERSION);
+	//g_rmanager_hge = hgeCreate(HGE_VERSION);
 
-	for (int i = 0; i < RESTYPES; i++)
-		m_resources[i] = nullptr;
+// 	for (int i = 0; i < RESOURCE_TYPE_COUNT; i++)
+// 		m_resources[i] = nullptr;
 	_parse_script(scriptname);
 }
 
 hgeResourceManager::~hgeResourceManager()
 {
 	_remove_all();
-	g_rmanager_hge->Release();
+	//g_rmanager_hge->Release();
 }
 
-void hgeResourceManager::_parse_script(const char *scriptname)
+void hgeResourceManager::_parse_script(const std::string & scriptname)
 {
-	ResDesc *rc, *rcnext;
+	//script_resource_t *rc, *rcnext;
 
-	if (scriptname)
+	if (! scriptname.empty())
 	{
-		RScript::Parse(this, NULL, scriptname, NULL);
+		script_resource_t::Parse(this, NULL, scriptname, NULL);
 
-		rc = m_resources[RES_SCRIPT];
-		while (rc)
-		{
-			rc->Free();
-			rcnext = rc->next;
-			delete rc;
-			rc = rcnext;
-		}
-		m_resources[RES_SCRIPT] = nullptr;
+// 		rc = m_res_scripts[RES_SCRIPT];
+// 		while (rc)
+// 		{
+// 			rc->Free();
+// 			rcnext = rc->next;
+// 			delete rc;
+// 			rc = rcnext;
+// 		}
+		m_res_scripts.clear();
+//		m_resources[RES_SCRIPT] = nullptr;
 	}
 }
 
 void hgeResourceManager::_remove_all()
 {
-	int i;
-	ResDesc *rc, *rcnext;
+	m_textures.clear();
+	m_targets.clear();
+	m_sprites.clear();
+	m_animations.clear();
+	m_fonts.clear();
+	m_psystems.clear();
+	m_distorts.clear();
+	m_string_tables.clear();
+	m_effects.clear();
+	m_musics.clear();
+	m_streams.clear();
+	m_res_scripts.clear();
+	m_bytes.clear();
 
-	for (i = 0; i < RESTYPES; i++)
-	{
-		rc = m_resources[i];
-		while (rc)
-		{
-			rc->Free();
-			rcnext = rc->next;
-			delete rc;
-			rc = rcnext;
-		}
-		m_resources[i] = nullptr;
-	}
+// 	int i;
+// 	BaseResource *rc, *rcnext;
+// 
+// 	for (i = 0; i < RESOURCE_TYPE_COUNT; i++)
+// 	{
+// 		rc = m_resources[i];
+// 		while (rc)
+// 		{
+// 			rc->Free();
+// 			rcnext = rc->next;
+// 			delete rc;
+// 			rc = rcnext;
+// 		}
+// 		m_resources[i] = nullptr;
+// 	}
 }
 
 void hgeResourceManager::ChangeScript(const char *scriptname)
@@ -73,58 +93,102 @@ void hgeResourceManager::ChangeScript(const char *scriptname)
 	_parse_script(scriptname);
 }
 
+
 bool hgeResourceManager::Precache(int groupid)
 {
-	int i;
-	ResDesc *rc;
-	bool bResult = true;
+	// Say hello to missing closures, so we have to do it via globals
+	bool result = true;
 
-	for (i = 0; i < RESTYPES; i++)
-	{
-		rc = m_resources[i];
-		while (rc)
-		{
-			if (!groupid || groupid == rc->resgroup)
-				bResult = bResult && (rc->Get(this) != 0);
-			rc = rc->next;
-		}
-	}
+#define PRECACHE_FOREACH(MAPVAR,MAPTYPE) \
+	std::for_each( MAPVAR.begin(), MAPVAR.end(), \
+		[&result,groupid,this]( const MAPTYPE::pair_t & rc ) { \
+			if (! groupid || groupid == rc.second->resgroup) result &= (rc.second->Get(this) != 0); \
+		})
 
-	return bResult;
+	PRECACHE_FOREACH(m_textures, texture_resource_t);
+	PRECACHE_FOREACH(m_targets, target_resource_t);
+	PRECACHE_FOREACH(m_animations, animation_resource_t);
+	PRECACHE_FOREACH(m_fonts, font_resource_t);
+	PRECACHE_FOREACH(m_psystems, psystem_resource_t);
+	PRECACHE_FOREACH(m_distorts, distort_resource_t);
+	PRECACHE_FOREACH(m_string_tables, string_table_resource_t);
+	PRECACHE_FOREACH(m_effects, bass_effect_resource_t);
+	PRECACHE_FOREACH(m_musics, bass_music_resource_t);
+	PRECACHE_FOREACH(m_streams, bass_stream_resource_t);
+	PRECACHE_FOREACH(m_res_scripts, script_resource_t);
+	PRECACHE_FOREACH(m_bytes, bytes_resource_t);
+
+#undef PRECACHE_FOREACH
+
+// 	m_targets.clear();
+// 	m_sprites.clear();
+// 	m_animations.clear();
+// 	m_fonts.clear();
+// 	m_psystems.clear();
+// 	m_distorts.clear();
+// 	m_string_tables.clear();
+// 	m_effects.clear();
+// 	m_musics.clear();
+// 	m_streams.clear();
+// 	m_res_scripts.clear();
+// 	m_bytes.clear();
+
+	return result;
 }
 
 void hgeResourceManager::Purge(int groupid)
 {
-	int i;
-	ResDesc *rc;
+#define PURGE_FOREACH(MAPVAR,MAPTYPE) \
+	std::for_each( MAPVAR.begin(), MAPVAR.end(), \
+		[groupid]( const MAPTYPE::pair_t & rc ) { \
+			if (! groupid || groupid == rc.second->resgroup) rc.second->Free(); \
+		})
 
-	for (i = 0; i < RESTYPES; i++)
-	{
-		rc = m_resources[i];
-		while (rc)
-		{
-			if (!groupid || groupid == rc->resgroup)
-				rc->Free();
-			rc = rc->next;
-		}
-	}
+	PURGE_FOREACH(m_textures, texture_resource_t);
+	PURGE_FOREACH(m_targets, target_resource_t);
+	PURGE_FOREACH(m_animations, animation_resource_t);
+	PURGE_FOREACH(m_fonts, font_resource_t);
+	PURGE_FOREACH(m_psystems, psystem_resource_t);
+	PURGE_FOREACH(m_distorts, distort_resource_t);
+	PURGE_FOREACH(m_string_tables, string_table_resource_t);
+	PURGE_FOREACH(m_effects, bass_effect_resource_t);
+	PURGE_FOREACH(m_musics, bass_music_resource_t);
+	PURGE_FOREACH(m_streams, bass_stream_resource_t);
+	PURGE_FOREACH(m_res_scripts, script_resource_t);
+	PURGE_FOREACH(m_bytes, bytes_resource_t);
+
+#undef PURGE_FOREACH
+// 	int i;
+// 	BaseResource *rc;
+// 
+// 	for (i = 0; i < RESOURCE_TYPE_COUNT; i++)
+// 	{
+// 		rc = m_resources[i];
+// 		while (rc)
+// 		{
+// 			if (!groupid || groupid == rc->resgroup)
+// 				rc->Free();
+// 			rc = rc->next;
+// 		}
+// 	}
 }
 
-void* hgeResourceManager::GetResource(const char *name, int resgroup)
+#if 0
+handle_t hgeResourceManager::GetResource(const std::string & name, int resgroup)
 {
-	void *reshandle;
-	RResource *resource;
-	ResDesc *Res = FindRes(this, RES_RESOURCE, name);
+	handle_t reshandle;
+	bytes_resource_t *resource;
+	BaseResource *Res = FindRes(this, RES_RESOURCE, name);
 
 	if (Res)
-		return (void *) Res->Get(this);
+		return Res->Get(this);
 	else
 	{
 		reshandle = g_rmanager_hge->Resource_Load(name);
 		if (reshandle)
 		{
-			resource = new RResource();
-			resource->handle = (uint32_t) reshandle;
+			resource = new bytes_resource_t();
+			resource->handle = reshandle;
 			resource->resgroup = resgroup;
 			strcpy(resource->name, name);
 			strcpy(resource->filename, name);
@@ -136,12 +200,34 @@ void* hgeResourceManager::GetResource(const char *name, int resgroup)
 
 	return nullptr;
 }
+#endif //0
 
-HTEXTURE hgeResourceManager::GetTexture(const char *name, int resgroup)
+HTEXTURE hgeResourceManager::GetTexture(const std::string & name, int resgroup)
 {
+	auto itr = m_textures.find( name );
+	if( itr != m_textures.end() ) {
+		return itr->second->handle;
+	}
+	else
+	{
+		auto res_handle = get_hge()->Texture_Load( name.c_str() );
+		if( res_handle )
+		{
+			auto resource = std::shared_ptr<texture_resource_t>(new texture_resource_t());
+			resource->handle = res_handle;
+			resource->resgroup = resgroup;
+			resource->mipmap = false;
+			resource->filename = name;
+			m_textures[name] = resource;
+			
+			return res_handle;
+		}
+	}
+	return HTEXTURE();
+/*
 	HTEXTURE reshandle;
 	RTexture *resource;
-	ResDesc *Res = FindRes(this, RES_TEXTURE, name);
+	BaseResource *Res = FindRes(this, RES_TEXTURE, name);
 	if (Res)
 		return (HTEXTURE) Res->Get(this);
 	else
@@ -160,15 +246,35 @@ HTEXTURE hgeResourceManager::GetTexture(const char *name, int resgroup)
 			return reshandle;
 		}
 	}
-
 	return nullptr;
+*/
 }
 
-HEFFECT hgeResourceManager::GetEffect(const char *name, int resgroup)
+HEFFECT hgeResourceManager::GetEffect(const std::string & name, int resgroup)
 {
+	auto itr = m_effects.find( name );
+	if( itr != m_effects.end() ) {
+		return itr->second->handle;
+	}
+	else
+	{
+		auto res_handle = get_hge()->Effect_Load( name.c_str() );
+		if( res_handle )
+		{
+			auto resource = std::shared_ptr<bass_effect_resource_t>(new bass_effect_resource_t());
+			resource->handle = res_handle;
+			resource->resgroup = resgroup;
+			resource->filename = name;
+			m_effects[name] = resource;
+			
+			return res_handle;
+		}
+	}
+	return HEFFECT();
+/*
 	HEFFECT reshandle;
 	REffect *resource;
-	ResDesc *Res = FindRes(this, RES_EFFECT, name);
+	BaseResource *Res = FindRes(this, RES_EFFECT, name);
 	if (Res)
 		return (HEFFECT) Res->Get(this);
 	else
@@ -188,13 +294,34 @@ HEFFECT hgeResourceManager::GetEffect(const char *name, int resgroup)
 	}
 
 	return nullptr;
+*/
 }
 
-HMUSIC hgeResourceManager::GetMusic(const char *name, int resgroup)
+HMUSIC hgeResourceManager::GetMusic(const std::string & name, int resgroup)
 {
+	auto itr = m_musics.find( name );
+	if( itr != m_musics.end() ) {
+		return itr->second->handle;
+	}
+	else
+	{
+		HMUSIC res_handle = get_hge()->Music_Load( name.c_str() );
+		if( res_handle )
+		{
+			auto resource = std::shared_ptr<bass_music_resource_t>(new bass_music_resource_t());
+			resource->handle = res_handle;
+			resource->resgroup = resgroup;
+			resource->filename = name;
+			m_musics[name] = resource;
+			
+			return res_handle;
+		}
+	}
+	return HMUSIC();
+/*
 	HMUSIC reshandle;
 	RMusic *resource;
-	ResDesc *Res = FindRes(this, RES_MUSIC, name);
+	BaseResource *Res = FindRes(this, RES_MUSIC, name);
 	if (Res)
 		return (HMUSIC) Res->Get(this);
 	else
@@ -214,13 +341,34 @@ HMUSIC hgeResourceManager::GetMusic(const char *name, int resgroup)
 	}
 
 	return nullptr;
+*/
 }
 
-HSTREAM hgeResourceManager::GetStream(const char *name, int resgroup)
+HSTREAM hgeResourceManager::GetStream(const std::string & name, int resgroup)
 {
+	auto itr = m_streams.find( name );
+	if( itr != m_streams.end() ) {
+		return itr->second->handle;
+	}
+	else
+	{
+		auto res_handle = get_hge()->Stream_Load( name.c_str() );
+		if( res_handle )
+		{
+			auto resource = std::shared_ptr<bass_stream_resource_t>(new bass_stream_resource_t());
+			resource->handle = res_handle;
+			resource->resgroup = resgroup;
+			resource->filename = name;
+			m_streams[name] = resource;
+			
+			return res_handle;
+		}
+	}
+	return HSTREAM();
+/*
 	HSTREAM reshandle;
 	RStream *resource;
-	ResDesc *Res = FindRes(this, RES_STREAM, name);
+	BaseResource *Res = FindRes(this, RES_STREAM, name);
 	if (Res)
 		return (HSTREAM) Res->Get(this);
 	else
@@ -240,69 +388,72 @@ HSTREAM hgeResourceManager::GetStream(const char *name, int resgroup)
 	}
 
 	return nullptr;
+*/
 }
 
-HTARGET hgeResourceManager::GetTarget(const char *name)
+HTARGET hgeResourceManager::GetTarget(const std::string & name)
 {
-	ResDesc *Res = FindRes(this, RES_TARGET, name);
-	if (Res)
-		return (HTARGET) Res->Get(this);
+	auto res = find_target(name);
+	return res ? res->Get(this) : HTARGET();
+}
+
+hgeSprite* hgeResourceManager::GetSprite(const std::string & name)
+{
+	auto res = find_sprite(name);
+	return res ? res->Get(this) : nullptr;
+}
+
+hgeAnimation* hgeResourceManager::GetAnimation(const std::string & name)
+{
+	auto res = find_animation(name);
+	return res ? res->Get(this) : nullptr;
+}
+
+hgeFont* hgeResourceManager::GetFont(const std::string & name)
+{
+	auto res = find_font(name);
+	return res ? res->Get(this) : nullptr;
+}
+
+hgeParticleSystem* hgeResourceManager::GetParticleSystem(const std::string & name)
+{
+	auto res = find_particle_system(name);
+	return res ? res->Get(this) : nullptr;
+}
+
+hgeDistortionMesh* hgeResourceManager::GetDistortionMesh(const std::string & name)
+{
+	auto res = find_distortion_mesh(name);
+	return res ? res->Get(this) : nullptr;
+}
+
+hgeStringTable* hgeResourceManager::GetStringTable(const std::string & name, int resgroup)
+{
+	auto itr = m_string_tables.find( name );
+	if( itr != m_string_tables.end() ) {
+		return itr->second->handle;
+	}
 	else
-		return nullptr;
-}
-
-hgeSprite* hgeResourceManager::GetSprite(const char *name)
-{
-	ResDesc *Res = FindRes(this, RES_SPRITE, name);
-	if (Res)
-		return (hgeSprite *) Res->Get(this);
-	else
-		return nullptr;
-}
-
-hgeAnimation* hgeResourceManager::GetAnimation(const char *name)
-{
-	ResDesc *Res = FindRes(this, RES_ANIMATION, name);
-	if (Res)
-		return (hgeAnimation *) Res->Get(this);
-	else
-		return nullptr;
-}
-
-hgeFont* hgeResourceManager::GetFont(const char *name)
-{
-	ResDesc *Res = FindRes(this, RES_FONT, name);
-	if (Res)
-		return (hgeFont *) Res->Get(this);
-	else
-		return nullptr;
-}
-
-hgeParticleSystem* hgeResourceManager::GetParticleSystem(const char *name)
-{
-	ResDesc *Res = FindRes(this, RES_PARTICLE, name);
-	if (Res)
-		return (hgeParticleSystem *) Res->Get(this);
-	else
-		return nullptr;
-}
-
-hgeDistortionMesh* hgeResourceManager::GetDistortionMesh(const char *name)
-{
-	ResDesc *Res = FindRes(this, RES_DISTORT, name);
-	if (Res)
-		return (hgeDistortionMesh *) Res->Get(this);
-	else
-		return nullptr;
-}
-
-hgeStringTable* hgeResourceManager::GetStringTable(const char *name, int resgroup)
-{
+	{
+		auto strtable = new hgeStringTable(name);
+		if( strtable )
+		{
+			auto resource = std::shared_ptr<string_table_resource_t>(new string_table_resource_t());
+			resource->handle = strtable;
+			resource->resgroup = resgroup;
+			resource->filename = name;
+			m_string_tables[name] = resource;
+			
+			return strtable;
+		}
+	}
+	return nullptr;
+/*
 	hgeStringTable *strtable;
 	RStringTable *resource;
-	ResDesc *Res = FindRes(this, RES_STRTABLE, name);
+	BaseResource *Res = FindRes(this, RES_STRTABLE, name);
 	if (Res)
-		return (hgeStringTable*) Res->Get(this);
+		return (hgeStringTable*) Res->Get(this).ptr;
 	else
 	{
 		strtable = new hgeStringTable(name);
@@ -320,26 +471,12 @@ hgeStringTable* hgeResourceManager::GetStringTable(const char *name, int resgrou
 	}
 
 	return nullptr;
+*/
 }
 
 HGE * hgeResourceManager::get_hge()
 {
-	return g_rmanager_hge;
-}
-
-ResDesc::ResDesc()
-{
-	g_resdesc_hge = hgeCreate(HGE_VERSION);
-}
-
-ResDesc::~ResDesc()
-{
-	g_resdesc_hge->Release();
-}
-
-HGE * ResDesc::get_hge()
-{
-	return g_resdesc_hge;
+	return (HGE*)g_hge_singleton;
 }
 
 } // namespace hge

@@ -463,7 +463,7 @@ HGE * hgeGUIObject::get_hge()
 hgeGUIObject::hgeGUIObject()
 {
 	g_hgeguiobject_hge = hgeCreate(HGE_VERSION);
-	m_color = 0xFFFFFFFF;
+	m_color = hge::COLOR_WHITE;
 }
 
 hgeGUIObject::hgeGUIObject(const hgeGUIObject &go)

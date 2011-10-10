@@ -19,7 +19,6 @@ char g_hgefont_buffer[1024];
 
 hgeFont::hgeFont(const char *szFont, bool bMipmap)
 {
-	void *data;
 	uint32_t size;
 	char *desc, *pdesc;
 	char linebuf[256];
@@ -37,11 +36,11 @@ hgeFont::hgeFont(const char *szFont, bool bMipmap)
 	m_rotation = 0.0f;
 	m_tracking = 0.0f;
 	m_spacing = 1.0f;
-	m_texture = nullptr;
+	//m_texture = nullptr;
 
 	m_depth = 0.5f;
 	m_blending = BLEND_COLORMUL | BLEND_ALPHABLEND | BLEND_NOZWRITE;
-	m_color = 0xFFFFFFFF;
+	m_color = hge::COLOR_WHITE;
 
 	ZeroMemory( &m_letters, sizeof(m_letters) );
 	ZeroMemory( &m_pre_margin, sizeof(m_letters) );
@@ -49,14 +48,14 @@ hgeFont::hgeFont(const char *szFont, bool bMipmap)
 
 	// Load font description
 
-	data = g_hgefont_hge->Resource_Load(szFont, &size);
+	auto data = g_hgefont_hge->Resource_Load(szFont, &size);
 	if (!data)
 		return;
 
 	desc = new char[size + 1];
-	memcpy(desc, data, size);
+	memcpy(desc, data.get(), size);
 	desc[size] = 0;
-	g_hgefont_hge->Resource_Free(data);
+	//g_hgefont_hge->Resource_Free( handle_t::from_pointer(data) );
 
 	pdesc = _get_line(desc, linebuf);
 	if (strcmp(linebuf, FNTHEADERTAG))
@@ -201,7 +200,8 @@ void hgeFont::printf(float x, float y, int align, const char *format, ...)
 void hgeFont::printfb(float x, float y, float w, float h, int align, const char *format, ...)
 {
 	char chr, *pbuf, *prevword, *linestart;
-	int i, lines = 0;
+	int lines = 0;
+	size_t i;
 	float tx, ty, hh, ww;
 	char *pArg = (char *) &format + sizeof(format);
 
@@ -352,7 +352,7 @@ void hgeFont::SetBlendMode(uint32_t blend)
 
 char *hgeFont::_get_line(char *file, char *line)
 {
-	int i = 0;
+	size_t i = 0;
 
 	if (!file[i])
 		return 0;

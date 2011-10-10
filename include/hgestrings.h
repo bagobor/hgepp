@@ -5,6 +5,7 @@
 #pragma once
 
 #include <hge.h>
+#include <string>
 
 namespace hge {
 
@@ -24,7 +25,7 @@ struct NamedString
 class HGE_EXPORT hgeStringTable
 {
 public:
-	hgeStringTable(const char *filename);
+	hgeStringTable(const std::string & filename);
 	~hgeStringTable();
 
 	char *GetString(const char *name);

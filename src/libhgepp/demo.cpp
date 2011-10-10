@@ -130,7 +130,7 @@ void splash_screen_init()
 	for (int i = 0; i < 4; i++)
 	{
 		g_splash_screen_quad.v[i].z = 0.5f;
-		g_splash_screen_quad.v[i].col = 0xFFFFFFFF;
+		g_splash_screen_quad.v[i].col = hge::COLOR_WHITE;
 	}
 
 	g_splash_screen_quad.v[0].tx = 0.0f;
@@ -181,7 +181,7 @@ bool splash_screen_frame()
 	g_splash_screen_quad.v[2].col = col;
 	g_splash_screen_quad.v[3].col = col;
 
-	g_hge_singleton->Gfx_BeginScene();
+	g_hge_singleton->Gfx_BeginScene( HTARGET() );
 	g_hge_singleton->Gfx_Clear(0);
 	g_hge_singleton->Gfx_RenderQuad(&g_splash_screen_quad);
 	g_hge_singleton->Gfx_EndScene();

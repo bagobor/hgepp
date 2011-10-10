@@ -290,7 +290,7 @@ hgeGUIListbox::hgeGUIListbox(int _id, float x, float y, float w, float h, hgeFon
 	m_is_enabled = true;
 	m_rect.Set(x, y, x + w, y + h);
 	m_font = fnt;
-	m_hilite_sprite = new hgeSprite(nullptr, 0, 0, w, fnt->GetHeight());
+	m_hilite_sprite = new hgeSprite(HTEXTURE(), 0, 0, w, fnt->GetHeight());
 	m_hilite_sprite->SetColor(hColor);
 	m_text_color = tColor;
 	m_hi_text_color = thColor;

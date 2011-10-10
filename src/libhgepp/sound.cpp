@@ -18,7 +18,9 @@ HEFFECT HGE_CALL HGE_Impl::Effect_Load(const char *filename, uint32_t size)
 	bass_HSAMPLE hs;
 	HSTREAM hstrm;
 	BASS_CHANNELINFO info;
-	void *buffer, *data;
+	void * buffer;
+	void * data;
+	bytes_t loaded_from_resource;
 
 	if (m_bassdll)
 	{
@@ -32,9 +34,10 @@ HEFFECT HGE_CALL HGE_Impl::Effect_Load(const char *filename, uint32_t size)
 		}
 		else
 		{
-			data = Resource_Load(filename, &_size);
-			if (!data)
-				return nullptr;
+			loaded_from_resource = Resource_Load(filename, &_size);
+			if (!loaded_from_resource)
+				return HEFFECT();
+			data = loaded_from_resource.get();
 		}
 
 		hs = BASS_SampleLoad(TRUE, data, 0, _size, 4, BASS_SAMPLE_OVER_VOL);
@@ -68,12 +71,12 @@ HEFFECT HGE_CALL HGE_Impl::Effect_Load(const char *filename, uint32_t size)
 			}
 		}
 
-		if (!size)
-			Resource_Free(data);
+// 		if (!size)
+// 			Resource_Free(data);
 		return hs;
 	}
 	else
-		return nullptr;
+		return HEFFECT();
 }
 
 HCHANNEL HGE_CALL HGE_Impl::Effect_Play(HEFFECT eff)
@@ -86,7 +89,7 @@ HCHANNEL HGE_CALL HGE_Impl::Effect_Play(HEFFECT eff)
 		return chn;
 	}
 	else
-		return nullptr;
+		return HCHANNEL();
 }
 
 HCHANNEL HGE_CALL HGE_Impl::Effect_PlayEx(HEFFECT eff, int volume, int pan, float pitch, bool loop)
@@ -108,7 +111,7 @@ HCHANNEL HGE_CALL HGE_Impl::Effect_PlayEx(HEFFECT eff, int volume, int pan, floa
 		return chn;
 	}
 	else
-		return nullptr;
+		return HCHANNEL();
 }
 
 void HGE_CALL HGE_Impl::Effect_Free(HEFFECT eff)
@@ -119,7 +122,8 @@ void HGE_CALL HGE_Impl::Effect_Free(HEFFECT eff)
 
 HMUSIC HGE_CALL HGE_Impl::Music_Load(const char *filename, uint32_t size)
 {
-	void *data;
+	void * data;
+	bytes_t loaded_from_resource;
 	uint32_t _size;
 	HMUSIC hm;
 
@@ -132,21 +136,22 @@ HMUSIC HGE_CALL HGE_Impl::Music_Load(const char *filename, uint32_t size)
 		}
 		else
 		{
-			data = Resource_Load(filename, &_size);
-			if (!data)
-				return nullptr;
+			loaded_from_resource = Resource_Load(filename, &_size);
+			if (!loaded_from_resource)
+				return HMUSIC();
+			data = loaded_from_resource.get();
 		}
 
 		hm = BASS_MusicLoad(TRUE, data, 0, 0, BASS_MUSIC_PRESCAN | BASS_MUSIC_POSRESETEX
 				| BASS_MUSIC_RAMP, 0);
 		if (!hm)
 			_PostError("Can't load music");
-		if (!size)
-			Resource_Free(data);
+// 		if (!size)
+// 			Resource_Free(data);
 		return hm;
 	}
 	else
-		return nullptr;
+		return HMUSIC();
 }
 
 HCHANNEL HGE_CALL HGE_Impl::Music_Play(HMUSIC mus, bool loop, int volume, int order, int row)
@@ -174,13 +179,13 @@ HCHANNEL HGE_CALL HGE_Impl::Music_Play(HMUSIC mus, bool loop, int volume, int or
 		return mus;
 	}
 	else
-		return nullptr;
+		return HCHANNEL();
 }
 
 void HGE_CALL HGE_Impl::Music_Free(HMUSIC mus)
 {
 	if (m_bassdll)
-		BASS_MusicFree(mus);
+		BASS_MusicFree(mus.get());
 }
 
 void HGE_CALL HGE_Impl::Music_SetAmplification(HMUSIC music, int ampl)
@@ -269,7 +274,8 @@ int HGE_CALL HGE_Impl::Music_GetChannelVolume(HMUSIC music, int channel)
 
 HSTREAM HGE_CALL HGE_Impl::Stream_Load(const char *filename, uint32_t size)
 {
-	void *data;
+	void * data;
+	bytes_t loaded_from_resource;
 	uint32_t _size;
 	HSTREAM hs;
 	CStreamList *stmItem;
@@ -286,30 +292,31 @@ HSTREAM HGE_CALL HGE_Impl::Stream_Load(const char *filename, uint32_t size)
 		}
 		else
 		{
-			data = Resource_Load(filename, &_size);
-			if (!data)
-				return nullptr;
+			loaded_from_resource = Resource_Load(filename, &_size);
+			if (!loaded_from_resource)
+				return HSTREAM();
+			data = loaded_from_resource.get();
 		}
 		hs = BASS_StreamCreateFile(TRUE, data, 0, _size, 0);
 		if (!hs)
 		{
 			_PostError("Can't load stream");
-			if (!size)
-				Resource_Free(data);
-			return nullptr;
+// 			if (!size)
+// 				Resource_Free(data);
+			return HSTREAM();
 		}
 		if (!size)
 		{
 			stmItem = new CStreamList;
 			stmItem->hstream = hs;
-			stmItem->data = data;
+			stmItem->data = loaded_from_resource;
 			stmItem->next = m_streams_list;
 			m_streams_list = stmItem;
 		}
 		return hs;
 	}
 	else
-		return nullptr;
+		return HSTREAM();
 }
 
 void HGE_CALL HGE_Impl::Stream_Free(HSTREAM stream)
@@ -326,7 +333,7 @@ void HGE_CALL HGE_Impl::Stream_Free(HSTREAM stream)
 					stmPrev->next = stmItem->next;
 				else
 					m_streams_list = stmItem->next;
-				Resource_Free(stmItem->data);
+				//Resource_Free(stmItem->data);
 				delete stmItem;
 				break;
 			}
@@ -353,7 +360,7 @@ HCHANNEL HGE_CALL HGE_Impl::Stream_Play(HSTREAM stream, bool loop, int volume)
 		return stream;
 	}
 	else
-		return nullptr;
+		return HCHANNEL();
 }
 
 void HGE_CALL HGE_Impl::Channel_SetPanning(HCHANNEL chn, int pan)
@@ -595,7 +602,7 @@ void HGE_Impl::_SoundDone()
 		while (stmItem)
 		{
 			stmNext = stmItem->next;
-			Resource_Free(stmItem->data);
+			//Resource_Free(stmItem->data);
 			delete stmItem;
 			stmItem = stmNext;
 		}

@@ -807,21 +807,21 @@ HGE_Impl::HGE_Impl()
 	m_d3d = nullptr;
 	m_d3d_device = nullptr;
 	m_d3dpp = nullptr;
-	m_targets_list = nullptr;
+	//m_targets_list = nullptr;
 	m_cur_target = nullptr;
 	m_screen_sfc = nullptr;
 	m_depth_sfc = nullptr;
 	m_vertex_buf = nullptr;
 	m_index_buf = nullptr;
 	m_vertices = nullptr;
-	m_textures_list = nullptr;
+	//m_textures_map = nullptr;
 
 	m_bassdll = nullptr;
 	m_no_sound = false;
 	m_streams_list = nullptr;
 
 	m_hsearch = nullptr;
-	m_res_list = nullptr;
+	//m_resources = nullptr;
 
 	m_input_queue = nullptr;
 	m_char = m_vkey = m_zpos = 0;

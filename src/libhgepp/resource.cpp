@@ -14,32 +14,31 @@ namespace hge
 bool HGE_CALL HGE_Impl::Resource_AttachPack(const char *filename, const char *password)
 {
 	char *szName;
-	CResourceList *resItem = m_res_list;
+	//resource_packs_item_t *resItem = m_resources;
 	unzFile zip;
 
 	szName = Resource_MakePath(filename);
 	strupr(szName);
 
-	while (resItem)
-	{
-		if (!strcmp(szName, resItem->filename))
-			return false;
-		resItem = resItem->next;
-	}
+// 	while (resItem)
+// 	{
+// 		if (!strcmp(szName, resItem->filename))
+// 			return false;
+// 		resItem = resItem->next;
+// 	}
+	if( m_resources.find( szName ) != m_resources.end() ) return false;
 
 	zip = unzOpen(szName);
 	if (!zip)
 		return false;
 	unzClose(zip);
 
-	resItem = new CResourceList;
-	strcpy(resItem->filename, szName);
+	resource_packs_item_t resItem;
+	resItem.filename = szName;
 	if (password)
-		strcpy(resItem->password, password);
-	else
-		resItem->password[0] = 0;
-	resItem->next = m_res_list;
-	m_res_list = resItem;
+		resItem.password = password;
+	//resItem->next = m_resources;
+	m_resources[szName] = resItem;
 
 	return true;
 }
@@ -47,53 +46,58 @@ bool HGE_CALL HGE_Impl::Resource_AttachPack(const char *filename, const char *pa
 void HGE_CALL HGE_Impl::Resource_RemovePack(const char *filename)
 {
 	char *szName;
-	CResourceList *resItem = m_res_list, *resPrev = 0;
+	//resource_packs_item_t *resItem = m_resources, *resPrev = 0;
 
 	szName = Resource_MakePath(filename);
 	strupr(szName);
 
-	while (resItem)
-	{
-		if (!strcmp(szName, resItem->filename))
-		{
-			if (resPrev)
-				resPrev->next = resItem->next;
-			else
-				m_res_list = resItem->next;
-			delete resItem;
-			break;
-		}
-
-		resPrev = resItem;
-		resItem = resItem->next;
+// 	while (resItem)
+// 	{
+// 		if (!strcmp(szName, resItem->filename))
+// 		{
+// 			if (resPrev)
+// 				resPrev->next = resItem->next;
+// 			else
+// 				m_resources = resItem->next;
+// 			delete resItem;
+// 			break;
+// 		}
+// 
+// 		resPrev = resItem;
+// 		resItem = resItem->next;
+// 	}
+	auto itr = m_resources.find( szName );
+	if ( itr != m_resources.end() ) {
+		m_resources.erase( szName );
 	}
 }
 
 void HGE_CALL HGE_Impl::Resource_RemoveAllPacks()
 {
-	CResourceList *resItem = m_res_list, *resNextItem;
+	//resource_packs_item_t *resItem = m_resources, *resNextItem;
 
-	while (resItem)
-	{
-		resNextItem = resItem->next;
-		delete resItem;
-		resItem = resNextItem;
-	}
+// 	while (resItem)
+// 	{
+// 		resNextItem = resItem->next;
+// 		delete resItem;
+// 		resItem = resNextItem;
+// 	}
 
-	m_res_list = 0;
+	//m_resources = 0;
+	m_resources.clear();
 }
 
-void* HGE_CALL HGE_Impl::Resource_Load(const char *filename, uint32_t *size)
+bytes_t HGE_CALL HGE_Impl::Resource_Load(const char *filename, uint32_t *size)
 {
 	static char *res_err = "Can't load resource: %s";
 
-	CResourceList *resItem = m_res_list;
+	//resource_packs_item_t *resItem = m_resources;
 	char szName[_MAX_PATH];
 	char szZipName[_MAX_PATH];
 	unzFile zip;
 	unz_file_info file_info;
 	int done, i;
-	void *ptr;
+	void * ptr;
 	HANDLE hF;
 
 	if (filename[0] == '\\' || filename[0] == '/' || filename[1] == ':')
@@ -109,9 +113,13 @@ void* HGE_CALL HGE_Impl::Resource_Load(const char *filename, uint32_t *size)
 			szName[i] = '\\';
 	}
 
-	while (resItem)
+	//while (resItem)
+	// TODO: optimize this reopening shit out
+	for( auto itr = m_resources.begin(); itr != m_resources.end(); ++itr )
 	{
-		zip = unzOpen(resItem->filename);
+		resource_packs_item_t & resItem = itr->second;
+
+		zip = unzOpen(resItem.filename.c_str());
 		done = unzGoToFirstFile(zip);
 		while (done == UNZ_OK)
 		{
@@ -124,13 +132,14 @@ void* HGE_CALL HGE_Impl::Resource_Load(const char *filename, uint32_t *size)
 			}
 			if (!strcmp(szName, szZipName))
 			{
-				if (unzOpenCurrentFilePassword(zip, resItem->password[0] ? resItem->password : 0)
-						!= UNZ_OK)
+				if (unzOpenCurrentFilePassword( zip, resItem.password.empty()
+									? resItem.password.c_str()
+									: nullptr ) != UNZ_OK)
 				{
 					unzClose(zip);
 					sprintf(szName, res_err, filename);
 					_PostError(szName);
-					return 0;
+					return nullptr;
 				}
 
 				ptr = malloc(file_info.uncompressed_size);
@@ -140,7 +149,7 @@ void* HGE_CALL HGE_Impl::Resource_Load(const char *filename, uint32_t *size)
 					unzClose(zip);
 					sprintf(szName, res_err, filename);
 					_PostError(szName);
-					return 0;
+					return nullptr;
 				}
 
 				if (unzReadCurrentFile(zip, ptr, file_info.uncompressed_size) < 0)
@@ -150,20 +159,20 @@ void* HGE_CALL HGE_Impl::Resource_Load(const char *filename, uint32_t *size)
 					free(ptr);
 					sprintf(szName, res_err, filename);
 					_PostError(szName);
-					return 0;
+					return nullptr;
 				}
 				unzCloseCurrentFile(zip);
 				unzClose(zip);
 				if (size)
 					*size = file_info.uncompressed_size;
-				return ptr;
+				return bytes_t( (char*)ptr );
 			}
 
 			done = unzGoToNextFile(zip);
 		}
 
 		unzClose(zip);
-		resItem = resItem->next;
+		//resItem = resItem->next;
 	}
 
 	// Load from file
@@ -175,7 +184,7 @@ void* HGE_CALL HGE_Impl::Resource_Load(const char *filename, uint32_t *size)
 	{
 		sprintf(szName, res_err, filename);
 		_PostError(szName);
-		return 0;
+		return nullptr;
 	}
 	file_info.uncompressed_size = GetFileSize(hF, NULL);
 	ptr = malloc(file_info.uncompressed_size);
@@ -184,7 +193,7 @@ void* HGE_CALL HGE_Impl::Resource_Load(const char *filename, uint32_t *size)
 		CloseHandle(hF);
 		sprintf(szName, res_err, filename);
 		_PostError(szName);
-		return 0;
+		return nullptr;
 	}
 	if (ReadFile(hF, ptr, file_info.uncompressed_size, &file_info.uncompressed_size, NULL ) == 0)
 	{
@@ -192,20 +201,20 @@ void* HGE_CALL HGE_Impl::Resource_Load(const char *filename, uint32_t *size)
 		free(ptr);
 		sprintf(szName, res_err, filename);
 		_PostError(szName);
-		return 0;
+		return nullptr;
 	}
 
 	CloseHandle(hF);
 	if (size)
 		*size = file_info.uncompressed_size;
-	return ptr;
+	return bytes_t( (char*)ptr);
 }
 
-void HGE_CALL HGE_Impl::Resource_Free(void *res)
-{
-	if (res)
-		free(res);
-}
+// void HGE_CALL HGE_Impl::Resource_Free(HTEXTURE res)
+// {
+// 	if (res)
+// 		free(res.get());
+// }
 
 char* HGE_CALL HGE_Impl::Resource_MakePath(const char *filename)
 {

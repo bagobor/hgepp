@@ -8,6 +8,9 @@
 #include <stdio.h>
 #include <hge_gapi.h>
 
+#include <map>
+#include <list>
+#include <string>
 
 #define HGE_COMPILE_SPLASHSCREEN
 
@@ -21,35 +24,45 @@ enum {
 typedef BOOL (WINAPI *GetSystemPowerStatusFunc)(LPSYSTEM_POWER_STATUS);
 
 
-struct CRenderTargetList
+struct render_target_t
 {
 	int width;
 	int height;
 	hgeGAPITexture * pTex;
 	hgeGAPISurface * pDepth;
-	CRenderTargetList * next;
+	//render_target_t * next;
 };
+typedef std::list <render_target_t *> render_target_list_t;
 
-struct CTextureList
+struct texture_cache_item_t
 {
-	HTEXTURE tex;
+	//HTEXTURE tex;
 	int width;
 	int height;
-	CTextureList* next;
+	//texture_cache_item_t* next;
 };
+typedef std::map <HTEXTURE, texture_cache_item_t> texture_cache_t;
 
-struct CResourceList
+struct resource_packs_item_t
 {
-	char filename[_MAX_PATH];
-	char password[64];
-	CResourceList* next;
+	//char filename[_MAX_PATH];
+	//char password[64];
+	std::string filename;
+	std::string password;
+	//resource_packs_item_t* next;
+
+	// TODO: cache open pack info here, create constructor and variables for open pack
+	//unzFile m_zip;
+
+	// TODO: add here destructor and cleanup code
 };
+typedef std::map <std::string, resource_packs_item_t> resource_packs_map_t;
 
 struct CStreamList
 {
 	HSTREAM hstream;
-	void* data;
-	CStreamList* next;
+	bytes_t data;
+	CStreamList * next;
 };
 
 struct CInputEventList
@@ -89,8 +102,11 @@ public:
 	virtual bool HGE_CALL System_Launch(const char *url);
 	virtual void HGE_CALL System_Snapshot(const char *filename = 0);
 
-	virtual void* HGE_CALL Resource_Load(const char *filename, uint32_t *size = 0);
-	virtual void HGE_CALL Resource_Free(void *res);
+	//
+	// RESOURCE management functions
+	//
+	virtual bytes_t HGE_CALL Resource_Load(const char *filename, uint32_t *size = 0);
+	//virtual void HGE_CALL Resource_Free(HTEXTURE res);
 	virtual bool HGE_CALL Resource_AttachPack(const char *filename, const char *password = 0);
 	virtual void HGE_CALL Resource_RemovePack(const char *filename);
 	virtual void HGE_CALL Resource_RemoveAllPacks();
@@ -166,11 +182,11 @@ public:
 	virtual int HGE_CALL Input_GetChar();
 	virtual bool HGE_CALL Input_GetEvent(hgeInputEvent *event);
 
-	virtual bool HGE_CALL Gfx_BeginScene(HTARGET target = nullptr);
+	virtual bool HGE_CALL Gfx_BeginScene(HTARGET target);
 	virtual void HGE_CALL Gfx_EndScene();
 	virtual void HGE_CALL Gfx_Clear(uint32_t color);
 	virtual void HGE_CALL Gfx_RenderLine(float x1, float y1, float x2, float y2, uint32_t color =
-			0xFFFFFFFF, float z = 0.5f);
+			hge::COLOR_WHITE, float z = 0.5f);
 	virtual void HGE_CALL Gfx_RenderTriple(const hgeTriple *triple);
 	virtual void HGE_CALL Gfx_RenderQuad(const hgeQuad *quad);
 	virtual hgeVertex* HGE_CALL Gfx_StartBatch(primitive_mode_t prim_type, HTEXTURE tex, int blend,
@@ -272,22 +288,22 @@ public:
 
 	hgeGAPISurface * m_screen_sfc;
 	hgeGAPISurface * m_depth_sfc;
-	// TODO: replace with STL container
-	CRenderTargetList* m_targets_list;
-	// TODO: replace with STL container
-	CRenderTargetList* m_cur_target;
+
+	render_target_list_t m_targets_list;
+	render_target_t * m_cur_target;
 
 	D3DXMATRIX m_view_matrix;
 	D3DXMATRIX m_proj_matrix;
 
 	// TODO: replace with STL container
-	CTextureList* m_textures_list;
+	texture_cache_t m_textures_map;
 	hgeVertex* m_vertices;
 
 	int m_prim_count;
 	primitive_mode_t m_cur_prim_type;
 	int m_cur_blend_mode;
 	HTEXTURE m_cur_texture;
+
 #if HGE_DIRECTX_VER >= 9
 	HSHADER m_cur_shader;
 #endif
@@ -333,7 +349,8 @@ public:
 
 	// Resources
 	char m_tmp_filename[_MAX_PATH];
-	CResourceList* m_res_list;
+	//resource_cache_item_t * m_res_list;
+	resource_packs_map_t m_resources;
 	HANDLE m_hsearch;
 	WIN32_FIND_DATA m_search_data;
 

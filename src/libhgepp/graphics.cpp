@@ -40,8 +40,8 @@ void HGE_CALL HGE_Impl::Gfx_SetClipping(int x, int y, int w, int h)
 	}
 	else
 	{
-		scr_width = Texture_GetWidth((HTEXTURE) m_cur_target->pTex);
-		scr_height = Texture_GetHeight((HTEXTURE) m_cur_target->pTex);
+		scr_width = Texture_GetWidth( HTEXTURE(m_cur_target->pTex) );
+		scr_height = Texture_GetHeight( HTEXTURE(m_cur_target->pTex) );
 	}
 
 	if (!w)
@@ -118,7 +118,7 @@ bool HGE_CALL HGE_Impl::Gfx_BeginScene(HTARGET targ)
 	hgeGAPISurface * pSurf = 0, *pDepth = 0;
 
 	D3DDISPLAYMODE Mode;
-	CRenderTargetList *target = (CRenderTargetList *) targ.ptr;
+	auto target = targ.get();
 
 	HRESULT hr = m_d3d_device->TestCooperativeLevel();
 	if (hr == D3DERR_DEVICELOST)
@@ -234,7 +234,7 @@ void HGE_CALL HGE_Impl::Gfx_RenderLine(float x1, float y1, float x2, float y2, u
 			if (m_cur_texture)
 			{
 				m_d3d_device->SetTexture(0, 0);
-				m_cur_texture = nullptr;
+				m_cur_texture.reset();
 			}
 		}
 
@@ -266,7 +266,7 @@ void HGE_CALL HGE_Impl::Gfx_RenderTriple(const hgeTriple *triple)
 				_SetBlendMode(triple->blend);
 			if (triple->tex != m_cur_texture)
 			{
-				m_d3d_device->SetTexture(0, (hgeGAPITexture *) triple->tex.ptr);
+				m_d3d_device->SetTexture(0, triple->tex.get());
 				m_cur_texture = triple->tex;
 			}
 		}
@@ -291,7 +291,7 @@ void HGE_CALL HGE_Impl::Gfx_RenderQuad(const hgeQuad *quad)
 				_SetBlendMode(quad->blend);
 			if (quad->tex != m_cur_texture)
 			{
-				m_d3d_device->SetTexture(0, (hgeGAPITexture *) quad->tex.ptr);
+				m_d3d_device->SetTexture(0, quad->tex.get());
 				m_cur_texture = quad->tex;
 			}
 		}
@@ -314,7 +314,7 @@ hgeVertex* HGE_CALL HGE_Impl::Gfx_StartBatch(primitive_mode_t prim_type, HTEXTUR
 			_SetBlendMode(blend);
 		if (tex != m_cur_texture)
 		{
-			m_d3d_device->SetTexture(0, (hgeGAPITexture *) tex.ptr);
+			m_d3d_device->SetTexture(0, tex.get());
 			m_cur_texture = tex;
 		}
 
@@ -332,83 +332,69 @@ void HGE_CALL HGE_Impl::Gfx_FinishBatch(int nprim)
 
 HTARGET HGE_CALL HGE_Impl::Target_Create(int width, int height, bool zbuffer)
 {
-	CRenderTargetList *pTarget;
 	D3DSURFACE_DESC TDesc;
 
-	pTarget = new CRenderTargetList;
-	pTarget->pTex = 0;
-	pTarget->pDepth = 0;
+	auto new_target = new render_target_t;
+	new_target->pTex = 0;
+	new_target->pDepth = 0;
 
 	if (FAILED(D3DXCreateTexture(m_d3d_device, width, height, 1, D3DUSAGE_RENDERTARGET,
-					m_d3dpp->BackBufferFormat, D3DPOOL_DEFAULT, &pTarget->pTex)))
+					m_d3dpp->BackBufferFormat, D3DPOOL_DEFAULT, &new_target->pTex)))
 	{
 		_PostError("Can't create render target texture");
-		delete pTarget;
-		return nullptr;
+		delete new_target;
+		return HTARGET();
 	}
 
-	pTarget->pTex->GetLevelDesc(0, &TDesc);
-	pTarget->width = TDesc.Width;
-	pTarget->height = TDesc.Height;
+	new_target->pTex->GetLevelDesc(0, &TDesc);
+	new_target->width = TDesc.Width;
+	new_target->height = TDesc.Height;
 
 	if (zbuffer)
 	{
 #if HGE_DIRECTX_VER == 8
-		if(FAILED(m_d3d_device->CreateDepthStencilSurface(pTarget->width, pTarget->height,
-								D3DFMT_D16, D3DMULTISAMPLE_NONE, &pTarget->pDepth)))
+		if(FAILED(m_d3d_device->CreateDepthStencilSurface(new_target->width, new_target->height,
+								D3DFMT_D16, D3DMULTISAMPLE_NONE, &new_target->pDepth)))
 #endif
 #if HGE_DIRECTX_VER == 9
 		if(FAILED(m_d3d_device->CreateDepthStencilSurface(width, height,
-								D3DFMT_D16, D3DMULTISAMPLE_NONE, 0, false, &pTarget->pDepth, NULL)))
+								D3DFMT_D16, D3DMULTISAMPLE_NONE, 0, false, &new_target->pDepth, NULL)))
 #endif
 		{
-			pTarget->pTex->Release();
+			new_target->pTex->Release();
 			_PostError("Can't create render target depth buffer");
-			delete pTarget;
-			return nullptr;
+			delete new_target;
+			return HTARGET();
 		}
 	}
 
-	pTarget->next = m_targets_list;
-	m_targets_list = pTarget;
+	//pTarget->next = m_targets_list;
+	m_targets_list.push_front( new_target );
 
-	return HTARGET(pTarget);
+	return HTARGET(new_target);
 }
 
 void HGE_CALL HGE_Impl::Target_Free(HTARGET target)
 {
-	CRenderTargetList *pTarget = m_targets_list, *pPrevTarget = NULL;
-
-	while (pTarget)
+	for( auto itr = m_targets_list.begin(); itr != m_targets_list.end(); ++itr )
 	{
-		if ((CRenderTargetList *) target.ptr == pTarget)
+		if (target.get() == *itr)
 		{
-			if (pPrevTarget)
-				pPrevTarget->next = pTarget->next;
-			else
-				m_targets_list = pTarget->next;
+			if ((*itr)->pTex)
+				(*itr)->pTex->Release();
+			if ((*itr)->pDepth)
+				(*itr)->pDepth->Release();
 
-			if (pTarget->pTex)
-				pTarget->pTex->Release();
-			if (pTarget->pDepth)
-				pTarget->pDepth->Release();
-
-			delete pTarget;
+			delete (*itr);
+			m_targets_list.erase( itr );
 			return;
 		}
-
-		pPrevTarget = pTarget;
-		pTarget = pTarget->next;
 	}
 }
 
 HTEXTURE HGE_CALL HGE_Impl::Target_GetTexture(HTARGET target)
 {
-	CRenderTargetList *targ = (CRenderTargetList *) target.ptr;
-	if (target)
-		return (HTEXTURE) targ->pTex;
-	else
-		return nullptr;
+	return target ? target.get()->pTex : nullptr;
 }
 
 HTEXTURE HGE_CALL HGE_Impl::Texture_Create(int width, int height)
@@ -431,26 +417,28 @@ HTEXTURE HGE_CALL HGE_Impl::Texture_Create(int width, int height)
 
 HTEXTURE HGE_CALL HGE_Impl::Texture_Load(const char *filename, uint32_t size, bool bMipmap)
 {
-	void *data;
+	HTEXTURE result;
 	uint32_t _size;
 	D3DFORMAT fmt1, fmt2;
 	hgeGAPITexture * pTex;
 	D3DXIMAGE_INFO info;
-	CTextureList *texItem;
+
+	void * pixels = nullptr;
+	bytes_t loaded_from_resource;
 
 	if (size)
 	{
-		data = (void *) filename;
+		pixels = (void *)filename;
 		_size = size;
 	}
 	else
 	{
-		data = g_hge_singleton->Resource_Load(filename, &_size);
-		if (!data)
-			return nullptr;
+		loaded_from_resource = g_hge_singleton->Resource_Load(filename, &_size);
+		if (! loaded_from_resource) return HTEXTURE();
+		pixels = loaded_from_resource.get();
 	}
 
-	if (*(uint32_t*) data == 0x20534444) // Compressed DDS format magic number
+	if (*(uint32_t*) pixels == 0x20534444) // Compressed DDS format magic number
 	{
 		fmt1 = D3DFMT_UNKNOWN;
 		fmt2 = D3DFMT_A8R8G8B8;
@@ -462,7 +450,7 @@ HTEXTURE HGE_CALL HGE_Impl::Texture_Load(const char *filename, uint32_t size, bo
 	}
 
 	//  if( FAILED( D3DXCreateTextureFromFileInMemory( pD3DDevice, data, _size, &pTex ) ) ) pTex=NULL;
-	if (FAILED( D3DXCreateTextureFromFileInMemoryEx( m_d3d_device, data, _size,
+	if (FAILED( D3DXCreateTextureFromFileInMemoryEx( m_d3d_device, pixels, _size,
 					D3DX_DEFAULT, D3DX_DEFAULT,
 					bMipmap ? 0:1, // Mip levels
 					0, // Usage
@@ -473,8 +461,8 @@ HTEXTURE HGE_CALL HGE_Impl::Texture_Load(const char *filename, uint32_t size, bo
 					0, // Color key
 					&info, NULL,
 					&pTex ) ))
-
-		if (FAILED( D3DXCreateTextureFromFileInMemoryEx( m_d3d_device, data, _size,
+	{
+		if (FAILED( D3DXCreateTextureFromFileInMemoryEx( m_d3d_device, pixels, _size,
 						D3DX_DEFAULT, D3DX_DEFAULT,
 						bMipmap ? 0:1, // Mip levels
 						0, // Usage
@@ -488,66 +476,72 @@ HTEXTURE HGE_CALL HGE_Impl::Texture_Load(const char *filename, uint32_t size, bo
 
 		{
 			_PostError("Can't create texture");
-			if (!size)
-				Resource_Free(data);
+// 			if (!size)
+// 				Resource_Free(result);
 			return nullptr;
 		}
+	}
 
-	if (!size)
-		Resource_Free(data);
+// 	if (!size) 
+// 		Resource_Free(result);
 
-	texItem = new CTextureList;
-	texItem->tex = (HTEXTURE) pTex;
-	texItem->width = info.Width;
-	texItem->height = info.Height;
-	texItem->next = m_textures_list;
-	m_textures_list = texItem;
+	texture_cache_item_t tex_item;
+	//tex_item.tex = HTEXTURE(pTex);
+	result = HTEXTURE(pTex);
+	tex_item.width = info.Width;
+	tex_item.height = info.Height;
+	//tex_item.next = m_textures_list;
+	m_textures_map[result] = tex_item;
 
-	return HTEXTURE(pTex);
+	return result;
 }
 
-void HGE_CALL HGE_Impl::Texture_Free(HTEXTURE tex)
+void HGE_CALL HGE_Impl::Texture_Free( HTEXTURE tex )
 {
-	hgeGAPITexture * pTex = (hgeGAPITexture *) tex.ptr;
-	CTextureList *texItem = m_textures_list, *texPrev = nullptr;
+	//hgeGAPITexture * texture_ptr = (hgeGAPITexture *) tex.ptr;
+	//texture_cache_item_t *texItem = m_textures_map, *texPrev = nullptr;
 
-	while (texItem)
-	{
-		if (texItem->tex == tex)
-		{
-			if (texPrev)
-				texPrev->next = texItem->next;
-			else
-				m_textures_list = texItem->next;
-			delete texItem;
-			break;
-		}
-		texPrev = texItem;
-		texItem = texItem->next;
-	}
-	if (pTex != nullptr)
-		pTex->Release();
+// 	while (texItem)
+// 	{
+// 		if (texItem->tex == tex)
+// 		{
+// 			if (texPrev)
+// 				texPrev->next = texItem->next;
+// 			else
+// 				m_textures_map = texItem->next;
+// 			delete texItem;
+// 			break;
+// 		}
+// 		texPrev = texItem;
+// 		texItem = texItem->next;
+// 	}
+	if (tex) tex.get()->Release();
+	m_textures_map.erase( tex );
 }
 
 int HGE_CALL HGE_Impl::Texture_GetWidth(HTEXTURE tex, bool bOriginal)
 {
 	D3DSURFACE_DESC TDesc;
-	hgeGAPITexture * pTex = (hgeGAPITexture *) tex.ptr;
-	CTextureList *texItem = m_textures_list;
+	//hgeGAPITexture * pTex = (hgeGAPITexture *) tex.ptr;
+	//texture_cache_item_t *texItem = m_textures_map;
 
 	if (bOriginal)
 	{
-		while (texItem)
-		{
-			if (texItem->tex == tex)
-				return texItem->width;
-			texItem = texItem->next;
+		auto itr = m_textures_map.find( tex );
+		if( itr != m_textures_map.end() ) {
+			return itr->second.width;
 		}
+// 		while (texItem)
+// 		{
+// 			if (texItem->tex == tex)
+// 				return texItem->width;
+// 			texItem = texItem->next;
+// 		}
 		return 0;
 	}
 	else
 	{
-		if (FAILED(pTex->GetLevelDesc(0, &TDesc)))
+		if (FAILED(tex.get()->GetLevelDesc(0, &TDesc)))
 			return 0;
 		else
 			return TDesc.Width;
@@ -557,22 +551,26 @@ int HGE_CALL HGE_Impl::Texture_GetWidth(HTEXTURE tex, bool bOriginal)
 int HGE_CALL HGE_Impl::Texture_GetHeight(HTEXTURE tex, bool bOriginal)
 {
 	D3DSURFACE_DESC TDesc;
-	hgeGAPITexture * pTex = (hgeGAPITexture *) tex.ptr;
-	CTextureList *texItem = m_textures_list;
+	//hgeGAPITexture * pTex = (hgeGAPITexture *) tex.ptr;
+	//texture_cache_item_t *texItem = m_textures_map;
 
 	if (bOriginal)
 	{
-		while (texItem)
-		{
-			if (texItem->tex == tex)
-				return texItem->height;
-			texItem = texItem->next;
+// 		while (texItem)
+// 		{
+// 			if (texItem->tex == tex)
+// 				return texItem->height;
+// 			texItem = texItem->next;
+// 		}
+		auto itr = m_textures_map.find( tex );
+		if( itr != m_textures_map.end() ) {
+			return itr->second.height;
 		}
 		return 0;
 	}
 	else
 	{
-		if (FAILED(pTex->GetLevelDesc(0, &TDesc)))
+		if (FAILED(tex.get()->GetLevelDesc(0, &TDesc)))
 			return 0;
 		else
 			return TDesc.Height;
@@ -582,13 +580,13 @@ int HGE_CALL HGE_Impl::Texture_GetHeight(HTEXTURE tex, bool bOriginal)
 uint32_t * HGE_CALL HGE_Impl::Texture_Lock(HTEXTURE tex, bool bReadOnly, int left, int top,
 		int width, int height)
 {
-	hgeGAPITexture * pTex = (hgeGAPITexture *) tex.ptr;
+	//hgeGAPITexture * pTex = (hgeGAPITexture *) tex.ptr;
 	D3DSURFACE_DESC TDesc;
 	D3DLOCKED_RECT TRect;
 	RECT region, *prec;
 	int flags;
 
-	pTex->GetLevelDesc(0, &TDesc);
+	tex.get()->GetLevelDesc(0, &TDesc);
 	if (TDesc.Format != D3DFMT_A8R8G8B8 && TDesc.Format != D3DFMT_X8R8G8B8)
 		return 0;
 
@@ -608,7 +606,7 @@ uint32_t * HGE_CALL HGE_Impl::Texture_Lock(HTEXTURE tex, bool bReadOnly, int lef
 	else
 		flags = 0;
 
-	if (FAILED(pTex->LockRect(0, &TRect, prec, flags)))
+	if (FAILED(tex.get()->LockRect(0, &TRect, prec, flags)))
 	{
 		_PostError("Can't lock texture");
 		return 0;
@@ -619,8 +617,8 @@ uint32_t * HGE_CALL HGE_Impl::Texture_Lock(HTEXTURE tex, bool bReadOnly, int lef
 
 void HGE_CALL HGE_Impl::Texture_Unlock(HTEXTURE tex)
 {
-	hgeGAPITexture * pTex = (hgeGAPITexture *) tex.ptr;
-	pTex->UnlockRect(0);
+	//hgeGAPITexture * pTex = (hgeGAPITexture *) tex.ptr;
+	tex.get()->UnlockRect(0);
 }
 
 //////// Implementation ////////
@@ -891,7 +889,7 @@ bool HGE_Impl::_GfxInit()
 	// Create vertex batch buffer
 
 	m_vertices = 0;
-	m_textures_list = 0;
+	//m_textures_map = 0;
 
 	// Init all stuff that can be lost
 
@@ -977,33 +975,35 @@ void HGE_Impl::_Resize(int width, int height)
 
 void HGE_Impl::_GfxDone()
 {
-	CRenderTargetList *target = m_targets_list, *next_target;
+	//render_target_t *target = m_targets_list, *next_target;
 
-	while (m_textures_list)
-		Texture_Free(m_textures_list->tex);
+	//while (m_textures_map)
+	//	Texture_Free(m_textures_map->tex);
+	while( m_textures_map.empty() == false ) {
+		Texture_Free( m_textures_map.begin()->first );
+	}
 
 	if (m_screen_sfc)
 	{
 		m_screen_sfc->Release();
-		m_screen_sfc = 0;
+		m_screen_sfc = nullptr;
 	}
 	if (m_depth_sfc)
 	{
 		m_depth_sfc->Release();
-		m_depth_sfc = 0;
+		m_depth_sfc = nullptr;
 	}
 
-	while (target)
+	while( ! m_targets_list.empty() ) 
 	{
+		render_target_t * target = m_targets_list.front();
 		if (target->pTex)
 			target->pTex->Release();
 		if (target->pDepth)
 			target->pDepth->Release();
-		next_target = target->next;
 		delete target;
-		target = next_target;
+		m_targets_list.pop_front();
 	}
-	m_targets_list = 0;
 
 	if (m_index_buf)
 	{
@@ -1046,7 +1046,7 @@ void HGE_Impl::_GfxDone()
 
 bool HGE_Impl::_GfxRestore()
 {
-	CRenderTargetList *target = m_targets_list;
+	//render_target_t *target = m_targets_list;
 
 	//if(!pD3DDevice) return false;
 	//if(pD3DDevice->TestCooperativeLevel() == D3DERR_DEVICELOST) return;
@@ -1056,13 +1056,15 @@ bool HGE_Impl::_GfxRestore()
 	if (m_depth_sfc)
 		m_depth_sfc->Release();
 
-	while (target)
+	//while (target)
+	for( auto itr = m_targets_list.begin(); itr != m_targets_list.end(); ++itr )
 	{
+		render_target_t *target = *itr;
 		if (target->pTex)
 			target->pTex->Release();
 		if (target->pDepth)
 			target->pDepth->Release();
-		target = target->next;
+		//target = target->next;
 	}
 
 	if (m_index_buf)
@@ -1099,7 +1101,7 @@ bool HGE_Impl::_GfxRestore()
 
 bool HGE_Impl::_init_lost()
 {
-	CRenderTargetList *target = m_targets_list;
+	//render_target_t *target = m_targets_list;
 
 	// Store render target
 
@@ -1114,8 +1116,10 @@ bool HGE_Impl::_init_lost()
 #endif
 	m_d3d_device->GetDepthStencilSurface(&m_depth_sfc);
 
-	while (target)
+	//while (target)
+	for( auto itr = m_targets_list.begin(); itr != m_targets_list.end(); ++itr )
 	{
+		render_target_t * target = *itr;
 		if (target->pTex)
 			D3DXCreateTexture(m_d3d_device, target->width, target->height, 1,
 					D3DUSAGE_RENDERTARGET, m_d3dpp->BackBufferFormat, D3DPOOL_DEFAULT,
@@ -1129,7 +1133,7 @@ bool HGE_Impl::_init_lost()
 			m_d3d_device->CreateDepthStencilSurface(target->width, target->height,
 					D3DFMT_D16, D3DMULTISAMPLE_NONE, 0, false, &target->pDepth, NULL);
 #endif
-			target = target->next;
+			//target = target->next;
 	}
 
 	// Create Vertex buffer
@@ -1280,7 +1284,7 @@ bool HGE_Impl::_init_lost()
 HSHADER HGE_CALL HGE_Impl::Shader_Create(const char *filename)
 {
 	LPD3DXBUFFER code = NULL;
-	LPDIRECT3DPIXELSHADER9 pixelShader = NULL;
+	hgeGAPIPixelShader * pixelShader = NULL;
 	HRESULT result = D3DXCompileShaderFromFile( filename, //filepath
 			NULL, //macro's
 			NULL, //includes
@@ -1309,7 +1313,7 @@ void HGE_CALL HGE_Impl::Gfx_SetShader(HSHADER shader)
 	{
 		_render_batch();
 		m_cur_shader = shader;
-		m_d3d_device->SetPixelShader((LPDIRECT3DPIXELSHADER9)shader.ptr);
+		m_d3d_device->SetPixelShader(shader.get());
 	}
 }
 #endif
@@ -1317,7 +1321,8 @@ void HGE_CALL HGE_Impl::Gfx_SetShader(HSHADER shader)
 #if HGE_DIRECTX_VER >= 9
 void HGE_CALL HGE_Impl::Shader_Free(HSHADER shader)
 {
-	((LPDIRECT3DPIXELSHADER9)shader.ptr)->Release();
+	_ASSERTE( shader );
+	shader.get()->Release();
 }
 #endif
 

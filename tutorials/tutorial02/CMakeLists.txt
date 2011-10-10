@@ -13,11 +13,19 @@ include_directories( ${DIRECTX_SDK_DIR}/include )
 
 #------ link directories listed ------
 link_directories( ${HGEPP_SOURCE_DIR}/linklib )
-link_directories( ${DIRECTX_SDK_DIR}/lib ${DIRECTX_SDK_DIR}/lib/x64 ${DIRECTX_SDK_DIR}/lib/x86 )
-link_libraries( hgepp )
+link_directories( ${DIRECTX_SDK_DIR}/lib ${DIRECTX_SDK_DIR}/lib/x86 )
+if( ${HGE_DIRECTX_VER} MATCHES "8" )
+    link_libraries( d3d8 d3dx8 )
+endif()
+if( ${HGE_DIRECTX_VER} MATCHES "9" )
+    link_libraries( d3d9 d3dx9 )
+endif()
+link_libraries( winmm )
+link_libraries( hgepp-static zlib )
 
 #------ target -----
 add_executable( hge_tut02 WIN32 ${TUT02_SRC} )
+add_dependencies( hge_tut02 hgepp-static zlib )
 
 if( MSVC )
     SET_TARGET_PROPERTIES( hge_tut02 PROPERTIES LINK_FLAGS "/NODEFAULTLIB:libci" )

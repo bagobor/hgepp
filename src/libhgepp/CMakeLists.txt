@@ -82,12 +82,12 @@ link_libraries( zlib )
 ## endif (MSVC)
 
 #------ target (for creating HGE.DLL) -----
-add_library( hgepp SHARED ${LIBHGE_SRC} )
-add_dependencies( hgepp hgezlib )
+# add_library( hgepp SHARED ${LIBHGE_SRC} )
+# add_dependencies( hgepp hgezlib )
 
-if( MSVC )
-    SET_TARGET_PROPERTIES( hgepp PROPERTIES LINK_FLAGS "/NODEFAULTLIB:libci" )
-endif()
+# if( MSVC )
+#     SET_TARGET_PROPERTIES( hgepp PROPERTIES LINK_FLAGS "/NODEFAULTLIB:libci" )
+# endif()
 
 #------ target (for creating static HGE.LIB) -----
 add_library( hgepp-static STATIC ${LIBHGE_SRC} )

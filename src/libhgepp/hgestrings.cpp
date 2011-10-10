@@ -14,10 +14,9 @@ const char STRFORMATERROR[] = "String table %s has incorrect format.";
 
 HGE * g_hgestringtab_hge = 0;
 
-hgeStringTable::hgeStringTable(const char *filename)
+hgeStringTable::hgeStringTable(const std::string & filename)
 {
 	int i;
-	void *data;
 	uint32_t size;
 	char *desc, *pdesc;
 	NamedString *str;
@@ -28,19 +27,19 @@ hgeStringTable::hgeStringTable(const char *filename)
 	strings = 0;
 
 	// load string table file
-	data = g_hgestringtab_hge->Resource_Load(filename, &size);
+	bytes_t data = g_hgestringtab_hge->Resource_Load(filename.c_str(), &size);
 	if (!data)
 		return;
 
 	desc = new char[size + 1];
-	memcpy(desc, data, size);
+	memcpy(desc, data.get(), size);
 	desc[size] = 0;
-	g_hgestringtab_hge->Resource_Free(data);
+	//g_hgestringtab_hge->Resource_Free(data);
 
 	// check header
 	if (memcmp(desc, STRHEADERTAG, sizeof(STRHEADERTAG) - 1))
 	{
-		g_hgestringtab_hge->System_Log(STRFORMATERROR, filename);
+		g_hgestringtab_hge->System_Log(STRFORMATERROR, filename.c_str());
 		delete[] desc;
 		return;
 	}

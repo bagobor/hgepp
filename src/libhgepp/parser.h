@@ -7,6 +7,7 @@
 #include <hge.h>
 
 #include <string.h>
+#include <string>
 #include <stdlib.h>
 
 namespace hge
@@ -42,30 +43,30 @@ enum
 class RScriptParser
 {
 public:
-	RScriptParser(char *name, char *scr);
+	RScriptParser(const char *name, const char *scr);
 	~RScriptParser();
 
 	int get_token();
 	void put_back();
 	int get_line();
-	char* get_name();
+	const std::string & get_name();
 
-	char* tkn_string();
-	int tkn_int();
-	float tkn_float();
-	bool tkn_bool();
-	uint32_t tkn_hex();
+	char * token_as_cstring();
+	int token_as_int();
+	float token_as_float();
+	bool token_as_bool();
+	uint32_t token_as_hex();
 
 	void ScriptPostError(char *msg1, char *msg2);
 
 	int tokentype;
 	char tokenvalue[128];
-	char* script;
-	char* scriptname;
+	const char * script;
+	std::string scriptname;
 	int line;
 
 private:
-	bool strtkcmp(char *str, char *mem);
+	bool strtkcmp(const char *str, const char *mem);
 
 	//static HGE *g_scriptparser_hge;
 };

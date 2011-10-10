@@ -98,7 +98,7 @@ bool RenderFunc()
 
 	if(state.bHelp)
 	{
-		fnt->SetColor(0xFFFFFFFF);
+		fnt->SetColor(hge::COLOR_WHITE);
 		fnt->Render(189, 18, HGETEXT_LEFT, "Left mouse button - fire particle system\n"
 			"Right mouse button - move the system with mouse\n\n"
 			"Keys 1 to 9 - select preset\nPresets are saved and loaded automatically\n\n"
@@ -151,8 +151,8 @@ void InitEditor()
 	char *bgName;
 	int bgw, bgh;
 
-	state.texBG = nullptr;
-	state.sprBG = 0;
+	state.texBG.reset();
+	state.sprBG = nullptr;
 
 	bgName = g_hge->Ini_GetString("HGE", "Background", 0);
 	if(bgName)

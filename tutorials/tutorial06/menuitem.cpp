@@ -135,13 +135,13 @@ void hgeGUIMenuItem::Focus(bool bFocused)
 	{
 		get_hge()->Effect_Play(snd);
 		scolor.SetHWColor(0xFFFFE060);
-		tcolor.SetHWColor(0xFFFFFFFF);
+		tcolor.SetHWColor(hge::COLOR_WHITE);
 		soffset=0;
 		doffset=4;
 	}
 	else
 	{
-		scolor.SetHWColor(0xFFFFFFFF);
+		scolor.SetHWColor(hge::COLOR_WHITE);
 		tcolor.SetHWColor(0xFFFFE060);
 		soffset=4;
 		doffset=-4;

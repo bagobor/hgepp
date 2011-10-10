@@ -19,7 +19,7 @@ hgeDistortionMesh::hgeDistortionMesh(int cols, int rows)
 	m_row_count = rows;
 	m_col_count = cols;
 	m_cell_width = m_cell_height = 0;
-	m_quad.tex = nullptr;
+	m_quad.tex.reset();
 	m_quad.blend = BLEND_COLORMUL | BLEND_ALPHABLEND | BLEND_ZWRITE;
 	m_disp_array = new hgeVertex[rows * cols];
 
@@ -31,7 +31,7 @@ hgeDistortionMesh::hgeDistortionMesh(int cols, int rows)
 		m_disp_array[i].ty = 0.0f;
 
 		m_disp_array[i].z = 0.5f;
-		m_disp_array[i].col = 0xFFFFFFFF;
+		m_disp_array[i].col = hge::COLOR_WHITE;
 	}
 }
 
@@ -283,6 +283,11 @@ int hgeDistortionMesh::GetRows()
 int hgeDistortionMesh::GetCols()
 {
 	return m_col_count;
+}
+
+HTEXTURE hgeDistortionMesh::GetTexture() const
+{
+	return m_quad.tex;
 }
 
 } // namespace hge

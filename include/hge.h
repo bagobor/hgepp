@@ -3,9 +3,12 @@
  */
 #pragma once
 
+#include <hge_gapi.h>
 
 #include <windows.h>
 #include <stdint.h>
+
+#include <memory>
 
 #define HGE_VERSION 0x180
 
@@ -49,37 +52,72 @@
 namespace hge {
 
 /*
-** HGE Handle types
-*/
-struct HGE_EXPORT handle_t
+ * HGE Handle type
+ * handle_type_t is the contained value type (uint32_t or a pointer to resource)
+ * flavour_t is some empty/dummy struct type to make handle types different by C++ type
+ */
+template <typename handle_type_t, class flavour_t>
+class HGE_EXPORT handle_t
 {
-	union {
-		void * ptr;
-		uint32_t u32;
-	};
-	handle_t(): ptr(nullptr) {}
-	handle_t( void * x ): ptr(x) {}
-	handle_t( uint32_t x ): u32(x) {}
+private:
+	handle_type_t	m_value;
 
-	inline operator bool() const {
-		return ptr != nullptr;
+public:
+	handle_t(): m_value(handle_type_t())
+	{
+	}
+	handle_t( handle_type_t v ): m_value(v)
+	{
+	}
+// 	static handle_t create( handle_type_t x ) {
+// 		return handle_t( x );
+// 	}
+
+	inline void reset()
+	{
+		m_value = handle_type_t();
 	}
 
-	inline bool operator == (const handle_t & other) const {
-		return ptr == other.ptr;
+	inline operator bool() const
+	{
+		return m_value != handle_type_t();
+	}
+
+	inline bool operator == (const handle_t <handle_type_t, flavour_t> & other) const
+	{
+		return m_value == other.m_value;
+	}
+	
+	inline bool operator < (const handle_t <handle_type_t, flavour_t> & other) const
+	{
+		return m_value < other.m_value;
+	}
+
+	inline handle_type_t get() const
+	{
+		return m_value;
 	}
 };
 
-typedef handle_t HTEXTURE;
-typedef handle_t HTARGET;
-typedef handle_t HEFFECT;
-typedef handle_t HMUSIC;
-typedef handle_t HSTREAM;
-typedef handle_t HCHANNEL;
+#define DECLARE_HGE_HANDLE(Type, FlavName, HandleTypeName) \
+	typedef struct { int _dummy; } FlavName##_flavour_t; \
+	typedef handle_t <Type, FlavName##_flavour_t> HandleTypeName;
+
+class render_target_t;
+
+DECLARE_HGE_HANDLE( hgeGAPITexture *, texture, HTEXTURE );
+DECLARE_HGE_HANDLE( render_target_t *, rendertarget, HTARGET );
+DECLARE_HGE_HANDLE( uint32_t, bass_effect, HEFFECT );
+DECLARE_HGE_HANDLE( uint32_t, bass_music, HMUSIC );
+DECLARE_HGE_HANDLE( uint32_t, bass_stream, HSTREAM );
+DECLARE_HGE_HANDLE( uint32_t, bass_channel, HCHANNEL );
+
 #if HGE_DIRECTX_VER >= 9
-	typedef handle_t HSHADER;
+	DECLARE_HGE_HANDLE( hgeGAPIPixelShader *, shader, HSHADER );
 #endif
 
+//! smart type representing a byte array, auto-deletes when no longer used
+typedef std::shared_ptr <char> bytes_t;
 
 /*
 ** Hardware color macros
@@ -87,6 +125,9 @@ typedef handle_t HCHANNEL;
 inline uint32_t ARGB( uint8_t a, uint8_t r, uint8_t g, uint8_t b) {
 	return ((uint32_t(a)<<24) + (uint32_t(r)<<16) + (uint32_t(g)<<8) + uint32_t(b));
 }
+static const uint32_t COLOR_WHITE = 0xFFFFFFFF;
+static const uint32_t COLOR_BLACK = 0xFF000000;
+
 inline uint8_t GETA( uint32_t col ) {
 	return ((col)>>24);
 }
@@ -377,8 +418,12 @@ public:
 		return System_GetStateString(state);
 	}
     
-    virtual void* HGE_CALL Resource_Load(const char *filename, uint32_t *size = 0) = 0;
-	virtual void HGE_CALL Resource_Free(void *res) = 0;
+	//
+	// RESOURCE management functions
+	//
+    virtual bytes_t HGE_CALL Resource_Load(const char *filename, uint32_t *size = 0) = 0;	
+	//virtual void HGE_CALL Resource_Free( bytes_t res) = 0;
+
 	virtual bool HGE_CALL Resource_AttachPack(const char *filename, const char *password = 0) = 0;
 	virtual void HGE_CALL Resource_RemovePack(const char *filename) = 0;
 	virtual void HGE_CALL Resource_RemoveAllPacks() = 0;
@@ -453,10 +498,14 @@ public:
 	virtual int HGE_CALL Input_GetChar() = 0;
 	virtual bool HGE_CALL Input_GetEvent(hgeInputEvent *event) = 0;
 
-    virtual bool HGE_CALL Gfx_BeginScene(HTARGET target = nullptr) = 0;
+    virtual bool HGE_CALL Gfx_BeginScene(HTARGET target) = 0;
+	inline bool HGE_CALL Gfx_BeginScene()
+	{
+		return Gfx_BeginScene( HTARGET() );
+	}
 	virtual void HGE_CALL Gfx_EndScene() = 0;
 	virtual void HGE_CALL Gfx_Clear(uint32_t color) = 0;
-	virtual void HGE_CALL Gfx_RenderLine(float x1, float y1, float x2, float y2, uint32_t color = 0xFFFFFFFF,
+	virtual void HGE_CALL Gfx_RenderLine(float x1, float y1, float x2, float y2, uint32_t color = hge::COLOR_WHITE,
 			float z = 0.5f) = 0;
 	virtual void HGE_CALL Gfx_RenderTriple(const hgeTriple *triple) = 0;
 	virtual void HGE_CALL Gfx_RenderQuad(const hgeQuad *quad) = 0;

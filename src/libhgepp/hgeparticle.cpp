@@ -12,15 +12,15 @@ HGE * g_hgeparticlesys_hge = 0;
 
 hgeParticleSystem::hgeParticleSystem(const char *filename, hgeSprite *sprite)
 {
-	void *psi;
+	hge::bytes_t psi;
 
 	g_hgeparticlesys_hge = hgeCreate(HGE_VERSION);
 
 	psi = g_hgeparticlesys_hge->Resource_Load(filename);
 	if (!psi)
 		return;
-	memcpy(&info, psi, sizeof(hgeParticleSystemInfo));
-	g_hgeparticlesys_hge->Resource_Free(psi);
+	memcpy(&info, psi.get(), sizeof(hgeParticleSystemInfo));
+	//g_hgeparticlesys_hge->Resource_Free(psi);
 	info.sprite = sprite;
 
 	m_location.x = m_prev_location.x = 0.0f;
