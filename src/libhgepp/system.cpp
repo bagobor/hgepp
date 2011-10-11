@@ -823,8 +823,9 @@ HGE_Impl::HGE_Impl()
 	m_hsearch = nullptr;
 	//m_resources = nullptr;
 
-	m_input_queue = nullptr;
-	m_char = m_vkey = m_zpos = 0;
+	//m_input_queue = nullptr;
+	m_char = m_zpos = 0;
+	m_vkey = HGEK_NO_KEY;
 	m_xpos = m_ypos = 0.0f;
 	m_mouse_over = false;
 	m_captured = false;
@@ -876,7 +877,7 @@ HGE_Impl::HGE_Impl()
 	m_app_path[i + 1] = 0;
 }
 
-void HGE_Impl::_PostError(char *error)
+void HGE_Impl::_PostError(const char *error)
 {
 	System_Log(error);
 	strcpy(m_error, error);
@@ -953,23 +954,23 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 		}
 		else
 		{
-			g_hge_singleton->_BuildEvent(INPUT_KEYDOWN, wparam, HIWORD(lparam) & 0xFF, (lparam
-					& 0x40000000) ? event_flags_t(true) : event_flags_t(), -1, -1);
+			g_hge_singleton->_BuildEvent(INPUT_KEYDOWN, (key_code_t)wparam,
+					HIWORD(lparam) & 0xFF, (lparam & 0x40000000) ? event_flags_t(true) : event_flags_t(), -1, -1);
 			return false;
 		}
 
 	case WM_KEYDOWN:
-		g_hge_singleton->_BuildEvent(INPUT_KEYDOWN, wparam, HIWORD(lparam) & 0xFF, (lparam
-				& 0x40000000) ? event_flags_t(true) : event_flags_t(), -1, -1);
+		g_hge_singleton->_BuildEvent(INPUT_KEYDOWN, (key_code_t)wparam, HIWORD(lparam) & 0xFF,
+				(lparam & 0x40000000) ? event_flags_t(true) : event_flags_t(), -1, -1);
 		return false;
 
 	case WM_SYSKEYUP:
-		g_hge_singleton->_BuildEvent(INPUT_KEYUP, wparam, HIWORD(lparam) & 0xFF, event_flags_t(),
+		g_hge_singleton->_BuildEvent(INPUT_KEYUP, (key_code_t)wparam, HIWORD(lparam) & 0xFF, event_flags_t(),
 				-1, -1);
 		return false;
 
 	case WM_KEYUP:
-		g_hge_singleton->_BuildEvent(INPUT_KEYUP, wparam, HIWORD(lparam) & 0xFF, event_flags_t(),
+		g_hge_singleton->_BuildEvent(INPUT_KEYUP, (key_code_t)wparam, HIWORD(lparam) & 0xFF, event_flags_t(),
 				-1, -1);
 		return false;
 
@@ -1016,11 +1017,11 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 		return false;
 
 	case WM_MOUSEMOVE:
-		g_hge_singleton->_BuildEvent(INPUT_MOUSEMOVE, 0, 0, 0, LOWORDINT(lparam), HIWORDINT(lparam));
+		g_hge_singleton->_BuildEvent(INPUT_MOUSEMOVE, HGEK_NO_KEY, 0, 0, LOWORDINT(lparam), HIWORDINT(lparam));
 		return false;
 	case 0x020A: // WM_MOUSEWHEEL, GET_WHEEL_DELTA_WPARAM(wparam);
-		g_hge_singleton->_BuildEvent(INPUT_MOUSEWHEEL, short(HIWORD(wparam)) / 120, 0, 0,
-				LOWORDINT(lparam), HIWORDINT(lparam));
+		g_hge_singleton->_BuildEvent(INPUT_MOUSEWHEEL, (key_code_t)(short(HIWORD(wparam)) / 120),
+			0, 0, LOWORDINT(lparam), HIWORDINT(lparam));
 		return false;
 
 	case WM_SIZE:

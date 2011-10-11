@@ -1283,19 +1283,26 @@ bool HGE_Impl::_init_lost()
 HSHADER HGE_CALL HGE_Impl::Shader_Create(const char *filename)
 {
 	LPD3DXBUFFER code = NULL;
+	LPD3DXBUFFER error_msg = NULL;
 	hgeGAPIPixelShader * pixelShader = NULL;
-	HRESULT result = D3DXCompileShaderFromFile( filename, //filepath
-			NULL, //macro's
-			NULL, //includes
-			"ps_main", //main function
-			"ps_2_0", //shader profile
-			0, //flags
-			&code, //compiled operations
-			NULL, //errors
-			NULL); //constants
+	HRESULT result = D3DXCompileShaderFromFile( filename,
+			NULL,		//macro's
+			NULL,		//includes
+			"ps_main",	//main function
+			"ps_2_0",	//shader profile
+			0,			//flags
+			& code,		//compiled operations
+			& error_msg,//errors
+			NULL);		//constants
 	if(FAILED(result))
 	{
-		_PostError("Can't create shader");
+		std::string err = "Can't create shader; file=";
+		err += filename;
+		if( error_msg ) {
+			err += "; err=";
+			err += std::string( (const char*)error_msg->GetBufferPointer(), error_msg->GetBufferSize() );
+		}
+		_PostError(err.c_str());
 		return nullptr;
 	}
 

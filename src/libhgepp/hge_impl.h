@@ -66,11 +66,11 @@ struct CStreamList
 	CStreamList * next;
 };
 
-struct CInputEventList
-{
-	hgeInputEvent event;
-	CInputEventList* next;
-};
+// struct CInputEventList
+// {
+// 	hgeInputEvent event;
+// 	CInputEventList* next;
+// };
 
 void splash_screen_init();
 void splash_screen_done();
@@ -175,13 +175,13 @@ public:
 	virtual void HGE_CALL Input_SetMousePos(float x, float y);
 	virtual int HGE_CALL Input_GetMouseWheel();
 	virtual bool HGE_CALL Input_IsMouseOver();
-	virtual bool HGE_CALL Input_KeyDown(int key);
-	virtual bool HGE_CALL Input_KeyUp(int key);
-	virtual bool HGE_CALL Input_GetKeyState(int key);
-	virtual char* HGE_CALL Input_GetKeyName(int key);
-	virtual int HGE_CALL Input_GetKey();
+	virtual bool HGE_CALL Input_KeyDown(key_code_t key);
+	virtual bool HGE_CALL Input_KeyUp(key_code_t key);
+	virtual bool HGE_CALL Input_GetKeyState(key_code_t key);
+	virtual char* HGE_CALL Input_GetKeyName(key_code_t key);
+	virtual key_code_t HGE_CALL Input_GetKey();
 	virtual int HGE_CALL Input_GetChar();
-	virtual bool HGE_CALL Input_GetEvent(hgeInputEvent *event);
+	virtual bool HGE_CALL Input_GetEvent(input_event_t *event);
 
 	virtual bool HGE_CALL Gfx_BeginScene(HTARGET target);
 	virtual void HGE_CALL Gfx_EndScene();
@@ -221,14 +221,17 @@ public:
 
     static HGE_Impl* _Interface_Get();
 	void _FocusChange(bool bAct);
-	void _PostError(char *error);
+	void _PostError(const char *error);
 
 	HINSTANCE m_hinstance;
 	HWND m_hwnd;
 
 	bool m_active;
+	// TODO: string this
 	char m_error[256];
+	// TODO: string this
 	char m_app_path[_MAX_PATH];
+	// TODO: string this
 	char m_ini_string[256];
 
 	// System States
@@ -333,7 +336,7 @@ public:
 	void _SetFXVolume(int vol);
 
 	// Input
-	int m_vkey;
+	key_code_t m_vkey;
 	int m_char;
 	int m_zpos;
 	float m_xpos;
@@ -341,12 +344,13 @@ public:
 	bool m_mouse_over;
 	bool m_captured;
 	char m_key_states[256];
-	CInputEventList* m_input_queue;
+	//CInputEventList* m_input_queue;
+	std::list <input_event_t> m_input_queue;
 
 	void _UpdateMouse();
 	void _InputInit();
 	void _ClearQueue();
-	void _BuildEvent(event_type_t type, int key, int scan, event_flags_t flags, int x, int y);
+	void _BuildEvent(event_type_t type, key_code_t key, int scan, event_flags_t flags, int x, int y);
 
 	// Resources
 	char m_tmp_filename[_MAX_PATH];
