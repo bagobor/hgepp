@@ -25,7 +25,7 @@ HEFFECT HGE_CALL HGE_Impl::Effect_Load(const char *filename, uint32_t size)
 	if (m_bassdll)
 	{
 		if (m_no_sound)
-			return 1;
+			return HEFFECT(1);
 
 		if (size)
 		{
@@ -43,7 +43,7 @@ HEFFECT HGE_CALL HGE_Impl::Effect_Load(const char *filename, uint32_t size)
 		hs = BASS_SampleLoad(TRUE, data, 0, _size, 4, BASS_SAMPLE_OVER_VOL);
 		if (!hs)
 		{
-			hstrm = BASS_StreamCreateFile(TRUE, data, 0, _size, BASS_STREAM_DECODE);
+			hstrm = HSTREAM(BASS_StreamCreateFile(TRUE, data, 0, _size, BASS_STREAM_DECODE));
 			if (hstrm)
 			{
 				length = (uint32_t) BASS_ChannelGetLength(hstrm);
@@ -73,7 +73,7 @@ HEFFECT HGE_CALL HGE_Impl::Effect_Load(const char *filename, uint32_t size)
 
 // 		if (!size)
 // 			Resource_Free(data);
-		return hs;
+		return HEFFECT(hs);
 	}
 	else
 		return HEFFECT();
@@ -83,8 +83,7 @@ HCHANNEL HGE_CALL HGE_Impl::Effect_Play(HEFFECT eff)
 {
 	if (m_bassdll)
 	{
-		HCHANNEL chn;
-		chn = BASS_SampleGetChannel(eff, false);
+		HCHANNEL chn(BASS_SampleGetChannel(eff, false));
 		BASS_ChannelPlay(chn, TRUE);
 		return chn;
 	}
@@ -97,10 +96,9 @@ HCHANNEL HGE_CALL HGE_Impl::Effect_PlayEx(HEFFECT eff, int volume, int pan, floa
 	if (m_bassdll)
 	{
 		BASS_SAMPLE info;
-		HCHANNEL chn;
 		BASS_SampleGetInfo(eff, &info);
 
-		chn = BASS_SampleGetChannel(eff, false);
+		HCHANNEL chn(BASS_SampleGetChannel(eff, false));
 		BASS_ChannelSetAttributes(chn, (int) (pitch * info.freq), volume, pan);
 
 		info.flags &= ~BASS_SAMPLE_LOOP;
@@ -125,8 +123,6 @@ HMUSIC HGE_CALL HGE_Impl::Music_Load(const char *filename, uint32_t size)
 	void * data;
 	bytes_t loaded_from_resource;
 	uint32_t _size;
-	HMUSIC hm;
-
 	if (m_bassdll)
 	{
 		if (size)
@@ -142,8 +138,9 @@ HMUSIC HGE_CALL HGE_Impl::Music_Load(const char *filename, uint32_t size)
 			data = loaded_from_resource.get();
 		}
 
-		hm = BASS_MusicLoad(TRUE, data, 0, 0, BASS_MUSIC_PRESCAN | BASS_MUSIC_POSRESETEX
-				| BASS_MUSIC_RAMP, 0);
+		HMUSIC hm(
+				BASS_MusicLoad(TRUE, data, 0, 0, BASS_MUSIC_PRESCAN | BASS_MUSIC_POSRESETEX | BASS_MUSIC_RAMP, 0)
+				);
 		if (!hm)
 			_PostError("Can't load music");
 // 		if (!size)
@@ -277,13 +274,12 @@ HSTREAM HGE_CALL HGE_Impl::Stream_Load(const char *filename, uint32_t size)
 	void * data;
 	bytes_t loaded_from_resource;
 	uint32_t _size;
-	HSTREAM hs;
 	CStreamList *stmItem;
 
 	if (m_bassdll)
 	{
 		if (m_no_sound)
-			return 1;
+			return HSTREAM(1);
 
 		if (size)
 		{
@@ -297,7 +293,7 @@ HSTREAM HGE_CALL HGE_Impl::Stream_Load(const char *filename, uint32_t size)
 				return HSTREAM();
 			data = loaded_from_resource.get();
 		}
-		hs = BASS_StreamCreateFile(TRUE, data, 0, _size, 0);
+		HSTREAM hs(BASS_StreamCreateFile(TRUE, data, 0, _size, 0));
 		if (!hs)
 		{
 			_PostError("Can't load stream");

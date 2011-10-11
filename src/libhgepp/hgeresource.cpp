@@ -62,11 +62,11 @@ void hgeResourceManager::_remove_all()
 	m_animations.clear();
 	m_fonts.clear();
 	m_psystems.clear();
-	m_distorts.clear();
+	m_distort_meshes.clear();
 	m_string_tables.clear();
-	m_effects.clear();
-	m_musics.clear();
-	m_streams.clear();
+	m_bass_effects.clear();
+	m_bass_musics.clear();
+	m_bass_streams.clear();
 	m_res_scripts.clear();
 	m_bytes.clear();
 
@@ -110,11 +110,11 @@ bool hgeResourceManager::Precache(int groupid)
 	PRECACHE_FOREACH(m_animations, animation_resource_t);
 	PRECACHE_FOREACH(m_fonts, font_resource_t);
 	PRECACHE_FOREACH(m_psystems, psystem_resource_t);
-	PRECACHE_FOREACH(m_distorts, distort_resource_t);
+	PRECACHE_FOREACH(m_distort_meshes, distort_resource_t);
 	PRECACHE_FOREACH(m_string_tables, string_table_resource_t);
-	PRECACHE_FOREACH(m_effects, bass_effect_resource_t);
-	PRECACHE_FOREACH(m_musics, bass_music_resource_t);
-	PRECACHE_FOREACH(m_streams, bass_stream_resource_t);
+	PRECACHE_FOREACH(m_bass_effects, bass_effect_resource_t);
+	PRECACHE_FOREACH(m_bass_musics, bass_music_resource_t);
+	PRECACHE_FOREACH(m_bass_streams, bass_stream_resource_t);
 	PRECACHE_FOREACH(m_res_scripts, script_resource_t);
 	PRECACHE_FOREACH(m_bytes, bytes_resource_t);
 
@@ -149,11 +149,11 @@ void hgeResourceManager::Purge(int groupid)
 	PURGE_FOREACH(m_animations, animation_resource_t);
 	PURGE_FOREACH(m_fonts, font_resource_t);
 	PURGE_FOREACH(m_psystems, psystem_resource_t);
-	PURGE_FOREACH(m_distorts, distort_resource_t);
+	PURGE_FOREACH(m_distort_meshes, distort_resource_t);
 	PURGE_FOREACH(m_string_tables, string_table_resource_t);
-	PURGE_FOREACH(m_effects, bass_effect_resource_t);
-	PURGE_FOREACH(m_musics, bass_music_resource_t);
-	PURGE_FOREACH(m_streams, bass_stream_resource_t);
+	PURGE_FOREACH(m_bass_effects, bass_effect_resource_t);
+	PURGE_FOREACH(m_bass_musics, bass_music_resource_t);
+	PURGE_FOREACH(m_bass_streams, bass_stream_resource_t);
 	PURGE_FOREACH(m_res_scripts, script_resource_t);
 	PURGE_FOREACH(m_bytes, bytes_resource_t);
 
@@ -252,8 +252,8 @@ HTEXTURE hgeResourceManager::GetTexture(const std::string & name, int resgroup)
 
 HEFFECT hgeResourceManager::GetEffect(const std::string & name, int resgroup)
 {
-	auto itr = m_effects.find( name );
-	if( itr != m_effects.end() ) {
+	auto itr = m_bass_effects.find( name );
+	if( itr != m_bass_effects.end() ) {
 		return itr->second->handle;
 	}
 	else
@@ -265,7 +265,7 @@ HEFFECT hgeResourceManager::GetEffect(const std::string & name, int resgroup)
 			resource->handle = res_handle;
 			resource->resgroup = resgroup;
 			resource->filename = name;
-			m_effects[name] = resource;
+			m_bass_effects[name] = resource;
 			
 			return res_handle;
 		}
@@ -299,8 +299,8 @@ HEFFECT hgeResourceManager::GetEffect(const std::string & name, int resgroup)
 
 HMUSIC hgeResourceManager::GetMusic(const std::string & name, int resgroup)
 {
-	auto itr = m_musics.find( name );
-	if( itr != m_musics.end() ) {
+	auto itr = m_bass_musics.find( name );
+	if( itr != m_bass_musics.end() ) {
 		return itr->second->handle;
 	}
 	else
@@ -312,7 +312,7 @@ HMUSIC hgeResourceManager::GetMusic(const std::string & name, int resgroup)
 			resource->handle = res_handle;
 			resource->resgroup = resgroup;
 			resource->filename = name;
-			m_musics[name] = resource;
+			m_bass_musics[name] = resource;
 			
 			return res_handle;
 		}
@@ -346,8 +346,8 @@ HMUSIC hgeResourceManager::GetMusic(const std::string & name, int resgroup)
 
 HSTREAM hgeResourceManager::GetStream(const std::string & name, int resgroup)
 {
-	auto itr = m_streams.find( name );
-	if( itr != m_streams.end() ) {
+	auto itr = m_bass_streams.find( name );
+	if( itr != m_bass_streams.end() ) {
 		return itr->second->handle;
 	}
 	else
@@ -359,7 +359,7 @@ HSTREAM hgeResourceManager::GetStream(const std::string & name, int resgroup)
 			resource->handle = res_handle;
 			resource->resgroup = resgroup;
 			resource->filename = name;
-			m_streams[name] = resource;
+			m_bass_streams[name] = resource;
 			
 			return res_handle;
 		}

@@ -27,7 +27,7 @@ HGE* HGE_CALL hgeCreate(int ver)
 	if (ver == HGE_VERSION)
 		return (HGE*) HGE_Impl::_Interface_Get();
 	else
-		return 0;
+		return nullptr;
 }
 
 HGE_Impl* HGE_Impl::_Interface_Get()

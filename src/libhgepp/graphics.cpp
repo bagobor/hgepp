@@ -393,7 +393,7 @@ void HGE_CALL HGE_Impl::Target_Free(HTARGET target)
 
 HTEXTURE HGE_CALL HGE_Impl::Target_GetTexture(HTARGET target)
 {
-	return target ? target.get()->pTex : nullptr;
+	return target ? HTEXTURE(target.get()->pTex) : HTEXTURE();
 }
 
 HTEXTURE HGE_CALL HGE_Impl::Texture_Create(int width, int height)
@@ -408,7 +408,7 @@ HTEXTURE HGE_CALL HGE_Impl::Texture_Create(int width, int height)
 					&pTex ) ))
 	{
 		_PostError("Can't create texture");
-		return nullptr;
+		return HTEXTURE(nullptr);
 	}
 
 	return (HTEXTURE) pTex;
@@ -477,7 +477,7 @@ HTEXTURE HGE_CALL HGE_Impl::Texture_Load(const char *filename, uint32_t size, bo
 			_PostError("Can't create texture");
 // 			if (!size)
 // 				Resource_Free(result);
-			return nullptr;
+			return HTEXTURE();
 		}
 	}
 
@@ -1268,10 +1268,10 @@ bool HGE_Impl::_init_lost()
 	m_prim_count = 0;
 	m_cur_prim_type = HGEPRIM_QUADS;
 	m_cur_blend_mode = BLEND_DEFAULT;
-	m_cur_texture = nullptr;
-#if HGE_DIRECTX_VER >= 9
-	m_cur_shader = nullptr;
-#endif
+// 	m_cur_texture = nullptr;
+// #if HGE_DIRECTX_VER >= 9
+// 	m_cur_shader = nullptr;
+// #endif
 
 	m_d3d_device->SetTransform(D3DTS_VIEW, &m_view_matrix);
 	m_d3d_device->SetTransform(D3DTS_PROJECTION, &m_proj_matrix);
@@ -1303,7 +1303,7 @@ HSHADER HGE_CALL HGE_Impl::Shader_Create(const char *filename)
 			err += std::string( (const char*)error_msg->GetBufferPointer(), error_msg->GetBufferSize() );
 		}
 		_PostError(err.c_str());
-		return nullptr;
+		return HSHADER();
 	}
 
 	m_d3d_device->CreatePixelShader((DWORD *)code->GetBufferPointer(), &pixelShader);

@@ -65,10 +65,10 @@ private:
 public:
 	typedef handle_t <handle_type_t, flavour_t> this_class_t;
 
-	handle_t(): m_value(handle_type_t())
+	explicit handle_t(): m_value(handle_type_t())
 	{
 	}
-	handle_t( handle_type_t v ): m_value(v)
+	explicit handle_t( handle_type_t v ): m_value(v)
 	{
 	}
 // 	static handle_t create( handle_type_t x ) {
@@ -128,6 +128,8 @@ DECLARE_HGE_HANDLE( uint32_t, bass_channel, HCHANNEL );
 #if HGE_DIRECTX_VER >= 9
 	DECLARE_HGE_HANDLE( hgeGAPIPixelShader *, shader, HSHADER );
 #endif
+
+#undef DECLARE_HGE_HANDLE
 
 //! smart type representing a byte array, auto-deletes when no longer used
 typedef std::shared_ptr <char> bytes_t;

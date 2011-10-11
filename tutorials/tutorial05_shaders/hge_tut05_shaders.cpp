@@ -32,7 +32,7 @@ HTEXTURE            tex;
 HSHADER             shad1;
 HSHADER             shad2;
 HSHADER             shad3;
-HSHADER             currShader = nullptr;
+HSHADER             currShader;
 
 // Pointers to the HGE objects we will use
 hgeDistortionMesh*  dis;
@@ -73,7 +73,7 @@ bool FrameFunc()
             break;
 
         case HGEK_1:
-            currShader = nullptr;
+            currShader.reset();
             break;
 
         case HGEK_2:
@@ -133,7 +133,7 @@ bool RenderFunc()
     g_hge->Gfx_Clear(0);
     g_hge->Gfx_SetShader(currShader);
     dis->Render(meshx, meshy);
-    g_hge->Gfx_SetShader(nullptr);
+    g_hge->Gfx_SetShader(HSHADER());
     fnt->printf(5, 5, HGETEXT_LEFT, "dt:%.3f\nFPS:%d\n\nPress SPACE,1,2,3,4!", g_hge->Timer_GetDelta(), g_hge->Timer_GetFPS());
     g_hge->Gfx_EndScene();
 

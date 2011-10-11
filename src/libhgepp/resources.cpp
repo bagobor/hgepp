@@ -100,7 +100,7 @@ void ScriptParseFileResource(hgeResourceManager *res_manager, RScriptParser *sp,
 		rc->resgroup = 0;
 		rc->filename.clear();
 	}
-	rc->handle = 0;
+	rc->handle = RTYPE::handle_type_t();
 	//rc->name = name;
 
 	while (ScriptSkipToNextParameter(sp, false))
@@ -575,7 +575,7 @@ void texture_resource_t::Free()
 void bass_effect_resource_t::Parse(hgeResourceManager *rm, RScriptParser *sp, const std::string & name,
 		const std::string & basename)
 {
-	ScriptParseFileResource <bass_effect_resource_t> (rm, sp, name, rm->m_effects, rm->find_bass_effect(basename) );
+	ScriptParseFileResource <bass_effect_resource_t> (rm, sp, name, rm->m_bass_effects, rm->find_bass_effect(basename) );
 }
 
 HEFFECT bass_effect_resource_t::Get(hgeResourceManager *rm)
@@ -644,7 +644,7 @@ void bass_music_resource_t::Parse(hgeResourceManager *rm, RScriptParser *sp, con
 	}
 
 	//AddRes(rm, RES_MUSIC, rc);
-	rm->m_musics[name] = rc;
+	rm->m_bass_musics[name] = rc;
 }
 
 HMUSIC bass_music_resource_t::Get(hgeResourceManager *rm)
@@ -670,7 +670,7 @@ void bass_music_resource_t::Free()
 void bass_stream_resource_t::Parse(hgeResourceManager *rm, RScriptParser *sp, const std::string & name,
 		const std::string & basename)
 {
-	ScriptParseFileResource <bass_stream_resource_t> (rm, sp, name, rm->m_streams, rm->find_bass_stream(basename));
+	ScriptParseFileResource <bass_stream_resource_t> (rm, sp, name, rm->m_bass_streams, rm->find_bass_stream(basename));
 }
 
 HSTREAM bass_stream_resource_t::Get(hgeResourceManager *rm)
@@ -1187,7 +1187,7 @@ void distort_resource_t::Parse(hgeResourceManager *rm, RScriptParser *sp, const 
 	}
 
 	//AddRes(rm, RES_DISTORT, rc);
-	rm->m_distorts[name] = rc;
+	rm->m_distort_meshes[name] = rc;
 }
 
 hgeDistortionMesh * distort_resource_t::Get(hgeResourceManager *rm)

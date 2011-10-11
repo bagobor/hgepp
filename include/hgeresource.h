@@ -31,6 +31,8 @@ template <class res_type_t>
 class BaseResource
 {
 public:
+	typedef res_type_t handle_type_t;
+
 	//std::string	name; - is stored in map keys
 	int			resgroup;
 	res_type_t	handle;
@@ -346,24 +348,24 @@ public:
 		return ( itr == m_psystems.end() ) ? nullptr : itr->second;
 	}
 	distort_resource_t::ptr_t find_distortion_mesh( const std::string & name ) {
-		auto itr = m_distorts.find( name );
-		return ( itr == m_distorts.end() ) ? nullptr : itr->second;
+		auto itr = m_distort_meshes.find( name );
+		return ( itr == m_distort_meshes.end() ) ? nullptr : itr->second;
 	}
 	string_table_resource_t::ptr_t find_string_table( const std::string & name ) {
 		auto itr = m_string_tables.find( name );
 		return ( itr == m_string_tables.end() ) ? nullptr : itr->second;
 	}
 	bass_effect_resource_t::ptr_t find_bass_effect( const std::string & name ) {
-		auto itr = m_effects.find( name );
-		return ( itr == m_effects.end() ) ? nullptr : itr->second;
+		auto itr = m_bass_effects.find( name );
+		return ( itr == m_bass_effects.end() ) ? nullptr : itr->second;
 	}
 	bass_music_resource_t::ptr_t find_bass_music( const std::string & name ) {
-		auto itr = m_musics.find( name );
-		return ( itr == m_musics.end() ) ? nullptr : itr->second;
+		auto itr = m_bass_musics.find( name );
+		return ( itr == m_bass_musics.end() ) ? nullptr : itr->second;
 	}
 	bass_stream_resource_t::ptr_t find_bass_stream( const std::string & name ) {
-		auto itr = m_streams.find( name );
-		return ( itr == m_streams.end() ) ? nullptr : itr->second;
+		auto itr = m_bass_streams.find( name );
+		return ( itr == m_bass_streams.end() ) ? nullptr : itr->second;
 	}
 	script_resource_t::ptr_t find_script( const std::string & name ) {
 		auto itr = m_res_scripts.find( name );
@@ -380,11 +382,11 @@ public:
 	animation_resource_t::map_t		m_animations;
 	font_resource_t::map_t			m_fonts;
 	psystem_resource_t::map_t		m_psystems;
-	distort_resource_t::map_t		m_distorts;
+	distort_resource_t::map_t		m_distort_meshes;
 	string_table_resource_t::map_t	m_string_tables;
-	bass_effect_resource_t::map_t	m_effects;
-	bass_music_resource_t::map_t	m_musics;
-	bass_stream_resource_t::map_t	m_streams;
+	bass_effect_resource_t::map_t	m_bass_effects;
+	bass_music_resource_t::map_t	m_bass_musics;
+	bass_stream_resource_t::map_t	m_bass_streams;
 	script_resource_t::map_t		m_res_scripts;
 	bytes_resource_t::map_t			m_bytes;
 
