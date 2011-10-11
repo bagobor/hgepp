@@ -3,7 +3,8 @@
  * hgeGUI default controls implementation
  */
 
-#include <hgeguictrls.h>
+#include <hgepp/hgeguictrls.h>
+
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>

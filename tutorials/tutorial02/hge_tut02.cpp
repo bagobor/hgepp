@@ -13,7 +13,7 @@
 // to the same folder.
 
 
-#include <hge.h>
+#include <hgepp.h>
 
 using namespace hge;
 

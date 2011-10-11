@@ -6,7 +6,25 @@ add_definitions( "-DHGEDLL_EXPORT" )
 
 #------ sources ------
 set( LIBHGE_SRC
-    demo.cpp
+    ${HGEPP_SOURCE_DIR}/include/hgepp.h
+    ${HGEPP_SOURCE_DIR}/include/hgepp/hge_pimpl.h
+    ${HGEPP_SOURCE_DIR}/include/hgepp/config.h
+    ${HGEPP_SOURCE_DIR}/include/hgepp/gapi.h
+    ${HGEPP_SOURCE_DIR}/include/hgepp/color.h
+    ${HGEPP_SOURCE_DIR}/include/hgepp/distort.h
+    ${HGEPP_SOURCE_DIR}/include/hgepp/font.h
+    ${HGEPP_SOURCE_DIR}/include/hgepp/hgegui.h
+    ${HGEPP_SOURCE_DIR}/include/hgepp/hgeguictrls.h
+    ${HGEPP_SOURCE_DIR}/include/hgepp/particle.h
+    ${HGEPP_SOURCE_DIR}/include/hgepp/rect.h
+    ${HGEPP_SOURCE_DIR}/include/hgepp/res_manager.h
+    ${HGEPP_SOURCE_DIR}/include/hgepp/sprite.h
+    ${HGEPP_SOURCE_DIR}/include/hgepp/stringtable.h
+    ${HGEPP_SOURCE_DIR}/include/hgepp/vector.h
+    ${HGEPP_SOURCE_DIR}/include/hgepp/types.h
+    ${HGEPP_SOURCE_DIR}/include/hgepp/res_script.h
+    ${HGEPP_SOURCE_DIR}/include/hgepp/hge_impl.h
+    hgelogo.cpp
     graphics.cpp
     ini.cpp
     input.cpp
@@ -16,39 +34,31 @@ set( LIBHGE_SRC
     sound.cpp
     system.cpp
     timer.cpp
-    hge_impl.h
     BASS/bass.h
-    ${HGEPP_SOURCE_DIR}/include/hge.h
-    ${HGEPP_SOURCE_DIR}/include/hgeanim.h
-    ${HGEPP_SOURCE_DIR}/include/hgecolor.h
-    ${HGEPP_SOURCE_DIR}/include/hgedistort.h
-    ${HGEPP_SOURCE_DIR}/include/hgefont.h
-    ${HGEPP_SOURCE_DIR}/include/hgegui.h
-    ${HGEPP_SOURCE_DIR}/include/hgeguictrls.h
-    ${HGEPP_SOURCE_DIR}/include/hgeparticle.h
-    ${HGEPP_SOURCE_DIR}/include/hgerect.h
-    ${HGEPP_SOURCE_DIR}/include/hgeresource.h
-    ${HGEPP_SOURCE_DIR}/include/hgesprite.h
-    ${HGEPP_SOURCE_DIR}/include/hgestrings.h
-    ${HGEPP_SOURCE_DIR}/include/hgevector.h
-    hgeanim.cpp
-    hgecolor.cpp
-    hgedistort.cpp
-    hgefont.cpp
+    animation.cpp
+    color.cpp
+    distort.cpp
+    font.cpp
     hgegui.cpp
     hgeguictrls.cpp
-    hgeparticle.cpp
-    hgepmanager.cpp
-    hgerect.cpp
-    hgeresource.cpp
-    hgesprite.cpp
-    hgestrings.cpp
-    hgevector.cpp
-    parser.cpp
-    resources.cpp
-    parser.h
-    resources.h
+    particle.cpp
+    particlemanager.cpp
+    rect.cpp
+    res_manager.cpp
+    sprite.cpp
+    stringtable.cpp
+    vector.cpp
+    res_script.cpp
+    res_parser.cpp
+
+    sfmt/SFMT.c sfmt/SFMT.h
+    sfmt/SFMT-alti.h sfmt/SFMT-params.h sfmt/SFMT-params11213.h
+    sfmt/SFMT-params1279.h sfmt/SFMT-params132049.h sfmt/SFMT-params19937.h
+    sfmt/SFMT-params216091.h sfmt/SFMT-params2281.h sfmt/SFMT-params4253.h
+    sfmt/SFMT-params44497.h sfmt/SFMT-params607.h sfmt/SFMT-params86243.h sfmt/SFMT-sse2.h
     )
+
+source_group( MersenneTwister REGULAR_EXPRESSION "sfmt/*" )
 
 #------ additional includes ------
 include_directories( ${HGEPP_SOURCE_DIR}/include )

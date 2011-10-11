@@ -3,7 +3,7 @@
  * hgeGUI helper class implementation
  */
 
-#include <hgegui.h>
+#include <hgepp/hgegui.h>
 
 namespace hge
 {

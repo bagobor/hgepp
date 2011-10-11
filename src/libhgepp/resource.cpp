@@ -2,7 +2,7 @@
  * Based on Haaf's Game Engine 1.8.1 (C) 2003-2007, Relish Games http://hge.relishgames.com
  * Core functions implementation: resources management
  */
-#include "hge_impl.h"
+#include <hgepp/hge_impl.h>
 
 #define NOCRYPT
 //#define NOUNCRYPT

@@ -14,11 +14,11 @@
 // to the same folder.
 
 
-#include <hge.h>
-#include <hgefont.h>
-#include <hgedistort.h>
+#include <hgepp.h>
+#include <hgepp/font.h>
+#include <hgepp/distort.h>
 
-#include <math.h>
+#include <cmath>
 
 using namespace hge;
 

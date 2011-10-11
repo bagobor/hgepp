@@ -3,9 +3,9 @@
  * Core functions implementation: graphics
  */
 
-#include "hge_impl.h"
+#include <hgepp/hge_impl.h>
 // GAPI dependent includes and defines (DX8/DX9 switch) by kvakvs@yandex.ru
-#include "hge_gapi.h"
+#include <hgepp/gapi.h>
 
 namespace hge
 {

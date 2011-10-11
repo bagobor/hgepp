@@ -13,13 +13,13 @@
 // and bass.dll to the same folder.
 
 
-#include <hge.h>
-#include <hgefont.h>
-#include <hgegui.h>
+#include <hgepp.h>
+// #include <font.h>
+// #include <hgegui.h>
 
 #include "menuitem.h"
 
-#include <math.h>
+#include <cmath>
 
 using namespace hge;
 
@@ -71,8 +71,8 @@ bool FrameFunc()
 
 	// Here we update our background animation
 	t+=dt;
-	tx=50*cosf(t/60);
-	ty=50*sinf(t/60);
+	tx=50*std::cosf(t/60);
+	ty=50*std::sinf(t/60);
 
 	quad.v[0].tx=tx;        quad.v[0].ty=ty;
 	quad.v[1].tx=tx+800/64; quad.v[1].ty=ty;

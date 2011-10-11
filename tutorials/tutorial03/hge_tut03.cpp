@@ -14,10 +14,10 @@
 // to the same folder.
 
 
-#include <hge.h>
-#include <hgesprite.h>
-#include <hgefont.h>
-#include <hgeparticle.h>
+#include <hgepp.h>
+#include <hgepp/sprite.h>
+#include <hgepp/font.h>
+#include <hgepp/particle.h>
 
 using namespace hge;
 

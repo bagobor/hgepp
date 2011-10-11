@@ -13,8 +13,8 @@
 // to the same folder.
 
 
-#include <hge.h>
-#include <hgefont.h>
+#include <hgepp.h>
+#include <hgepp/font.h>
 
 using namespace hge;
 

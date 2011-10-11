@@ -8,12 +8,12 @@
 #pragma once
 
 
-#include <hge.h>
-#include <hgeanim.h>
-#include <hgefont.h>
-#include <hgeparticle.h>
-#include <hgegui.h>
-#include <hgeguictrls.h>
+#include <hgepp.h>
+#include <hgepp/sprite.h>
+#include <hgepp/font.h>
+#include <hgepp/particle.h>
+#include <hgepp/hgegui.h>
+#include <hgepp/hgeguictrls.h>
 
 using namespace hge;
 

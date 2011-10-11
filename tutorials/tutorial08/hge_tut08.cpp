@@ -17,13 +17,13 @@
 // moon shape, hide stars behind the moon
 
 
-#include <math.h>
+#include <cmath>
 
-#include <hge.h>
-#include <hgecolor.h>
-#include <hgesprite.h>
-#include <hgedistort.h>
-#include <hgefont.h>
+#include <hgepp.h>
+#include <hgepp/color.h>
+#include <hgepp/sprite.h>
+#include <hgepp/distort.h>
+#include <hgepp/font.h>
 
 using namespace hge;
 

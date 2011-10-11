@@ -16,11 +16,11 @@
 // to the same folder.
 
 
-#include <hge.h>
-#include <hgefont.h>
-#include <hgedistort.h>
+#include <hgepp.h>
+#include <hgepp/font.h>
+#include <hgepp/distort.h>
 
-#include <math.h>
+#include <cmath>
 
 using namespace hge;
 
@@ -95,15 +95,15 @@ bool FrameFunc()
         case 0: for(i=1;i<nRows-1;i++)
                     for(j=1;j<nCols-1;j++)
                     {
-                        dis->SetDisplacement(j,i,cosf(t*10+(i+j)/2)*5,sinf(t*10+(i+j)/2)*5,HGEDISP_NODE);
+                        dis->SetDisplacement(j,i,std::cosf(t*10+(i+j)/2)*5,std::sinf(t*10+(i+j)/2)*5,HGEDISP_NODE);
                     }
                 break;
 
         case 1: for(i=0;i<nRows;i++)
                     for(j=1;j<nCols-1;j++)
                     {
-                        dis->SetDisplacement(j,i,cosf(t*5+j/2)*15,0,HGEDISP_NODE);
-                        col=int((cosf(t*5+(i+j)/2)+1)*35);
+                        dis->SetDisplacement(j,i,std::cosf(t*5+j/2)*15,0,HGEDISP_NODE);
+                        col=int((std::cosf(t*5+(i+j)/2)+1)*35);
                         dis->SetColor(j,i,0xFF<<24 | col<<16 | col<<8 | col);
                     }
                 break;
@@ -111,10 +111,10 @@ bool FrameFunc()
         case 2: for(i=0;i<nRows;i++)
                     for(j=0;j<nCols;j++)
                     {
-                        r=sqrtf(powf(j-(float)nCols/2,2)+powf(i-(float)nRows/2,2));
-                        a=r*cosf(t*2)*0.1f;
-                        dx=sinf(a)*(i*cellh-256)+cosf(a)*(j*cellw-256);
-                        dy=cosf(a)*(i*cellh-256)-sinf(a)*(j*cellw-256);
+                        r=std::sqrtf(std::powf(j-(float)nCols/2,2)+std::powf(i-(float)nRows/2,2));
+                        a=r*std::cosf(t*2)*0.1f;
+                        dx=std::sinf(a)*(i*cellh-256)+std::cosf(a)*(j*cellw-256);
+                        dy=std::cosf(a)*(i*cellh-256)-std::sinf(a)*(j*cellw-256);
                         dis->SetDisplacement(j,i,dx,dy,HGEDISP_CENTER);
                         col=int((cos(r+t*4)+1)*40);
                         dis->SetColor(j,i,0xFF<<24 | col<<16 | (col/2)<<8);

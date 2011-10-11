@@ -7,7 +7,7 @@
 */
 
 
-#include <hge.h>
+#include <hgepp.h>
 
 using namespace hge;
 
